@@ -2,8 +2,25 @@ package me.jishuna.jishlib;
 
 import org.bukkit.Color;
 
+import net.kyori.adventure.text.Component;
+import net.md_5.bungee.api.ChatColor;
+
 public class StringUtils {
 	private StringUtils() {
+	}
+
+	public static String parseToLegacy(String input) {
+		return parseToLegacy(input, true);
+	}
+
+	public static String parseToLegacy(String input, boolean legacyCodes) {
+		Component component = Constants.MINI_MESSAGE.deserialize(input);
+		String output = Constants.SERIALIZER.serialize(component);
+
+		if (legacyCodes) {
+			output = ChatColor.translateAlternateColorCodes('&', output);
+		}
+		return output;
 	}
 
 	public static Color parseColor(String input, Color def) {
