@@ -1,6 +1,6 @@
 rootProject.name = 'jishlib'
 gradle.rootProject {
-    it.version = '1.0.4-SNAPSHOT'
+    it.version = '1.0.6-SNAPSHOT'
     it.group = 'me.jishuna'
 }
 
