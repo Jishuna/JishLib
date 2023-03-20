@@ -6,6 +6,11 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+/**
+ * Big thanks to 7smile7, <a href=
+ * "https://www.spigotmc.org/threads/guide-on-workload-distribution-or-how-to-handle-heavy-splittable-tasks.409003/">See
+ * his thread here</a>
+ */
 public class TypedDistributionTask<T> implements Runnable {
 
 	protected final Consumer<T> action;
