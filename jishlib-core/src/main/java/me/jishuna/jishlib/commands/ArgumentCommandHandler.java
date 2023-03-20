@@ -50,7 +50,7 @@ public class ArgumentCommandHandler extends SimpleCommandHandler {
 				return true;
 			}
 
-			return executor.onCommand(sender, command, alias, Arrays.copyOfRange(args, 1, args.length + 1));
+			return executor.onCommand(sender, command, alias, Arrays.copyOfRange(args, 1, args.length));
 		}
 		return true;
 	}
@@ -71,7 +71,7 @@ public class ArgumentCommandHandler extends SimpleCommandHandler {
 		} else if (args.length > 1) {
 			SimpleCommandHandler executor = this.subcommands.get(args[0]);
 			if (executor != null)
-				return executor.onTabComplete(sender, command, alias, Arrays.copyOfRange(args, 1, args.length + 1));
+				return executor.onTabComplete(sender, command, alias, Arrays.copyOfRange(args, 1, args.length));
 		}
 		return Collections.emptyList();
 	}
