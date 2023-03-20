@@ -1,5 +1,6 @@
 package me.jishuna.jishlib;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,7 +15,7 @@ public class Localization {
 	}
 
 	public String localize(String key, Object... format) {
-		return String.format(localize(key), format);
+		return MessageFormat.format(localize(key), format);
 	}
 
 	public void parse(YamlConfiguration config) {

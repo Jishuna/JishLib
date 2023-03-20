@@ -1,5 +1,6 @@
 package me.jishuna.jishlib.commands;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -58,7 +59,6 @@ public class ArgumentCommandHandler extends SimpleCommandHandler {
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
 		if (args.length == 1) {
-			List<String> suggestions = new ArrayList<>();
 			List<String> validSubcommands = new ArrayList<>();
 
 			for (Entry<String, SimpleCommandHandler> entry : this.subcommands.entrySet()) {
@@ -66,8 +66,7 @@ public class ArgumentCommandHandler extends SimpleCommandHandler {
 					validSubcommands.add(entry.getKey());
 			}
 
-			StringUtil.copyPartialMatches(args[0], validSubcommands, suggestions);
-			return suggestions;
+			return StringUtil.copyPartialMatches(args[0], validSubcommands, new ArrayList<>());
 		} else if (args.length > 1) {
 			SimpleCommandHandler executor = this.subcommands.get(args[0]);
 			if (executor != null)
@@ -77,11 +76,7 @@ public class ArgumentCommandHandler extends SimpleCommandHandler {
 	}
 
 	public void sendUsage(CommandSender sender, String arg, Collection<String> allowedargs) {
-		String msg = usageMessage.get();
-		msg = msg.replace("%arg%", arg);
-		msg = msg.replace("%args%", String.join(", ", allowedargs));
-
-		sender.sendMessage(msg);
+		sender.sendMessage(MessageFormat.format(usageMessage.get(), arg, String.join(", ", allowedargs)));
 	}
 
 	protected void addArgumentExecutor(String arg, SimpleCommandHandler exeuctor) {
