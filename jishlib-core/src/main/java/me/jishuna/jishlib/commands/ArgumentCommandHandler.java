@@ -2,6 +2,7 @@ package me.jishuna.jishlib.commands;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -16,8 +17,8 @@ import org.bukkit.util.StringUtil;
 
 public class ArgumentCommandHandler extends SimpleCommandHandler {
 	private final Map<String, SimpleCommandHandler> subcommands = new HashMap<>();
-	Supplier<String> permMessage;
-	Supplier<String> usageMessage;
+	private final Supplier<String> permMessage;
+	private final Supplier<String> usageMessage;
 
 	private CommandExecutor defaultExecutor;
 
@@ -38,14 +39,14 @@ public class ArgumentCommandHandler extends SimpleCommandHandler {
 			if (this.defaultExecutor != null) {
 				return this.defaultExecutor.onCommand(sender, command, alias, args);
 			} else {
-				sendUsage(sender, "none");
+				sendUsage(sender, "none", this.subcommands.keySet());
 				return true;
 			}
 		} else if (args.length > 0) {
 			SimpleCommandHandler executor = this.subcommands.get(args[0]);
 
 			if (executor == null) {
-				sendUsage(sender, args[0]);
+				sendUsage(sender, args[0], this.subcommands.keySet());
 				return true;
 			}
 
@@ -75,19 +76,27 @@ public class ArgumentCommandHandler extends SimpleCommandHandler {
 		return Collections.emptyList();
 	}
 
-	private void sendUsage(CommandSender sender, String arg) {
+	public void sendUsage(CommandSender sender, String arg, Collection<String> allowedargs) {
 		String msg = usageMessage.get();
 		msg = msg.replace("%arg%", arg);
-		msg = msg.replace("%args%", String.join(", ", this.subcommands.keySet()));
+		msg = msg.replace("%args%", String.join(", ", allowedargs));
 
 		sender.sendMessage(msg);
 	}
 
-	public void addArgumentExecutor(String arg, SimpleCommandHandler exeuctor) {
+	protected void addArgumentExecutor(String arg, SimpleCommandHandler exeuctor) {
 		this.subcommands.put(arg, exeuctor);
 	}
 
-	public void setDefault(SimpleCommandHandler exeuctor) {
+	protected void setDefault(SimpleCommandHandler exeuctor) {
 		this.defaultExecutor = exeuctor;
+	}
+
+	public Supplier<String> getPermMessage() {
+		return permMessage;
+	}
+
+	public Supplier<String> getUsageMessage() {
+		return usageMessage;
 	}
 }
