@@ -14,13 +14,17 @@ public class StringUtils {
 	}
 
 	public static String parseToLegacy(String input, boolean legacyCodes) {
-		Component component = Constants.MINI_MESSAGE.deserialize(input);
+		Component component = parseComponent(input);
 		String output = Constants.SERIALIZER.serialize(component);
 
 		if (legacyCodes) {
 			output = ChatColor.translateAlternateColorCodes('&', output);
 		}
 		return output;
+	}
+	
+	public static Component parseComponent(String input) {
+		return Constants.MINI_MESSAGE.deserialize(input);
 	}
 
 	public static Color parseColor(String input, Color def) {
