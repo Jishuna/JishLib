@@ -19,7 +19,7 @@ public class PrimitiveAdapter<T> implements TypeAdapter<T> {
     }
 
     @Override
-    public void write(ConfigurationSection config, String path, T value) {
+    public void write(ConfigurationSection config, String path, Object value) {
         config.set(path, value);
     }
 }

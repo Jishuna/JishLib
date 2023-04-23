@@ -9,7 +9,7 @@ public class MaterialTypeAdapter implements TypeAdapter<Material> {
         return Material.matchMaterial(config.getString(path));
     }
 
-    public void write(ConfigurationSection config, String path, Material value) {
-        config.set(path, value.name());
+    public void write(ConfigurationSection config, String path, Object value) {
+        config.set(path, ((Material) value).name());
     }
 }
