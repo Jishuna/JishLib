@@ -16,6 +16,6 @@ public class StringTypeAdapter implements TypeAdapter<String> {
     }
     
     public void write(ConfigurationSection config, String path, Object value) {
-        config.set(path, value);
+        config.set(path, StringUtils.toMiniMessage(value.toString()));
     }
 }

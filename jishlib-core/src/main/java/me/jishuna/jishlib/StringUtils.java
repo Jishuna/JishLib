@@ -6,54 +6,58 @@ import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
 
 public class StringUtils {
-	private StringUtils() {
-	}
+    private StringUtils() {
+    }
 
-	public static String parseToLegacy(String input) {
-		return parseToLegacy(input, true);
-	}
+    public static String parseToLegacy(String input) {
+        return parseToLegacy(input, true);
+    }
 
-	public static String parseToLegacy(String input, boolean legacyCodes) {
-		Component component = parseComponent(input);
-		String output = Constants.SERIALIZER.serialize(component);
+    public static String parseToLegacy(String input, boolean legacyCodes) {
+        Component component = parseComponent(input);
+        String output = Constants.SERIALIZER.serialize(component);
 
-		if (legacyCodes) {
-			output = ChatColor.translateAlternateColorCodes('&', output);
-		}
-		return output;
-	}
-	
-	public static Component parseComponent(String input) {
-		return Constants.MINI_MESSAGE.deserialize(input);
-	}
+        if (legacyCodes) {
+            output = ChatColor.translateAlternateColorCodes('&', output);
+        }
+        return output;
+    }
 
-	public static Color parseColor(String input, Color def) {
-		if (input == null) {
-			return def;
-		}
+    public static Component parseComponent(String input) {
+        return Constants.MINI_MESSAGE.deserialize(input);
+    }
 
-		String[] parts = input.split(",");
-		int red;
-		int green;
-		int blue;
+    public static String toMiniMessage(String input) {
+        return Constants.MINI_MESSAGE.serialize(Constants.SERIALIZER.deserialize(input));
+    }
 
-		if (parts.length < 3) {
-			return def;
-		}
+    public static Color parseColor(String input, Color def) {
+        if (input == null) {
+            return def;
+        }
 
-		try {
-			red = Integer.parseInt(parts[0]);
-			green = Integer.parseInt(parts[1]);
-			blue = Integer.parseInt(parts[2]);
-		} catch (NumberFormatException ex) {
-			return def;
-		}
+        String[] parts = input.split(",");
+        int red;
+        int green;
+        int blue;
 
-		if (!Utils.isWithinBounds(red, 0, 255) || !Utils.isWithinBounds(green, 0, 255)
-				|| !Utils.isWithinBounds(blue, 0, 255)) {
-			return def;
-		}
+        if (parts.length < 3) {
+            return def;
+        }
 
-		return Color.fromRGB(red, green, blue);
-	}
+        try {
+            red = Integer.parseInt(parts[0]);
+            green = Integer.parseInt(parts[1]);
+            blue = Integer.parseInt(parts[2]);
+        } catch (NumberFormatException ex) {
+            return def;
+        }
+
+        if (!Utils.isWithinBounds(red, 0, 255) || !Utils.isWithinBounds(green, 0, 255)
+                || !Utils.isWithinBounds(blue, 0, 255)) {
+            return def;
+        }
+
+        return Color.fromRGB(red, green, blue);
+    }
 }
