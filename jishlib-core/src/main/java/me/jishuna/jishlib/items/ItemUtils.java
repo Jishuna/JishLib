@@ -24,7 +24,7 @@ public class ItemUtils {
 		return amount;
 	}
 
-	public static <T> T getPersistantData(ItemStack item, NamespacedKey key, PersistentDataType<T, T> type) {
+	public static <T, V> V getPersistantData(ItemStack item, NamespacedKey key, PersistentDataType<T, V> type) {
 		if (item == null || !item.hasItemMeta()) {
 			return null;
 		}
