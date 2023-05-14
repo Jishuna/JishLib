@@ -1,15 +1,16 @@
 package me.jishuna.jishlib.config.adapter;
 
 import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
 
-public class MaterialTypeAdapter implements TypeAdapter<Material> {
+public class MaterialTypeAdapter implements StringAdapter<Material> {
 
-    public Material read(ConfigurationSection config, String path) {
-        return Material.matchMaterial(config.getString(path));
+    @Override
+    public String toString(Material value) {
+        return value.name();
     }
 
-    public void write(ConfigurationSection config, String path, Object value) {
-        config.set(path, ((Material) value).name());
+    @Override
+    public Material fromString(String value) {
+        return Material.matchMaterial(value);
     }
 }

@@ -1,27 +1,46 @@
 package me.jishuna.jishlib.config.adapter;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import me.jishuna.jishlib.StringUtils;
+import me.jishuna.jishlib.config.ConfigType;
+import me.jishuna.jishlib.config.ConfigurationManager;
 
-public class CollectionTypeAdapter<T extends Collection<String>> implements TypeAdapter<T> {
+public class CollectionTypeAdapter<V, T extends Collection<V>> implements TypeAdapter<T> {
+    private static Map<Class<?>, Supplier<? extends Collection<?>>> defaults;
 
-    private final Supplier<T> supplier;
-
-    public CollectionTypeAdapter(Supplier<T> supplier) {
-        this.supplier = supplier;
+    static {
+        defaults = new HashMap<>();
+        defaults.put(List.class, ArrayList::new);
+        defaults.put(Set.class, LinkedHashSet::new);
+        defaults.put(Queue.class, ArrayDeque::new);
     }
 
+    private final StringAdapter<V> adapter;
+    private final ConfigType<T> type;
+
+    @SuppressWarnings("unchecked")
+    public CollectionTypeAdapter(ConfigurationManager manager, ConfigType<?> type) {
+        this.adapter = (StringAdapter<V>) manager.getStringAdapter(type.getComponentTypes().get(0));
+        this.type = (ConfigType<T>) type;
+    }
+
+    @SuppressWarnings("unchecked")
     public T read(ConfigurationSection config, String path) {
-        T collection = this.supplier.get();
+        T collection = (T) defaults.get(this.type.getType()).get();
         List<String> list = config.getStringList(path);
 
-        list.forEach(value -> collection.add(StringUtils.parseToLegacy(value)));
+        list.forEach(value -> collection.add(this.adapter.fromString(value)));
 
         return collection;
     }
@@ -29,7 +48,7 @@ public class CollectionTypeAdapter<T extends Collection<String>> implements Type
     @SuppressWarnings("unchecked")
     public void write(ConfigurationSection config, String path, Object value) {
         List<String> list = new ArrayList<>();
-        ((T) value).forEach(list::add);
+        ((T) value).forEach(entry -> list.add(this.adapter.toString(entry)));
         config.set(path, list);
     }
 }

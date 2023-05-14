@@ -1,21 +1,14 @@
 package me.jishuna.jishlib.config.adapter;
 
-import org.bukkit.configuration.ConfigurationSection;
+public class StringTypeAdapter implements StringAdapter<String> {
 
-import me.jishuna.jishlib.StringUtils;
-
-public class StringTypeAdapter implements TypeAdapter<String> {
-    
-    public String read(ConfigurationSection config, String path) {
-        String value = config.getString(path);
-        if (value != null) {
-            value = StringUtils.parseToLegacy(value);
-        }
-
+    @Override
+    public String toString(String value) {
         return value;
     }
-    
-    public void write(ConfigurationSection config, String path, Object value) {
-        config.set(path, StringUtils.toMiniMessage(value.toString()));
+
+    @Override
+    public String fromString(String value) {
+        return value;
     }
 }

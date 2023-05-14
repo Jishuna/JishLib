@@ -4,7 +4,7 @@ import java.util.function.Function;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-public class PrimitiveAdapter<T> implements TypeAdapter<T> {
+public class PrimitiveAdapter<T> implements StringAdapter<T> {
 
     private final Function<String, T> reader;
 
@@ -13,13 +13,17 @@ public class PrimitiveAdapter<T> implements TypeAdapter<T> {
     }
 
     @Override
-    public T read(ConfigurationSection config, String path) {
-        String value = config.getString(path);
-        return this.reader.apply(value);
+    public void write(ConfigurationSection config, String path, Object value) {
+        config.set(path, value);
     }
 
     @Override
-    public void write(ConfigurationSection config, String path, Object value) {
-        config.set(path, value);
+    public String toString(T value) {
+        return String.valueOf(value);
+    }
+
+    @Override
+    public T fromString(String value) {
+        return reader.apply(value);
     }
 }

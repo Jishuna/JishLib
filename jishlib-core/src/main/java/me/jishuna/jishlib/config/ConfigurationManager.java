@@ -1,33 +1,30 @@
 package me.jishuna.jishlib.config;
 
 import java.io.File;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import org.bukkit.Material;
 import org.bukkit.plugin.Plugin;
 
+import me.jishuna.jishlib.collections.WeightedRandom;
 import me.jishuna.jishlib.config.adapter.CollectionTypeAdapter;
+import me.jishuna.jishlib.config.adapter.EnumAdapter;
 import me.jishuna.jishlib.config.adapter.MaterialTypeAdapter;
 import me.jishuna.jishlib.config.adapter.PrimitiveAdapter;
+import me.jishuna.jishlib.config.adapter.StringAdapter;
 import me.jishuna.jishlib.config.adapter.StringTypeAdapter;
 import me.jishuna.jishlib.config.adapter.TypeAdapter;
+import me.jishuna.jishlib.config.adapter.WeightedRandomAdapter;
 
 public class ConfigurationManager {
 
-    private final Map<Class<?>, TypeAdapter<?>> adapters = new HashMap<>();
-    // private final Plugin plugin;
+    private final Map<ConfigType<?>, TypeAdapter<?>> adapters = new HashMap<>();
     private final Logger logger;
 
     public ConfigurationManager(Plugin plugin) {
-        // this.plugin = plugin;
         this.logger = plugin.getLogger();
 
         registerTypeAdapter(long.class, new PrimitiveAdapter<>(Long::parseLong));
@@ -48,14 +45,10 @@ public class ConfigurationManager {
         registerTypeAdapter(String.class, new StringTypeAdapter());
         registerTypeAdapter(Material.class, new MaterialTypeAdapter());
 
-        registerTypeAdapter(List.class, new CollectionTypeAdapter<>(ArrayList::new));
-        registerTypeAdapter(Set.class, new CollectionTypeAdapter<>(HashSet::new));
-        registerTypeAdapter(Queue.class, new CollectionTypeAdapter<>(ArrayDeque::new));
-
     }
 
     public <T> void registerTypeAdapter(Class<T> clazz, TypeAdapter<T> adapter) {
-        this.adapters.put(clazz, adapter);
+        this.adapters.put(new ConfigType<>(clazz), adapter);
     }
 
     public <T> ReloadableObject<T> createReloadable(File file, T target) {
@@ -66,8 +59,41 @@ public class ConfigurationManager {
         return new ReloadableClass<>(this, file, target);
     }
 
-    public TypeAdapter<?> getAdapter(Class<?> type) {
-        return this.adapters.get(type);
+    public <T> StringAdapter<T> getStringAdapter(ConfigType<T> type) {
+        TypeAdapter<T> adapter = getAdapter(type);
+
+        if (adapter instanceof StringAdapter<T> stringAdapter) {
+            return stringAdapter;
+        }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> TypeAdapter<T> getAdapter(ConfigType<T> type) {
+        TypeAdapter<T> adapter = (TypeAdapter<T>) this.adapters.get(type);
+
+        if (adapter != null) {
+            return adapter;
+        }
+
+        adapter = (TypeAdapter<T>) createAdapter(type);
+        this.adapters.put(type, adapter);
+        return adapter;
+    }
+
+    private TypeAdapter<?> createAdapter(ConfigType<?> type) {
+        if (Enum.class.isAssignableFrom(type.getType())) {
+            return new EnumAdapter<>(type.getType());
+        }
+        if (Collection.class.isAssignableFrom(type.getType())) {
+            return new CollectionTypeAdapter<>(this, type);
+        }
+
+        if (WeightedRandom.class.isAssignableFrom(type.getType())) {
+            System.out.println(type);
+            return new WeightedRandomAdapter<>(this, type);
+        }
+        return null;
     }
 
     public Logger getLogger() {
