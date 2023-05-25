@@ -4,12 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.configuration.file.YamlConfigurationOptions;
 
 import me.jishuna.jishlib.config.adapter.TypeAdapter;
 import me.jishuna.jishlib.config.annotation.ConfigEntry;
@@ -26,6 +26,7 @@ public abstract class ConfigReloadable<T> {
         this.logger = manager.getLogger();
 
         cacheFields(clazz);
+        Collections.reverse(this.fields);
     }
 
     public ConfigReloadable<T> load() {

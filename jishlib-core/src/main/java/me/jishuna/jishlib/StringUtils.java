@@ -3,33 +3,34 @@ package me.jishuna.jishlib;
 import org.bukkit.Color;
 
 import net.kyori.adventure.text.Component;
-import net.md_5.bungee.api.ChatColor;
 
 public class StringUtils {
     private StringUtils() {
     }
 
-    public static String parseToLegacy(String input) {
-        return parseToLegacy(input, true);
-    }
-
-    public static String parseToLegacy(String input, boolean legacyCodes) {
-        Component component = parseComponent(input);
-        String output = Constants.SERIALIZER.serialize(component);
-
-        if (legacyCodes) {
-            output = ChatColor.translateAlternateColorCodes('&', output);
-        }
-        return output;
-    }
-
-    public static Component parseComponent(String input) {
-        return Constants.MINI_MESSAGE.deserialize(input);
-    }
-
-    public static String toMiniMessage(String input) {
-        return Constants.MINI_MESSAGE.serialize(Constants.SERIALIZER.deserialize(input));
-    }
+   public static Component fromMiniMessage(String input) {
+       return Constants.MINI_MESSAGE.deserialize(input);
+   }
+   
+   public static String toMiniMessage(Component component) {
+       return Constants.MINI_MESSAGE.serialize(component);
+   }
+   
+   public static String toLegacy(Component component) {
+       return Constants.SERIALIZER.serialize(component);
+   }
+   
+   public static Component fromLegacy(String input) {
+       return Constants.SERIALIZER.deserialize(input);
+   }
+   
+   public static String miniMessageToLegacy(String input) {
+       return toLegacy(fromMiniMessage(input));
+   }
+   
+   public static String legacyToMiniMessage(String input) {
+       return toMiniMessage(fromLegacy(input));
+   }
 
     public static Color parseColor(String input, Color def) {
         if (input == null) {

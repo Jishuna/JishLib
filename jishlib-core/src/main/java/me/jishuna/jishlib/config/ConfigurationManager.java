@@ -90,7 +90,6 @@ public class ConfigurationManager {
         }
 
         if (WeightedRandom.class.isAssignableFrom(type.getType())) {
-            System.out.println(type);
             return new WeightedRandomAdapter<>(this, type);
         }
         return null;
