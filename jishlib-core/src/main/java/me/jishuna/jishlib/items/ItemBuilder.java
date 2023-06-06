@@ -24,123 +24,131 @@ import org.bukkit.profile.PlayerProfile;
 import org.bukkit.profile.PlayerTextures;
 
 public class ItemBuilder {
-	private static final String TEXTURE_URL = "http://textures.minecraft.net/texture/";
+    private static final String TEXTURE_URL = "http://textures.minecraft.net/texture/";
 
-	private ItemStack item;
-	private ItemMeta meta;
+    private ItemStack item;
+    private ItemMeta meta;
 
-	private ItemBuilder() {
-	}
+    private ItemBuilder() {
+    }
 
-	public static ItemBuilder create(Material material) {
-		return create(material, 1);
-	}
+    public static ItemBuilder create(Material material) {
+        return create(material, 1);
+    }
 
-	public static ItemBuilder create(Material material, int amount) {
-		ItemBuilder builder = new ItemBuilder();
-		builder.item = new ItemStack(material, amount);
-		builder.meta = builder.item.getItemMeta();
+    public static ItemBuilder create(Material material, int amount) {
+        ItemBuilder builder = new ItemBuilder();
+        builder.item = new ItemStack(material, amount);
+        builder.meta = builder.item.getItemMeta();
 
-		return builder;
-	}
+        return builder;
+    }
 
-	public static ItemBuilder modifyItem(ItemStack item) {
-		ItemBuilder builder = new ItemBuilder();
-		builder.item = item;
-		builder.meta = item.getItemMeta();
+    public static ItemBuilder modifyItem(ItemStack item) {
+        ItemBuilder builder = new ItemBuilder();
+        builder.item = item;
+        builder.meta = item.getItemMeta();
 
-		return builder;
-	}
+        return builder;
+    }
 
-	public <T extends ItemMeta> ItemBuilder modify(Class<T> metaType, Consumer<T> action) {
-		if (!metaType.isAssignableFrom(meta.getClass())) {
-			return this;
-		}
+    public <T extends ItemMeta> ItemBuilder modify(Class<T> metaType, Consumer<T> action) {
+        if (!metaType.isAssignableFrom(meta.getClass())) {
+            return this;
+        }
 
-		action.accept(metaType.cast(meta));
-		return this;
-	}
+        action.accept(metaType.cast(meta));
+        return this;
+    }
 
-	public ItemBuilder amount(int amount) {
-		this.item.setAmount(amount);
+    public ItemBuilder amount(int amount) {
+        this.item.setAmount(amount);
 
-		return this;
-	}
+        return this;
+    }
 
-	public ItemBuilder name(String name) {
-		this.meta.setDisplayName(name);
-		return this;
-	}
+    public ItemBuilder name(String name) {
+        return name(name, false);
+    }
 
-	public ItemBuilder lore(List<String> lore) {
-		List<String> itemLore = getLore();
-		itemLore.addAll(lore);
+    public ItemBuilder name(String name, boolean append) {
+        if (append) {
+            this.meta.setDisplayName(this.meta.getDisplayName() + name);
+        } else {
+            this.meta.setDisplayName(name);
+        }
+        return this;
+    }
 
-		meta.setLore(itemLore);
-		return this;
-	}
+    public ItemBuilder lore(List<String> lore) {
+        List<String> itemLore = getLore();
+        itemLore.addAll(lore);
 
-	public ItemBuilder lore(String... lore) {
-		List<String> itemLore = getLore();
-		List<String> loreList = Arrays.stream(lore).toList();
-		itemLore.addAll(loreList);
+        meta.setLore(itemLore);
+        return this;
+    }
 
-		meta.setLore(itemLore);
-		return this;
-	}
+    public ItemBuilder lore(String... lore) {
+        List<String> itemLore = getLore();
+        List<String> loreList = Arrays.stream(lore).toList();
+        itemLore.addAll(loreList);
 
-	public ItemBuilder enchantment(Enchantment enchantment, int level) {
-		this.meta.addEnchant(enchantment, level, true);
-		return this;
-	}
+        meta.setLore(itemLore);
+        return this;
+    }
 
-	public ItemBuilder storedEnchantment(Enchantment enchantment, int level) {
-		return modify(EnchantmentStorageMeta.class, meta -> meta.addStoredEnchant(enchantment, level, true));
-	}
+    public ItemBuilder enchantment(Enchantment enchantment, int level) {
+        this.meta.addEnchant(enchantment, level, true);
+        return this;
+    }
 
-	public ItemBuilder flags(ItemFlag... flags) {
-		this.meta.addItemFlags(flags);
-		return this;
-	}
+    public ItemBuilder storedEnchantment(Enchantment enchantment, int level) {
+        return modify(EnchantmentStorageMeta.class, meta -> meta.addStoredEnchant(enchantment, level, true));
+    }
 
-	public <T, Z> ItemBuilder persistentData(NamespacedKey key, PersistentDataType<T, Z> type, Z value) {
-		this.meta.getPersistentDataContainer().set(key, type, value);
-		return this;
-	}
+    public ItemBuilder flags(ItemFlag... flags) {
+        this.meta.addItemFlags(flags);
+        return this;
+    }
 
-	public ItemBuilder modelData(int index) {
-		this.meta.setCustomModelData(index);
-		return this;
-	}
+    public <T, Z> ItemBuilder persistentData(NamespacedKey key, PersistentDataType<T, Z> type, Z value) {
+        this.meta.getPersistentDataContainer().set(key, type, value);
+        return this;
+    }
 
-	public ItemBuilder modifier(Attribute attribute, AttributeModifier modifier) {
-		this.meta.addAttributeModifier(attribute, modifier);
-		return this;
-	}
+    public ItemBuilder modelData(int index) {
+        this.meta.setCustomModelData(index);
+        return this;
+    }
 
-	public ItemBuilder skullTexture(String texture) {
-		return modify(SkullMeta.class, meta -> {
-			PlayerProfile profile = Bukkit.createPlayerProfile(UUID.nameUUIDFromBytes(texture.getBytes()));
-			PlayerTextures textures = profile.getTextures();
-			try {
-				textures.setSkin(new URL(TEXTURE_URL + texture));
-			} catch (MalformedURLException ignored) {
-				return;
-			}
+    public ItemBuilder modifier(Attribute attribute, AttributeModifier modifier) {
+        this.meta.addAttributeModifier(attribute, modifier);
+        return this;
+    }
 
-			profile.setTextures(textures);
-			((SkullMeta) this.meta).setOwnerProfile(profile);
-		});
-	}
+    public ItemBuilder skullTexture(String texture) {
+        return modify(SkullMeta.class, meta -> {
+            PlayerProfile profile = Bukkit.createPlayerProfile(UUID.nameUUIDFromBytes(texture.getBytes()));
+            PlayerTextures textures = profile.getTextures();
+            try {
+                textures.setSkin(new URL(TEXTURE_URL + texture));
+            } catch (MalformedURLException ignored) {
+                return;
+            }
 
-	public ItemStack build() {
-		ItemStack finalItem = this.item;
-		finalItem.setItemMeta(this.meta);
+            profile.setTextures(textures);
+            ((SkullMeta) this.meta).setOwnerProfile(profile);
+        });
+    }
 
-		return finalItem;
-	}
+    public ItemStack build() {
+        ItemStack finalItem = this.item;
+        finalItem.setItemMeta(this.meta);
 
-	private List<String> getLore() {
-		return meta.hasLore() ? meta.getLore() : new ArrayList<>();
-	}
+        return finalItem;
+    }
+
+    private List<String> getLore() {
+        return meta.hasLore() ? meta.getLore() : new ArrayList<>();
+    }
 }

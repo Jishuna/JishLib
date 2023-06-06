@@ -16,7 +16,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import me.jishuna.jishlib.config.ConfigType;
 import me.jishuna.jishlib.config.ConfigurationManager;
 
-public class CollectionTypeAdapter<V, T extends Collection<V>> implements TypeAdapter<T> {
+public class CollectionAdapter<V, T extends Collection<V>> implements TypeAdapter<T> {
     private static Map<Class<?>, Supplier<? extends Collection<?>>> defaults;
 
     static {
@@ -30,7 +30,7 @@ public class CollectionTypeAdapter<V, T extends Collection<V>> implements TypeAd
     private final ConfigType<T> type;
 
     @SuppressWarnings("unchecked")
-    public CollectionTypeAdapter(ConfigurationManager manager, ConfigType<?> type) {
+    public CollectionAdapter(ConfigurationManager manager, ConfigType<?> type) {
         this.adapter = (StringAdapter<V>) manager.getStringAdapter(type.getComponentTypes().get(0));
         this.type = (ConfigType<T>) type;
     }
@@ -46,7 +46,7 @@ public class CollectionTypeAdapter<V, T extends Collection<V>> implements TypeAd
     }
 
     @SuppressWarnings("unchecked")
-    public void write(ConfigurationSection config, String path, Object value) {
+    public void write(ConfigurationSection config, String path, Object value, boolean replace) {
         List<String> list = new ArrayList<>();
         ((T) value).forEach(entry -> list.add(this.adapter.toString(entry)));
         config.set(path, list);

@@ -102,7 +102,7 @@ public abstract class ConfigReloadable<T> {
         for (ConfigField field : this.fields) {
             String path = field.getPath();
 
-            if (!replace && config.isSet(path)) {
+            if (!replace && !path.isEmpty() && config.isSet(path)) {
                 config.setComments(path, field.getComments());
                 continue;
             }
@@ -120,7 +120,7 @@ public abstract class ConfigReloadable<T> {
                 continue;
             }
 
-            adapter.write(config, path, writeValue);
+            adapter.write(config, path, writeValue, replace);
             config.setComments(path, field.getComments());
         }
 

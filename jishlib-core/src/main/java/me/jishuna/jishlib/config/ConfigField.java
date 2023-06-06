@@ -45,10 +45,6 @@ public class ConfigField {
     private void initalize() {
         this.path = this.field.getAnnotation(ConfigEntry.class).value();
 
-        if (this.path.isBlank()) {
-            this.path = field.getName();
-        }
-
         for (Comment comment : this.field.getAnnotationsByType(Comment.class)) {
             if (this.comments == null) {
                 this.comments = new ArrayList<>();

@@ -13,7 +13,7 @@ public interface StringAdapter<T> extends TypeAdapter<T> {
     }
 
     @SuppressWarnings("unchecked")
-    default void write(ConfigurationSection config, String path, Object value) {
+    default void write(ConfigurationSection config, String path, Object value, boolean replace) {
         if (value == null) {
             return;
         }

@@ -6,29 +6,29 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
 public class ItemUtils {
-	private ItemUtils() {
-	}
+    private ItemUtils() {
+    }
 
-	public static int getTotalAmount(Inventory inventory, ItemStack target) {
-		int amount = 0;
+    public static int getTotalAmount(Inventory inventory, ItemStack target) {
+        int amount = 0;
 
-		for (ItemStack item : inventory) {
-			if (item == null) {
-				continue;
-			}
+        for (ItemStack item : inventory) {
+            if (item == null) {
+                continue;
+            }
 
-			if (item.isSimilar(target)) {
-				amount += item.getAmount();
-			}
-		}
-		return amount;
-	}
+            if (item.isSimilar(target)) {
+                amount += item.getAmount();
+            }
+        }
+        return amount;
+    }
 
-	public static <T, V> V getPersistantData(ItemStack item, NamespacedKey key, PersistentDataType<T, V> type) {
-		if (item == null || !item.hasItemMeta()) {
-			return null;
-		}
+    public static <T, V> V getPersistantData(ItemStack item, NamespacedKey key, PersistentDataType<T, V> type) {
+        if (item == null || !item.hasItemMeta()) {
+            return null;
+        }
 
-		return item.getItemMeta().getPersistentDataContainer().get(key, type);
-	}
+        return item.getItemMeta().getPersistentDataContainer().get(key, type);
+    }
 }

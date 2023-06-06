@@ -13,7 +13,7 @@ public class PrimitiveAdapter<T> implements StringAdapter<T> {
     }
 
     @Override
-    public void write(ConfigurationSection config, String path, Object value) {
+    public void write(ConfigurationSection config, String path, Object value, boolean replace) {
         config.set(path, value);
     }
 

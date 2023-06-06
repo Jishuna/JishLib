@@ -7,12 +7,15 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.Plugin;
 
 import me.jishuna.jishlib.collections.WeightedRandom;
-import me.jishuna.jishlib.config.adapter.CollectionTypeAdapter;
+import me.jishuna.jishlib.config.adapter.CollectionAdapter;
 import me.jishuna.jishlib.config.adapter.EnumAdapter;
-import me.jishuna.jishlib.config.adapter.MaterialTypeAdapter;
+import me.jishuna.jishlib.config.adapter.MapAdapter;
+import me.jishuna.jishlib.config.adapter.MaterialAdapter;
+import me.jishuna.jishlib.config.adapter.NamespacedKeyAdapter;
 import me.jishuna.jishlib.config.adapter.PrimitiveAdapter;
 import me.jishuna.jishlib.config.adapter.StringAdapter;
 import me.jishuna.jishlib.config.adapter.StringTypeAdapter;
@@ -43,7 +46,8 @@ public class ConfigurationManager {
         registerTypeAdapter(Boolean.class, new PrimitiveAdapter<>(Boolean::parseBoolean));
 
         registerTypeAdapter(String.class, new StringTypeAdapter());
-        registerTypeAdapter(Material.class, new MaterialTypeAdapter());
+        registerTypeAdapter(NamespacedKey.class, new NamespacedKeyAdapter());
+        registerTypeAdapter(Material.class, new MaterialAdapter());
 
     }
 
@@ -86,7 +90,11 @@ public class ConfigurationManager {
             return new EnumAdapter<>(type.getType());
         }
         if (Collection.class.isAssignableFrom(type.getType())) {
-            return new CollectionTypeAdapter<>(this, type);
+            return new CollectionAdapter<>(this, type);
+        }
+
+        if (Map.class.isAssignableFrom(type.getType())) {
+            return new MapAdapter<>(this, type);
         }
 
         if (WeightedRandom.class.isAssignableFrom(type.getType())) {

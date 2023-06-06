@@ -14,6 +14,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent.Builder;
 import net.kyori.adventure.text.TextReplacementConfig;
 
+@Deprecated
 public class Localization {
     private static final Pattern PATTERN = Pattern.compile("%[^%]*%");
     private static final Localization instance = new Localization();

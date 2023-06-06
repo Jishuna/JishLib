@@ -31,7 +31,7 @@ public class WeightedRandomAdapter<T> implements TypeAdapter<WeightedRandom<T>> 
     }
 
     @SuppressWarnings("unchecked")
-    public void write(ConfigurationSection config, String path, Object value) {
+    public void write(ConfigurationSection config, String path, Object value, boolean replace) {
         ConfigurationSection section = config.getConfigurationSection(path);
         if (section == null) {
             section = config.createSection(path);
