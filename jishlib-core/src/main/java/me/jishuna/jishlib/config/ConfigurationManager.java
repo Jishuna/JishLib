@@ -12,6 +12,7 @@ import org.bukkit.plugin.Plugin;
 
 import me.jishuna.jishlib.collections.WeightedRandom;
 import me.jishuna.jishlib.config.adapter.CollectionAdapter;
+import me.jishuna.jishlib.config.adapter.ConfigMappableAdapter;
 import me.jishuna.jishlib.config.adapter.EnumAdapter;
 import me.jishuna.jishlib.config.adapter.MapAdapter;
 import me.jishuna.jishlib.config.adapter.MaterialAdapter;
@@ -21,6 +22,7 @@ import me.jishuna.jishlib.config.adapter.StringAdapter;
 import me.jishuna.jishlib.config.adapter.StringTypeAdapter;
 import me.jishuna.jishlib.config.adapter.TypeAdapter;
 import me.jishuna.jishlib.config.adapter.WeightedRandomAdapter;
+import me.jishuna.jishlib.config.annotation.ConfigMappable;
 
 public class ConfigurationManager {
 
@@ -99,6 +101,10 @@ public class ConfigurationManager {
 
         if (WeightedRandom.class.isAssignableFrom(type.getType())) {
             return new WeightedRandomAdapter<>(this, type);
+        }
+
+        if (type.getType().isAnnotationPresent(ConfigMappable.class)) {
+            return new ConfigMappableAdapter<>(this, type);
         }
         return null;
     }

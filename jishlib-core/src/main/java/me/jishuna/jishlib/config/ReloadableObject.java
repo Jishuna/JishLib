@@ -1,7 +1,6 @@
 package me.jishuna.jishlib.config;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import me.jishuna.jishlib.config.annotation.PostLoad;
@@ -43,48 +42,12 @@ public class ReloadableObject<T> extends ConfigReloadable<T> {
 
     @Override
     protected void setField(ConfigField field, Object value) throws ReflectiveOperationException {
-        Field internal = field.getField();
-        if (field.isStatic()) {
-            internal.set(null, value);
-        } else {
-            boolean access = internal.canAccess(wrapped);
-            if (!access) {
-                internal.trySetAccessible();
-            }
-
-            internal.set(wrapped, value);
-
-            if (!access) {
-                internal.setAccessible(false);
-            }
-        }
+        ReflectionHelper.setField(field, value, this.wrapped);
     }
 
     @Override
     protected Object getField(ConfigField field) {
-        Field internal = field.getField();
-        if (field.isStatic()) {
-            try {
-                return internal.get(null);
-            } catch (ReflectiveOperationException ex) {
-                return null;
-            }
-        } else {
-            boolean access = internal.canAccess(wrapped);
-            if (!access) {
-                internal.trySetAccessible();
-            }
-
-            try {
-                return internal.get(wrapped);
-            } catch (ReflectiveOperationException ex) {
-                return null;
-            } finally {
-                if (!access) {
-                    internal.setAccessible(false);
-                }
-            }
-        }
+        return ReflectionHelper.getField(field, this.wrapped);
     }
 
     public T getWrapped() {

@@ -27,15 +27,17 @@ public class MapAdapter<K, V, T extends Map<K, V>> implements TypeAdapter<T> {
         }
 
         ConfigurationSection section = config.getConfigurationSection(path);
+        boolean isString = (this.keyAdapter instanceof StringTypeAdapter);
 
-        for (String key : section.getKeys(true)) {
-            if (section.isConfigurationSection(key)) {
+        for (String key : section.getKeys(isString)) {
+            if (isString && section.isConfigurationSection(key)) {
                 continue;
             }
-
+            
             K mapKey = this.keyAdapter.fromString(key);
             V mapValue = this.valueAdapter.read(section, key);
             map.put(mapKey, mapValue);
+
         }
 
         return map;

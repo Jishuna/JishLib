@@ -66,6 +66,11 @@ public class MessageHandler {
         return getInstance().getStringList(key);
     }
 
+    public static List<String> getList(String key, Object... format) {
+        List<String> list = getInstance().getStringList(key);
+        return list.stream().map(string -> MessageFormat.format(string, format)).toList();
+    }
+
     public static void initalize(ConfigurationManager manager, File target, InputStream internal) {
         if (instance != null) {
             return;
