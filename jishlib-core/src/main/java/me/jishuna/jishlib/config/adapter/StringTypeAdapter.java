@@ -1,6 +1,6 @@
 package me.jishuna.jishlib.config.adapter;
 
-import me.jishuna.jishlib.StringUtils;
+import me.jishuna.jishlib.util.StringUtils;
 
 public class StringTypeAdapter implements StringAdapter<String> {
 

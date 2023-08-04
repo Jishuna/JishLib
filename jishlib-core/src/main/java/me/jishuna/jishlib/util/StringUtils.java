@@ -1,7 +1,8 @@
-package me.jishuna.jishlib;
+package me.jishuna.jishlib.util;
 
 import org.bukkit.Color;
 
+import me.jishuna.jishlib.Constants;
 import net.kyori.adventure.text.Component;
 
 public class StringUtils {

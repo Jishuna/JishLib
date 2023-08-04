@@ -15,6 +15,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import me.jishuna.jishlib.config.ConfigReloadable;
 import me.jishuna.jishlib.config.ConfigurationManager;
 import me.jishuna.jishlib.config.annotation.ConfigEntry;
+import me.jishuna.jishlib.util.StringUtils;
 
 public class MessageHandler {
     private static MessageHandler instance;

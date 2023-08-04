@@ -1,4 +1,4 @@
-package me.jishuna.jishlib;
+package me.jishuna.jishlib.util;
 
 import org.bukkit.Chunk;
 

@@ -1,11 +1,30 @@
 package me.jishuna.jishlib.config;
 
 import java.io.File;
+import java.lang.reflect.Method;
 
 public class ReloadableClass<T> extends ConfigReloadable<T> {
 
     public ReloadableClass(ConfigurationManager manager, File file, Class<T> clazz) {
         super(manager, file, clazz);
+    }
+
+    @Override
+    protected void postLoad(Method postLoadMethod) {
+        try {
+            boolean access = postLoadMethod.canAccess(null);
+            if (!access) {
+                postLoadMethod.trySetAccessible();
+            }
+
+            postLoadMethod.invoke(null);
+
+            if (!access) {
+                postLoadMethod.setAccessible(false);
+            }
+        } catch (ReflectiveOperationException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override

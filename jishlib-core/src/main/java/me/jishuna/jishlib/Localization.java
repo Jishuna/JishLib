@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import me.jishuna.jishlib.util.StringUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent.Builder;
 import net.kyori.adventure.text.TextReplacementConfig;
