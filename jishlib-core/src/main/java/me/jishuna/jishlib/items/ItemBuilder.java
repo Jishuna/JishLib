@@ -51,6 +51,10 @@ public class ItemBuilder {
 
         return builder;
     }
+    
+    public static ItemBuilder modifyClone(ItemStack item) {
+       return modifyItem(item.clone());
+    }
 
     public <T extends ItemMeta> ItemBuilder modify(Class<T> metaType, Consumer<T> action) {
         if (!metaType.isAssignableFrom(meta.getClass())) {

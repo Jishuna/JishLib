@@ -17,6 +17,16 @@ public class MobHead {
     public static final ItemStack WITHER_SKELETON = ItemBuilder.create(Material.WITHER_SKELETON_SKULL).build();
     public static final ItemStack ENDER_DRAGON = ItemBuilder.create(Material.DRAGON_HEAD).build();
 
+    public static final ItemStack WOLF = ItemBuilder.create(Material.PLAYER_HEAD).skullTexture("d0498de6f5b09e0ce35a7292fe50b79fce9065d9be8e2a87c7a13566efb26d72").build();
+    public static final ItemStack IRON_GOLEM = ItemBuilder.create(Material.PLAYER_HEAD).skullTexture("e13f34227283796bc017244cb46557d64bd562fa9dab0e12af5d23ad699cf697").build();
+    public static final ItemStack BEE = ItemBuilder.create(Material.PLAYER_HEAD).skullTexture("4420c9c43e095880dcd2e281c81f47b163b478f58a584bb61f93e6e10a155f31").build();
+    public static final ItemStack DOLPHIN = ItemBuilder.create(Material.PLAYER_HEAD).skullTexture("8e9688b950d880b55b7aa2cfcd76e5a0fa94aac6d16f78e833f7443ea29fed3").build();
+    public static final ItemStack LLAMA = ItemBuilder.create(Material.PLAYER_HEAD).skullTexture("9f7d90b305aa64313c8d4404d8d652a96eba8a754b67f4347dcccdd5a6a63398").build();
+    public static final ItemStack TRADER_LLAMA = ItemBuilder.create(Material.PLAYER_HEAD).skullTexture("56307f42fc88ebc211e04ea2bb4d247b7428b711df9a4e0c6d1b921589e443a1").build();
+    public static final ItemStack PANDA = ItemBuilder.create(Material.PLAYER_HEAD).skullTexture("dca096eea506301bea6d4b17ee1605625a6f5082c71f74a639cc940439f47166").build();
+    public static final ItemStack GOAT = ItemBuilder.create(Material.PLAYER_HEAD).skullTexture("a662336d8ae092407e58f7cc80d20f20e7650357a454ce16e3307619a0110648").build();
+    public static final ItemStack POLAR_BEAR = ItemBuilder.create(Material.PLAYER_HEAD).skullTexture("c4fe926922fbb406f343b34a10bb98992cee4410137d3f88099427b22de3ab90").build();
+    
     public static final ItemStack ENDERMAN = ItemBuilder.create(Material.PLAYER_HEAD).skullTexture("7a59bb0a7a32965b3d90d8eafa899d1835f424509eadd4e6b709ada50b9cf").build();
     public static final ItemStack ENDERMITE = ItemBuilder.create(Material.PLAYER_HEAD).skullTexture("5bc7b9d36fb92b6bf292be73d32c6c5b0ecc25b44323a541fae1f1e67e393a3e").build();
     public static final ItemStack SPIDER = ItemBuilder.create(Material.PLAYER_HEAD).skullTexture("35e248da2e108f09813a6b848a0fcef111300978180eda41d3d1a7a8e4dba3c3").build();
@@ -57,6 +67,16 @@ public class MobHead {
         TYPE_MAP.put(EntityType.ENDER_DRAGON.getKey(), ENDER_DRAGON);
 
         TYPE_MAP.put(EntityType.GIANT.getKey(), ZOMBIE);
+        
+        TYPE_MAP.put(EntityType.WOLF.getKey(), WOLF);
+        TYPE_MAP.put(EntityType.IRON_GOLEM.getKey(), IRON_GOLEM);
+        TYPE_MAP.put(EntityType.BEE.getKey(), BEE);
+        TYPE_MAP.put(EntityType.DOLPHIN.getKey(), DOLPHIN);
+        TYPE_MAP.put(EntityType.LLAMA.getKey(), LLAMA);
+        TYPE_MAP.put(EntityType.TRADER_LLAMA.getKey(), TRADER_LLAMA);
+        TYPE_MAP.put(EntityType.PANDA.getKey(), PANDA);
+        TYPE_MAP.put(EntityType.GOAT.getKey(), GOAT);
+        TYPE_MAP.put(EntityType.POLAR_BEAR.getKey(), POLAR_BEAR);
 
         TYPE_MAP.put(EntityType.ENDERMAN.getKey(), ENDERMAN);
         TYPE_MAP.put(EntityType.ENDERMITE.getKey(), ENDERMITE);
