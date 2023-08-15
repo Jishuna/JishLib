@@ -30,7 +30,7 @@ public abstract class ConfigReloadable<T> {
         this.logger = manager.getLogger();
 
         cacheFields(clazz);
-        Collections.reverse(this.fields);
+       // Collections.reverse(this.fields);
     }
 
     public ConfigReloadable<T> load() {
@@ -166,12 +166,13 @@ public abstract class ConfigReloadable<T> {
     }
 
     private void cacheFields(Class<? super T> clazz) {
+        int index = 0;
         for (Field field : clazz.getDeclaredFields()) {
             if (!field.isAnnotationPresent(ConfigEntry.class)) {
                 continue;
             }
 
-            this.fields.add(new ConfigField(field));
+            this.fields.add(index++, new ConfigField(field));
         }
 
         Class<? super T> superClass = clazz.getSuperclass();

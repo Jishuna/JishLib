@@ -41,7 +41,7 @@ public class JishLib {
         return getInstance().plugin.getLogger();
     }
 
-    public static ConfigurationManager getConfigurationManaher() {
+    public static ConfigurationManager getConfigurationManager() {
         return getInstance().configManager;
     }
 }
