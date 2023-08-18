@@ -51,9 +51,9 @@ public class ItemBuilder {
 
         return builder;
     }
-    
+
     public static ItemBuilder modifyClone(ItemStack item) {
-       return modifyItem(item.clone());
+        return modifyItem(item.clone());
     }
 
     public <T extends ItemMeta> ItemBuilder modify(Class<T> metaType, Consumer<T> action) {
@@ -108,6 +108,11 @@ public class ItemBuilder {
 
     public ItemBuilder storedEnchantment(Enchantment enchantment, int level) {
         return modify(EnchantmentStorageMeta.class, meta -> meta.addStoredEnchant(enchantment, level, true));
+    }
+
+    public ItemBuilder unbreakable() {
+        this.meta.setUnbreakable(true);
+        return this;
     }
 
     public ItemBuilder flags(ItemFlag... flags) {
