@@ -10,14 +10,16 @@ import me.jishuna.jishlib.util.Utils;
 
 public abstract class PagedCustomInventory<T> extends CustomInventory {
     private final List<T> items;
-    private final int maxIndex;
+    private final int itemsPerPage;
+    private final int maxPage;
 
-    private int startIndex = 0;
+    private int page = 0;
 
     protected PagedCustomInventory(Inventory inventory, List<T> items, int maxIndex) {
         super(inventory);
         this.items = items;
-        this.maxIndex = maxIndex;
+        this.itemsPerPage = maxIndex;
+        this.maxPage = (int) Math.ceil(items.size() / (double) maxIndex);
     }
 
     protected abstract ItemStack asItemStack(T entry);
@@ -25,8 +27,10 @@ public abstract class PagedCustomInventory<T> extends CustomInventory {
     protected abstract void onItemClicked(InventoryClickEvent event, T item);
 
     protected void refreshOptions() {
-        for (int i = 0; i < this.maxIndex; i++) {
-            int index = this.startIndex + i;
+        int startIndex = this.page * this.itemsPerPage;
+        for (int i = 0; i < this.itemsPerPage; i++) {
+            int index = startIndex + i;
+
             if (index >= this.items.size()) {
                 setItem(i, null);
                 removeButton(i);
@@ -40,15 +44,18 @@ public abstract class PagedCustomInventory<T> extends CustomInventory {
     }
 
     protected void changePage(int amount) {
-        int maxPage = (this.items.size() - 1) / this.maxIndex;
-        this.startIndex = Utils.clamp((this.startIndex / this.maxIndex) + amount, 0, maxPage) * this.maxIndex;
-
+        this.page = Utils.clamp(this.page + amount, 0, this.maxPage);
         refreshOptions();
     }
 
-    private void onClick(InventoryClickEvent event) {
-        T entry = this.items.get(this.startIndex + event.getSlot());
-        onItemClicked(event, entry);
+    protected int getPage() {
+        return this.page;
     }
 
+    private void onClick(InventoryClickEvent event) {
+        int startIndex = this.page * this.itemsPerPage;
+        T entry = this.items.get(startIndex + event.getSlot());
+
+        onItemClicked(event, entry);
+    }
 }

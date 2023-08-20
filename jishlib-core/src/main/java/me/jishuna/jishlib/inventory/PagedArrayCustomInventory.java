@@ -8,14 +8,18 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class PagedArrayCustomInventory<T> extends CustomInventory{
+public abstract class PagedArrayCustomInventory<T> extends CustomInventory {
     private final List<T[]> items;
+    private final int itemsPerPage;
+    private final int maxPage;
 
     private int page = 0;
 
-    protected PagedArrayCustomInventory(Inventory inventory, List<T[]> items) {
+    protected PagedArrayCustomInventory(Inventory inventory, List<T[]> items, int maxIndex) {
         super(inventory);
         this.items = items;
+        this.itemsPerPage = maxIndex;
+        this.maxPage = this.items.size();
     }
 
     protected abstract ItemStack asItemStack(T entry);
@@ -23,26 +27,31 @@ public abstract class PagedArrayCustomInventory<T> extends CustomInventory{
     protected abstract void onItemClicked(InventoryClickEvent event, T item);
 
     protected void refreshOptions() {
-        for (int i = 0; i < 45; i++) {
-            T[] entry = this.items.get(page);
-            ItemStack[] stackArray = Arrays.stream(entry).map(this::asItemStack).toArray(ItemStack[]::new);
-            addButton(i, stackArray[i], this::onClick);
+        T[] entry = this.items.get(page);
+        ItemStack[] stackArray = Arrays.stream(entry).map(this::asItemStack).toArray(ItemStack[]::new);
+
+        for (int i = 0; i < this.itemsPerPage; i++) {
+            if (i >= stackArray.length) {
+                setItem(i, null);
+                removeButton(i);
+            } else {
+                addButton(i, stackArray[i], this::onClick);
+            }
         }
     }
 
     protected void changePage(int amount) {
-        int maxPage = this.items.size();
-        this.page = Utils.clamp(this.page + amount, 0, maxPage);
+        this.page = Utils.clamp(this.page + amount, 0, this.maxPage);
 
         refreshOptions();
+    }
+
+    protected int getPage() {
+        return this.page;
     }
 
     private void onClick(InventoryClickEvent event) {
         T[] entry = this.items.get(this.page);
         onItemClicked(event, entry[event.getSlot()]);
-    }
-
-    protected int getPage() {
-        return this.page;
     }
 }
