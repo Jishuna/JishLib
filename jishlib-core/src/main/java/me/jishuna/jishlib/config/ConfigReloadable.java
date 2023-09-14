@@ -109,9 +109,8 @@ public abstract class ConfigReloadable<T> {
         for (ConfigField field : this.fields) {
             String path = field.getPath();
 
-            if (!replace && !path.isEmpty() && config.isSet(path)) {
+            if (!path.isEmpty()) {
                 config.setComments(path, field.getComments());
-                continue;
             }
 
             ConfigType<?> type = ConfigType.get(field.getField());

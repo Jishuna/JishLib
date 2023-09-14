@@ -17,6 +17,10 @@ public interface StringAdapter<T> extends TypeAdapter<T> {
         if (value == null) {
             return;
         }
+        
+        if (config.isSet(path) && !replace) {
+            return;
+        }
 
         config.set(path, toString((T) value));
     }

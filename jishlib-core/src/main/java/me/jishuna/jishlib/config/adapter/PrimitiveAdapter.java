@@ -14,6 +14,10 @@ public class PrimitiveAdapter<T> implements StringAdapter<T> {
 
     @Override
     public void write(ConfigurationSection config, String path, Object value, boolean replace) {
+        if (config.isSet(path) && !replace) {
+            return;
+        }
+        
         config.set(path, value);
     }
 

@@ -67,9 +67,8 @@ public class ConfigMappableAdapter<T> implements TypeAdapter<T> {
         for (ConfigField field : this.fields) {
             String fullPath = path + "." + field.getPath();
 
-            if (!replace && !fullPath.isEmpty() && config.isSet(fullPath)) {
+            if (!fullPath.isEmpty()) {
                 config.setComments(fullPath, field.getComments());
-                continue;
             }
 
             ConfigType<?> type = ConfigType.get(field.getField());

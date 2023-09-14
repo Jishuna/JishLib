@@ -19,7 +19,7 @@ public abstract class PagedArrayCustomInventory<T> extends CustomInventory {
         super(inventory);
         this.items = items;
         this.itemsPerPage = maxIndex;
-        this.maxPage = this.items.size();
+        this.maxPage = this.items.size() - 1;
     }
 
     protected abstract ItemStack asItemStack(T entry);

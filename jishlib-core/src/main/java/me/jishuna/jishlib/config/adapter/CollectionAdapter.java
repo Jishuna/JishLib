@@ -47,8 +47,17 @@ public class CollectionAdapter<V, T extends Collection<V>> implements TypeAdapte
 
     @SuppressWarnings("unchecked")
     public void write(ConfigurationSection config, String path, Object value, boolean replace) {
-        List<String> list = new ArrayList<>();
-        ((T) value).forEach(entry -> list.add(this.adapter.toString(entry)));
+        List<String> list = config.getStringList(path);
+        if (replace) {
+            list.clear();
+        }
+
+        ((T) value).forEach(entry -> {
+            String toAdd = this.adapter.toString(entry);
+            if (!list.contains(toAdd)) {
+                list.add(toAdd);
+            }
+        });
         config.set(path, list);
     }
 }
