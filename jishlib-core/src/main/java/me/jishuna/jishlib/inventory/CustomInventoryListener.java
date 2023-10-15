@@ -18,7 +18,7 @@ public class CustomInventoryListener implements Listener {
         if (event.getClickedInventory() == null)
             return;
 
-        CustomInventory inventory = manager.getInventory(event.getView());
+        CustomInventory<?> inventory = manager.getInventory(event.getView());
 
         if (inventory != null) {
             inventory.consumeClickEvent(event);
@@ -27,7 +27,7 @@ public class CustomInventoryListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onInventoryClose(InventoryCloseEvent event) {
-        CustomInventory inventory = manager.removeInventory(event.getView());
+        CustomInventory<?> inventory = manager.removeInventory(event.getView());
 
         if (inventory != null) {
             inventory.consumeCloseEvent(event);

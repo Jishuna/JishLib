@@ -93,7 +93,11 @@ public class ItemBuilder {
     }
 
     public ItemBuilder lore(String... lore) {
-        List<String> itemLore = getLore();
+        return lore(false, lore);
+    }
+
+    public ItemBuilder lore(boolean replace, String... lore) {
+        List<String> itemLore = replace ? new ArrayList<>() : getLore();
         List<String> loreList = Arrays.stream(lore).toList();
         itemLore.addAll(loreList);
 
@@ -125,6 +129,11 @@ public class ItemBuilder {
         return this;
     }
 
+    public ItemBuilder removePersistentData(NamespacedKey key) {
+        this.meta.getPersistentDataContainer().remove(key);
+        return this;
+    }
+
     public ItemBuilder modelData(int index) {
         this.meta.setCustomModelData(index);
         return this;
@@ -146,7 +155,13 @@ public class ItemBuilder {
             }
 
             profile.setTextures(textures);
-            ((SkullMeta) this.meta).setOwnerProfile(profile);
+            meta.setOwnerProfile(profile);
+        });
+    }
+
+    public ItemBuilder skullProfile(PlayerProfile profile) {
+        return modify(SkullMeta.class, meta -> {
+            meta.setOwnerProfile(profile);
         });
     }
 

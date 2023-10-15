@@ -1,6 +1,10 @@
 package me.jishuna.jishlib.pdc;
 
+import java.util.function.BiFunction;
+
 import org.bukkit.NamespacedKey;
+import org.bukkit.persistence.PersistentDataAdapterContext;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
 
@@ -16,4 +20,8 @@ public class PersistentTypes {
 
     public static final PersistentDataType<String, NamespacedKey> NAMESPACE = new NamespacedKeyType();
     public static final PersistentDataType<Integer, Vector> VECTOR = new VectorType();
+
+    public static <T extends PDCSerializable> CustomType<T> create(Class<T> clazz, BiFunction<PersistentDataContainer, PersistentDataAdapterContext, T> creator) {
+        return new CustomType<>(clazz, creator);
+    }
 }

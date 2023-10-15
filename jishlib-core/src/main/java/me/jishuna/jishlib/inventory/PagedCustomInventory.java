@@ -8,14 +8,14 @@ import org.bukkit.inventory.ItemStack;
 
 import me.jishuna.jishlib.util.Utils;
 
-public abstract class PagedCustomInventory<T> extends CustomInventory {
+public abstract class PagedCustomInventory<T, B extends Inventory> extends CustomInventory<B> {
     private final List<T> items;
     private final int itemsPerPage;
     private final int maxPage;
 
     private int page = 0;
 
-    protected PagedCustomInventory(Inventory inventory, List<T> items, int maxIndex) {
+    protected PagedCustomInventory(B inventory, List<T> items, int maxIndex) {
         super(inventory);
         this.items = items;
         this.itemsPerPage = maxIndex;

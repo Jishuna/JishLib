@@ -8,14 +8,14 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class PagedArrayCustomInventory<T> extends CustomInventory {
+public abstract class PagedArrayCustomInventory<T, B extends Inventory> extends CustomInventory<B> {
     private final List<T[]> items;
     private final int itemsPerPage;
     private final int maxPage;
 
     private int page = 0;
 
-    protected PagedArrayCustomInventory(Inventory inventory, List<T[]> items, int maxIndex) {
+    protected PagedArrayCustomInventory(B inventory, List<T[]> items, int maxIndex) {
         super(inventory);
         this.items = items;
         this.itemsPerPage = maxIndex;

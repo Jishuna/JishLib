@@ -1,5 +1,6 @@
 package me.jishuna.jishlib;
 
+import java.io.File;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
@@ -27,6 +28,10 @@ public class JishLib {
 
     public static void registerEvents() {
         Bukkit.getPluginManager().registerEvents(new CustomInventoryListener(getInventoryManager()), getPluginInstance());
+    }
+
+    public static void initializeMessages(String fileName) {
+        MessageHandler.initalize(getConfigurationManager(), new File(getPluginInstance().getDataFolder(), fileName), getPluginInstance().getResource(fileName));
     }
 
     public static void cleanup() {
