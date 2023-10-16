@@ -65,9 +65,17 @@ public class ItemBuilder {
         return this;
     }
 
+    public ItemBuilder type(Material type) {
+        this.item.setType(type);
+        return this;
+    }
+
+    public Material type() {
+        return this.item.getType();
+    }
+
     public ItemBuilder amount(int amount) {
         this.item.setAmount(amount);
-
         return this;
     }
 
@@ -85,7 +93,7 @@ public class ItemBuilder {
     }
 
     public ItemBuilder lore(List<String> lore) {
-        List<String> itemLore = getLore();
+        List<String> itemLore = lore();
         itemLore.addAll(lore);
 
         meta.setLore(itemLore);
@@ -93,16 +101,29 @@ public class ItemBuilder {
     }
 
     public ItemBuilder lore(String... lore) {
-        return lore(false, lore);
-    }
-
-    public ItemBuilder lore(boolean replace, String... lore) {
-        List<String> itemLore = replace ? new ArrayList<>() : getLore();
+        List<String> itemLore = lore();
         List<String> loreList = Arrays.stream(lore).toList();
         itemLore.addAll(loreList);
 
         meta.setLore(itemLore);
         return this;
+    }
+
+    public ItemBuilder removeLore(int index) {
+        List<String> itemLore = lore();
+        itemLore.remove(index);
+
+        meta.setLore(itemLore);
+        return this;
+    }
+
+    public ItemBuilder clearLore() {
+        meta.setLore(new ArrayList<>());
+        return this;
+    }
+
+    public List<String> lore() {
+        return meta.hasLore() ? meta.getLore() : new ArrayList<>();
     }
 
     public ItemBuilder enchantment(Enchantment enchantment, int level) {
@@ -170,9 +191,5 @@ public class ItemBuilder {
         finalItem.setItemMeta(this.meta);
 
         return finalItem;
-    }
-
-    private List<String> getLore() {
-        return meta.hasLore() ? meta.getLore() : new ArrayList<>();
     }
 }

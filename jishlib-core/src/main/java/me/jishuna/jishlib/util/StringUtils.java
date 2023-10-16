@@ -4,6 +4,7 @@ import org.bukkit.Color;
 
 import me.jishuna.jishlib.Constants;
 import net.kyori.adventure.text.Component;
+import net.md_5.bungee.api.ChatColor;
 
 public class StringUtils {
     private StringUtils() {
@@ -31,6 +32,10 @@ public class StringUtils {
 
     public static String legacyToMiniMessage(String input) {
         return toMiniMessage(fromLegacy(input));
+    }
+
+    public static String colorize(String input) {
+        return ChatColor.translateAlternateColorCodes('&', miniMessageToLegacy(input));
     }
 
     public static String capitalize(String input) {

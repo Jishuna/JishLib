@@ -9,17 +9,17 @@ import org.bukkit.inventory.ItemStack;
 import me.jishuna.jishlib.util.Utils;
 
 public abstract class PagedCustomInventory<T, B extends Inventory> extends CustomInventory<B> {
-    private final List<T> items;
+    private List<T> items;
     private final int itemsPerPage;
-    private final int maxPage;
+    private int maxPage;
 
     private int page = 0;
 
-    protected PagedCustomInventory(B inventory, List<T> items, int maxIndex) {
-        super(inventory);
+    protected PagedCustomInventory(B inventory, List<T> items, int maxIndex, CustomInventory<?> previous) {
+        super(inventory, previous);
         this.items = items;
         this.itemsPerPage = maxIndex;
-        this.maxPage = (int) Math.ceil(items.size() / (double) maxIndex);
+        this.maxPage = Math.max(0, (int) Math.ceil(items.size() / (double) maxIndex) - 1);
     }
 
     protected abstract ItemStack asItemStack(T entry);
@@ -44,12 +44,23 @@ public abstract class PagedCustomInventory<T, B extends Inventory> extends Custo
     }
 
     protected void changePage(int amount) {
+        int prev = this.page;
+
         this.page = Utils.clamp(this.page + amount, 0, this.maxPage);
-        refreshOptions();
+        if (this.page != prev) {
+            refreshOptions();
+        }
     }
 
     protected int getPage() {
         return this.page;
+    }
+
+    protected void updateList(List<T> items) {
+        this.items = items;
+        this.maxPage = Math.max(0, (int) Math.ceil(items.size() / (double) this.itemsPerPage) - 1);
+
+        refreshOptions();
     }
 
     private void onClick(InventoryClickEvent event) {

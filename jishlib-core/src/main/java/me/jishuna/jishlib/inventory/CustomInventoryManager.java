@@ -10,7 +10,7 @@ public class CustomInventoryManager implements Listener {
     private final HashMap<InventoryView, CustomInventory<?>> inventoryMap = new HashMap<>();
 
     public void openInventory(HumanEntity player, CustomInventory<?> inventory) {
-        this.inventoryMap.put(inventory.open(player), inventory);
+        this.inventoryMap.put(player.openInventory(inventory.getBukkitInventory()), inventory);
     }
 
     public CustomInventory<?> getInventory(InventoryView view) {

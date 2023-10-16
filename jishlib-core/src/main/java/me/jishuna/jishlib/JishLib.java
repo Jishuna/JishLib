@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
+import org.bukkit.conversations.ConversationFactory;
 import org.bukkit.plugin.Plugin;
 
 import me.jishuna.jishlib.config.ConfigurationManager;
@@ -16,10 +17,12 @@ public class JishLib {
     private final Plugin plugin;
     private final ConfigurationManager configManager;
     private final CustomInventoryManager inventoryManager = new CustomInventoryManager();
+    private final ConversationFactory conversationFactory;
 
     public JishLib(Plugin plugin) {
         this.plugin = plugin;
         this.configManager = new ConfigurationManager(plugin);
+        this.conversationFactory = new ConversationFactory(plugin);
     }
 
     public static void initialize(Plugin plugin) {
@@ -32,6 +35,14 @@ public class JishLib {
 
     public static void initializeMessages(String fileName) {
         MessageHandler.initalize(getConfigurationManager(), new File(getPluginInstance().getDataFolder(), fileName), getPluginInstance().getResource(fileName));
+    }
+
+    public static void run(Runnable task) {
+        Bukkit.getScheduler().runTask(getPluginInstance(), task);
+    }
+
+    public static void runAsync(Runnable task) {
+        Bukkit.getScheduler().runTaskAsynchronously(getPluginInstance(), task);
     }
 
     public static void cleanup() {
@@ -60,5 +71,9 @@ public class JishLib {
 
     public static CustomInventoryManager getInventoryManager() {
         return getInstance().inventoryManager;
+    }
+
+    public static ConversationFactory getConversationFactory() {
+        return getInstance().conversationFactory;
     }
 }
