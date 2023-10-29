@@ -1,10 +1,13 @@
-package me.jishuna.jishlib.items;
+package me.jishuna.jishlib.item;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -16,6 +19,7 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -67,6 +71,7 @@ public class ItemBuilder {
 
     public ItemBuilder type(Material type) {
         this.item.setType(type);
+        this.meta = Bukkit.getItemFactory().asMetaFor(this.meta, type);
         return this;
     }
 
@@ -77,6 +82,10 @@ public class ItemBuilder {
     public ItemBuilder amount(int amount) {
         this.item.setAmount(amount);
         return this;
+    }
+
+    public int amount() {
+        return this.item.getAmount();
     }
 
     public ItemBuilder name(String name) {
@@ -90,6 +99,10 @@ public class ItemBuilder {
             this.meta.setDisplayName(name);
         }
         return this;
+    }
+
+    public String name() {
+        return this.meta.getDisplayName();
     }
 
     public ItemBuilder lore(List<String> lore) {
@@ -126,8 +139,27 @@ public class ItemBuilder {
         return meta.hasLore() ? meta.getLore() : new ArrayList<>();
     }
 
+    public ItemBuilder durability(int durability) {
+        if (this.meta instanceof Damageable damageable) {
+            damageable.setDamage(durability);
+        }
+        return this;
+    }
+
+    public int durability() {
+        if (this.meta instanceof Damageable damageable) {
+            return damageable.getDamage();
+        }
+        return 0;
+    }
+
     public ItemBuilder enchantment(Enchantment enchantment, int level) {
         this.meta.addEnchant(enchantment, level, true);
+        return this;
+    }
+
+    public ItemBuilder removeEnchantment(Enchantment enchantment) {
+        this.meta.removeEnchant(enchantment);
         return this;
     }
 
@@ -135,14 +167,31 @@ public class ItemBuilder {
         return modify(EnchantmentStorageMeta.class, meta -> meta.addStoredEnchant(enchantment, level, true));
     }
 
-    public ItemBuilder unbreakable() {
-        this.meta.setUnbreakable(true);
+    public int level(Enchantment enchantment) {
+        return this.meta.getEnchantLevel(enchantment);
+    }
+
+    public ItemBuilder unbreakable(boolean unbreakable) {
+        this.meta.setUnbreakable(unbreakable);
         return this;
+    }
+
+    public boolean unbreakable() {
+        return this.meta.isUnbreakable();
     }
 
     public ItemBuilder flags(ItemFlag... flags) {
         this.meta.addItemFlags(flags);
         return this;
+    }
+
+    public ItemBuilder removeFlags(ItemFlag... flags) {
+        this.meta.removeItemFlags(flags);
+        return this;
+    }
+
+    public Set<ItemFlag> flags() {
+        return this.meta.getItemFlags();
     }
 
     public <T, Z> ItemBuilder persistentData(NamespacedKey key, PersistentDataType<T, Z> type, Z value) {
@@ -163,6 +212,20 @@ public class ItemBuilder {
     public ItemBuilder modifier(Attribute attribute, AttributeModifier modifier) {
         this.meta.addAttributeModifier(attribute, modifier);
         return this;
+    }
+
+    public ItemBuilder removeModifier(Attribute attribute, AttributeModifier modifier) {
+        this.meta.removeAttributeModifier(attribute, modifier);
+        return this;
+    }
+
+    public Collection<AttributeModifier> modifiers(Attribute attribute) {
+        if (!this.meta.hasAttributeModifiers()) {
+            return Collections.emptyList();
+        }
+
+        Collection<AttributeModifier> modifiers = this.meta.getAttributeModifiers(attribute);
+        return modifiers == null ? Collections.emptyList() : modifiers;
     }
 
     public ItemBuilder skullTexture(String texture) {
@@ -191,5 +254,13 @@ public class ItemBuilder {
         finalItem.setItemMeta(this.meta);
 
         return finalItem;
+    }
+
+    public ItemBuilder clone() {
+        ItemBuilder clone = new ItemBuilder();
+        clone.item = this.item.clone();
+        clone.meta = this.meta.clone();
+
+        return clone;
     }
 }

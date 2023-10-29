@@ -1,6 +1,7 @@
 package me.jishuna.jishlib.config.adapter;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,16 +12,19 @@ import me.jishuna.jishlib.config.ConfigType;
 import me.jishuna.jishlib.config.ConfigurationManager;
 import me.jishuna.jishlib.config.ReflectionHelper;
 import me.jishuna.jishlib.config.annotation.ConfigEntry;
+import me.jishuna.jishlib.config.annotation.PostLoad;
 
 public class ConfigMappableAdapter<T> implements TypeAdapter<T> {
     private final ConfigurationManager manager;
     private final List<ConfigField> fields = new ArrayList<>();
     private final ConfigType<T> type;
+    private final Method postLoadMethod;
 
     @SuppressWarnings("unchecked")
     public ConfigMappableAdapter(ConfigurationManager manager, ConfigType<?> type) {
         this.manager = manager;
         this.type = (ConfigType<T>) type;
+        this.postLoadMethod = findPostLoadMethod(this.type.getType());
 
         cacheFields(this.type.getType());
     }
@@ -53,6 +57,10 @@ public class ConfigMappableAdapter<T> implements TypeAdapter<T> {
                 }
 
                 ReflectionHelper.setField(field, readValue, object);
+            }
+
+            if (this.postLoadMethod != null) {
+                this.postLoad(this.postLoadMethod, object);
             }
 
             return object;
@@ -90,18 +98,51 @@ public class ConfigMappableAdapter<T> implements TypeAdapter<T> {
         }
     }
 
-    private void cacheFields(Class<? super T> class1) {
-        for (Field field : class1.getDeclaredFields()) {
+    private void postLoad(Method postLoadMethod, T object) {
+        try {
+            boolean access = postLoadMethod.canAccess(object);
+            if (!access) {
+                postLoadMethod.trySetAccessible();
+            }
+
+            postLoadMethod.invoke(object);
+
+            if (!access) {
+                postLoadMethod.setAccessible(false);
+            }
+        } catch (ReflectiveOperationException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void cacheFields(Class<? super T> clazz) {
+        int index = 0;
+        for (Field field : clazz.getDeclaredFields()) {
             if (!field.isAnnotationPresent(ConfigEntry.class)) {
                 continue;
             }
 
-            this.fields.add(new ConfigField(field));
+            this.fields.add(index++, new ConfigField(field));
         }
 
-        Class<? super T> superClass = class1.getSuperclass();
+        Class<? super T> superClass = clazz.getSuperclass();
         if (superClass != null && superClass != Object.class) {
             cacheFields(superClass);
         }
+    }
+
+    private Method findPostLoadMethod(Class<? super T> clazz) {
+        for (Method method : clazz.getDeclaredMethods()) {
+            if (method.isAnnotationPresent(PostLoad.class)) {
+                return method;
+            }
+        }
+
+        Class<? super T> superClass = clazz.getSuperclass();
+        if (superClass != null && superClass != Object.class) {
+            return findPostLoadMethod(superClass);
+        }
+
+        return null;
     }
 }

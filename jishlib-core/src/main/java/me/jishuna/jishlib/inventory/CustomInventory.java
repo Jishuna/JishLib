@@ -4,23 +4,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import me.jishuna.jishlib.JishLib;
+import me.jishuna.jishlib.item.provider.ItemProvider;
 
 public class CustomInventory<T extends Inventory> {
     private final Map<Integer, Consumer<InventoryClickEvent>> buttons = new HashMap<>();
+
+    private final Map<Integer, ItemProvider> providers = new HashMap<>();
+
     private final List<Consumer<InventoryClickEvent>> clickActions = new ArrayList<>();
     private final List<Consumer<InventoryCloseEvent>> closeActions = new ArrayList<>();
-    private final List<Consumer<InventoryOpenEvent>> openActions = new ArrayList<>();
+    private final List<Consumer<HumanEntity>> openActions = new ArrayList<>();
 
     private final T inventory;
     private final CustomInventory<?> previous;
@@ -43,12 +47,22 @@ public class CustomInventory<T extends Inventory> {
         this.openActions.addAll(backing.openActions);
     }
 
-    public void addButton(int slot, ItemStack item, Consumer<InventoryClickEvent> action) {
+    public void setButton(int slot, Button button) {
+        this.buttons.put(slot, event -> button.getAction().accept(event, this));
+        this.providers.put(slot, button.getProvider());
+    }
+
+    public void setButton(int slot, ItemStack item, Consumer<InventoryClickEvent> action) {
         this.buttons.put(slot, action);
         this.inventory.setItem(slot, item);
     }
 
-    public void addButton(int slot, Consumer<InventoryClickEvent> action) {
+    public void setButton(int slot, ItemProvider provider, Consumer<InventoryClickEvent> action) {
+        this.buttons.put(slot, action);
+        this.providers.put(slot, provider);
+    }
+
+    public void setButton(int slot, Consumer<InventoryClickEvent> action) {
         this.buttons.put(slot, action);
     }
 
@@ -64,7 +78,7 @@ public class CustomInventory<T extends Inventory> {
         this.closeActions.add(action);
     }
 
-    public void addOpenConsumer(Consumer<InventoryOpenEvent> action) {
+    public void addOpenConsumer(Consumer<HumanEntity> action) {
         this.openActions.add(action);
     }
 
@@ -76,10 +90,18 @@ public class CustomInventory<T extends Inventory> {
         this.inventory.setItem(slot, item);
     }
 
+    public void setItem(int slot, ItemProvider provider) {
+        this.providers.put(slot, provider);
+    }
+
     public void setItem(ItemStack item, int... slots) {
         for (int i : slots) {
             setItem(i, item);
         }
+    }
+
+    public void clearItem(int slot) {
+        this.inventory.setItem(slot, null);
     }
 
     public ItemStack getItem(int slot) {
@@ -121,6 +143,12 @@ public class CustomInventory<T extends Inventory> {
         Bukkit.getScheduler().runTask(JishLib.getPluginInstance(), () -> open(target));
     }
 
+    public void openPrevious(HumanEntity target) {
+        if (this.previous != null) {
+            this.previous.openSafe(target);
+        }
+    }
+
     public final void consumeClickEvent(InventoryClickEvent event) {
         int slot = event.getRawSlot();
 
@@ -136,7 +164,14 @@ public class CustomInventory<T extends Inventory> {
         this.closeActions.forEach(consumer -> consumer.accept(event));
     }
 
-    public final void consumeOpenEvent(InventoryOpenEvent event) {
-        this.openActions.forEach(consumer -> consumer.accept(event));
+    public final void consumeOpen(HumanEntity player) {
+        processProviders();
+        this.openActions.forEach(consumer -> consumer.accept(player));
+    }
+
+    private void processProviders() {
+        for (Entry<Integer, ItemProvider> entry : this.providers.entrySet()) {
+            this.inventory.setItem(entry.getKey(), entry.getValue().get());
+        }
     }
 }

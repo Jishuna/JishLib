@@ -32,13 +32,13 @@ public abstract class PagedCustomInventory<T, B extends Inventory> extends Custo
             int index = startIndex + i;
 
             if (index >= this.items.size()) {
-                setItem(i, null);
+                clearItem(i);
                 removeButton(i);
             } else {
                 T entry = this.items.get(index);
 
                 ItemStack item = asItemStack(entry);
-                addButton(i, item, this::onClick);
+                setButton(i, item, this::onClick);
             }
         }
     }
@@ -59,6 +59,7 @@ public abstract class PagedCustomInventory<T, B extends Inventory> extends Custo
     protected void updateList(List<T> items) {
         this.items = items;
         this.maxPage = Math.max(0, (int) Math.ceil(items.size() / (double) this.itemsPerPage) - 1);
+        this.page = 0;
 
         refreshOptions();
     }

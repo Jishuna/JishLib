@@ -6,7 +6,7 @@ public class MaterialAdapter implements StringAdapter<Material> {
 
     @Override
     public String toString(Material value) {
-        return value.name();
+        return value.getKey().toString();
     }
 
     @Override

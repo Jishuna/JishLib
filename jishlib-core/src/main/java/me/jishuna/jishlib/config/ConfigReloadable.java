@@ -29,7 +29,6 @@ public abstract class ConfigReloadable<T> {
         this.logger = manager.getLogger();
 
         cacheFields(clazz);
-       // Collections.reverse(this.fields);
     }
 
     public ConfigReloadable<T> load() {

@@ -1,4 +1,4 @@
-package me.jishuna.jishlib.items;
+package me.jishuna.jishlib.item;
 
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.Inventory;

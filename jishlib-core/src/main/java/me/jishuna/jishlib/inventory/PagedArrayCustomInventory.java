@@ -32,10 +32,10 @@ public abstract class PagedArrayCustomInventory<T, B extends Inventory> extends 
 
         for (int i = 0; i < this.itemsPerPage; i++) {
             if (i >= stackArray.length) {
-                setItem(i, null);
+                clearItem(i);
                 removeButton(i);
             } else {
-                addButton(i, stackArray[i], this::onClick);
+                setButton(i, stackArray[i], this::onClick);
             }
         }
     }

@@ -1,4 +1,4 @@
-package me.jishuna.jishlib.items;
+package me.jishuna.jishlib.item;
 
 import java.util.HashMap;
 import java.util.Map;

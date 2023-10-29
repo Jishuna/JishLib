@@ -27,15 +27,11 @@ public class StringUtils {
     }
 
     public static String miniMessageToLegacy(String input) {
-        return toLegacy(fromMiniMessage(input));
+        return ChatColor.translateAlternateColorCodes('&', toLegacy(fromMiniMessage(input)));
     }
 
     public static String legacyToMiniMessage(String input) {
         return toMiniMessage(fromLegacy(input));
-    }
-
-    public static String colorize(String input) {
-        return ChatColor.translateAlternateColorCodes('&', miniMessageToLegacy(input));
     }
 
     public static String capitalize(String input) {
