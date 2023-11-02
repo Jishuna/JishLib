@@ -9,7 +9,6 @@ public class BooleanType implements PersistentDataType<Byte, Boolean> {
     public Class<Byte> getPrimitiveType() {
         return Byte.class;
     }
-
     @Override
     public Class<Boolean> getComplexType() {
         return Boolean.class;

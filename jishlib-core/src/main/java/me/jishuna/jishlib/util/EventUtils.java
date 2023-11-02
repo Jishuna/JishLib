@@ -5,6 +5,8 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 public class EventUtils {
+    private EventUtils() {
+    }
 
     public static Entity getAttackingEntity(EntityDamageByEntityEvent event) {
         Entity damager = event.getDamager();

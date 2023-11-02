@@ -18,8 +18,7 @@ public class VectorType implements PersistentDataType<Integer, Vector> {
 
     @Override
     public Integer toPrimitive(Vector complex, PersistentDataAdapterContext context) {
-        return ((byte) complex.getBlockX() & 0xff) << 16 | ((byte) complex.getBlockY() & 0xff) << 8
-                | ((byte) complex.getBlockZ() & 0xff);
+        return ((byte) complex.getBlockX() & 0xff) << 16 | ((byte) complex.getBlockY() & 0xff) << 8 | ((byte) complex.getBlockZ() & 0xff);
     }
 
     @Override

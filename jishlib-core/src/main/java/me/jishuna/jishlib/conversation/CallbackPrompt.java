@@ -1,7 +1,6 @@
 package me.jishuna.jishlib.conversation;
 
 import java.util.function.Consumer;
-
 import org.bukkit.conversations.ConversationContext;
 import org.bukkit.conversations.Prompt;
 import org.bukkit.conversations.StringPrompt;
@@ -16,13 +15,13 @@ public class CallbackPrompt extends StringPrompt {
     }
 
     @Override
-    public String getPromptText(ConversationContext context) {
-        return this.message;
+    public Prompt acceptInput(ConversationContext context, String input) {
+        this.callback.accept(input);
+        return Prompt.END_OF_CONVERSATION;
     }
 
     @Override
-    public Prompt acceptInput(ConversationContext context, String input) {
-        callback.accept(input);
-        return Prompt.END_OF_CONVERSATION;
+    public String getPromptText(ConversationContext context) {
+        return this.message;
     }
 }

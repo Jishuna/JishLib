@@ -11,6 +11,6 @@ public class ListMessageEntry extends MessageEntry {
     }
 
     public List<String> getValue() {
-        return value;
+        return this.value;
     }
 }

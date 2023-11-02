@@ -4,23 +4,22 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Optional;
 import java.util.function.Consumer;
-
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
 public class FileUtils {
+    public static final FilenameFilter YML_FILE_FILTER = (dir, name) -> name.endsWith(".yml") || name.endsWith(".yaml");
+
     private FileUtils() {
     }
 
-    public static final FilenameFilter YML_FILE_FILTER = (dir, name) -> name.endsWith("yml") || name.endsWith("yaml");
+    public static Optional<YamlConfiguration> loadResource(Plugin source, String resourceName) {
+        Optional<File> optional = loadResourceFile(source, resourceName);
 
-    public static void saveResource(Plugin source, String resourceName) {
-        File resourceFile = new File(source.getDataFolder(), resourceName);
-
-        // Copy file if needed
-        if (!resourceFile.exists() && source.getResource(resourceName) != null) {
-            source.saveResource(resourceName, false);
+        if (optional.isPresent()) {
+            return Optional.of(YamlConfiguration.loadConfiguration(optional.get()));
         }
+        return Optional.empty();
     }
 
     public static Optional<File> loadResourceFile(Plugin source, String resourceName) {
@@ -38,13 +37,12 @@ public class FileUtils {
         return Optional.of(resourceFile);
     }
 
-    public static Optional<YamlConfiguration> loadResource(Plugin source, String resourceName) {
-        Optional<File> optional = loadResourceFile(source, resourceName);
+    public static void saveResource(Plugin source, String resourceName) {
+        File resourceFile = new File(source.getDataFolder(), resourceName);
 
-        if (optional.isPresent()) {
-            return Optional.of(YamlConfiguration.loadConfiguration(optional.get()));
-        } else {
-            return Optional.empty();
+        // Copy file if needed
+        if (!resourceFile.exists() && source.getResource(resourceName) != null) {
+            source.saveResource(resourceName, false);
         }
     }
 

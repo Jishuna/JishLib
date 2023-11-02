@@ -18,7 +18,7 @@ public class MessageWriter {
             return;
         }
 
-        try (stream; BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(this.stream))) {
+        try (this.stream; BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(this.stream))) {
             for (MessageEntry entry : messages) {
                 entry.write(writer);
             }

@@ -2,9 +2,9 @@ package me.jishuna.jishlib;
 
 public class SimpleSemVersion {
 
-    private int major;
-    private int minor;
-    private int patch;
+    private final int major;
+    private final int minor;
+    private final int patch;
 
     public SimpleSemVersion(int major, int minor, int patch) {
         this.major = major;
@@ -16,13 +16,13 @@ public class SimpleSemVersion {
         version = version.replaceAll("[^\\d.]", "");
         String[] parts = version.split("\\.");
 
-        if (parts.length != 3)
+        if (parts.length != 3) {
             throw new IllegalArgumentException("String must be in the format major.minor.patch");
+        }
 
         SimpleSemVersion semVersion = null;
         try {
-            semVersion = new SimpleSemVersion(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]),
-                    Integer.parseInt(parts[2]));
+            semVersion = new SimpleSemVersion(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
         } catch (NumberFormatException ex) {
             throw new IllegalArgumentException("String must be in the format major.minor.patch");
         }
@@ -32,9 +32,11 @@ public class SimpleSemVersion {
     public boolean isNewerThan(SimpleSemVersion other) {
         if (this.major != other.major) {
             return this.major > other.major;
-        } else if (this.minor != other.minor) {
+        }
+        if (this.minor != other.minor) {
             return this.minor > other.minor;
-        } else if (this.patch != other.patch) {
+        }
+        if (this.patch != other.patch) {
             return this.patch > other.patch;
         }
         return false;
@@ -44,5 +46,4 @@ public class SimpleSemVersion {
     public String toString() {
         return this.major + "." + this.minor + "." + this.patch;
     }
-
 }

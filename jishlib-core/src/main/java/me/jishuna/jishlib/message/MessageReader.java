@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MessageReader {
-    private final InputStream stream;
-
     private final List<String> commentBuffer = new ArrayList<>();
+
     private final List<MessageEntry> messages = new ArrayList<>();
+    private final InputStream stream;
 
     public MessageReader(InputStream stream) {
         this.stream = stream;
@@ -22,7 +22,7 @@ public class MessageReader {
             return this.messages;
         }
 
-        try (stream; BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
+        try (this.stream; BufferedReader reader = new BufferedReader(new InputStreamReader(this.stream))) {
             while (reader.ready()) {
                 processLine(reader.readLine());
             }
@@ -36,11 +36,11 @@ public class MessageReader {
         line = line.trim();
 
         if (line.isBlank() || line.startsWith("#")) {
-            commentBuffer.add(line);
+            this.commentBuffer.add(line);
             return;
         }
 
-        messages.add(new MessageEntry(line, this.commentBuffer.toArray(String[]::new)));
+        this.messages.add(new MessageEntry(line, this.commentBuffer.toArray(String[]::new)));
         this.commentBuffer.clear();
     }
 }

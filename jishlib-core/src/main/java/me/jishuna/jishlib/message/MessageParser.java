@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import me.jishuna.jishlib.util.StringUtils;
 
 public class MessageParser {
@@ -16,13 +15,40 @@ public class MessageParser {
     private final Map<String, MessageEntry> messages = new LinkedHashMap<>();
 
     private MessageParser() {
-
     }
 
-    private void parseMessages(List<MessageEntry> messages) {
-        for (MessageEntry entry : messages) {
-            parseMessage(entry);
+    public static MessageParser empty() {
+        return new MessageParser();
+    }
+
+    public static MessageParser parse(List<MessageEntry> messages) {
+        MessageParser parser = new MessageParser();
+        parser.parseMessages(messages);
+
+        return parser;
+    }
+
+    public Map<String, MessageEntry> getRawMessages() {
+        return this.messages;
+    }
+
+    public boolean merge(MessageParser other) {
+        boolean added = false;
+
+        for (Entry<String, MessageEntry> entry : other.messages.entrySet()) {
+            String key = entry.getKey();
+            if (!this.messages.containsKey(key)) {
+                this.messages.put(key, entry.getValue());
+                added = true;
+            }
         }
+
+        return added;
+    }
+
+    private List<String> parseListMessage(String input) {
+        Matcher matcher = LIST_PATTERN.matcher(input);
+        return matcher.results().map(this::processMatch).toList();
     }
 
     private void parseMessage(MessageEntry entry) {
@@ -44,41 +70,13 @@ public class MessageParser {
         this.messages.put(key, parsed);
     }
 
-    private List<String> parseListMessage(String input) {
-        Matcher matcher = LIST_PATTERN.matcher(input);
-        return matcher.results().map(this::processMatch).toList();
+    private void parseMessages(List<MessageEntry> messages) {
+        for (MessageEntry entry : messages) {
+            parseMessage(entry);
+        }
     }
 
     private String processMatch(MatchResult result) {
         return StringUtils.miniMessageToLegacy(result.group(1).replace("\\\"", "\""));
-    }
-
-    public boolean merge(MessageParser other) {
-        boolean added = false;
-
-        for (Entry<String, MessageEntry> entry : other.messages.entrySet()) {
-            String key = entry.getKey();
-            if (!this.messages.containsKey(key)) {
-                this.messages.put(key, entry.getValue());
-                added = true;
-            }
-        }
-
-        return added;
-    }
-
-    public Map<String, MessageEntry> getRawMessages() {
-        return this.messages;
-    }
-
-    public static MessageParser parse(List<MessageEntry> messages) {
-        MessageParser parser = new MessageParser();
-        parser.parseMessages(messages);
-
-        return parser;
-    }
-
-    public static MessageParser empty() {
-        return new MessageParser();
     }
 }

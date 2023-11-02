@@ -1,7 +1,6 @@
 package me.jishuna.jishlib.item.provider;
 
 import java.util.function.Supplier;
-
 import org.bukkit.inventory.ItemStack;
 
 public class DynamicItemProvider implements ItemProvider {

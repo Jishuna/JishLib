@@ -1,24 +1,32 @@
 package me.jishuna.jishlib.inventory;
 
 import java.util.HashMap;
-
+import java.util.UUID;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.InventoryView;
 
 public class CustomInventoryManager implements Listener {
-    private final HashMap<InventoryView, CustomInventory<?>> inventoryMap = new HashMap<>();
+    private final HashMap<UUID, CustomInventorySession> inventoryMap = new HashMap<>();
 
-    public void openInventory(HumanEntity player, CustomInventory<?> inventory) {
-        inventory.consumeOpen(player);
-        this.inventoryMap.put(player.openInventory(inventory.getBukkitInventory()), inventory);
+    public void destroySession(HumanEntity player) {
+        destroySession(player.getUniqueId());
     }
 
-    public CustomInventory<?> getInventory(InventoryView view) {
-        return this.inventoryMap.get(view);
+    public void destroySession(UUID id) {
+        this.inventoryMap.remove(id);
     }
 
-    public CustomInventory<?> removeInventory(InventoryView view) {
-        return this.inventoryMap.remove(view);
+    public CustomInventorySession getSession(HumanEntity player) {
+        return getSession(player.getUniqueId());
+    }
+
+    public CustomInventorySession getSession(UUID id) {
+        return this.inventoryMap.get(id);
+    }
+
+    public void openInventory(HumanEntity player, CustomInventory<?> inventory, boolean recordHistory) {
+        this.inventoryMap
+                .computeIfAbsent(player.getUniqueId(), k -> new CustomInventorySession(player, inventory, this))
+                .open(inventory, recordHistory);
     }
 }

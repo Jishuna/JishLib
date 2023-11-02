@@ -4,33 +4,28 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Scanner;
-
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Consumer;
 
 // From: https://www.spigotmc.org/wiki/creating-an-update-checker-that-checks-for-updates
 public class UpdateChecker {
 
-	private final JavaPlugin plugin;
-	private final int resourceId;
+    private final JavaPlugin plugin;
+    private final int resourceId;
 
-	public UpdateChecker(JavaPlugin plugin, int resourceId) {
-		this.plugin = plugin;
-		this.resourceId = resourceId;
-	}
+    public UpdateChecker(JavaPlugin plugin, int resourceId) {
+        this.plugin = plugin;
+        this.resourceId = resourceId;
+    }
 
-	public void getVersion(final Consumer<String> consumer) {
-		Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
-			try (InputStream inputStream = new URL(
-					"https://api.spigotmc.org/legacy/update.php?resource=" + this.resourceId).openStream();
-					Scanner scanner = new Scanner(inputStream)) {
-				if (scanner.hasNext()) {
-					consumer.accept(scanner.next());
-				}
-			} catch (IOException exception) {
-				plugin.getLogger().warning("Unable to check for updates: " + exception.getMessage());
-			}
-		});
-	}
+    public void getVersion(final Consumer<String> consumer) {
+        try (InputStream inputStream = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + this.resourceId).openStream();
+                Scanner scanner = new Scanner(inputStream)) {
+            if (scanner.hasNext()) {
+                consumer.accept(scanner.next());
+            }
+        } catch (IOException exception) {
+            this.plugin.getLogger().warning("Unable to check for updates: " + exception.getMessage());
+        }
+    }
 }

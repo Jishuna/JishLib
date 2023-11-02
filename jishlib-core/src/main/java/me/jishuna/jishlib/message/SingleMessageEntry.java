@@ -9,6 +9,6 @@ public class SingleMessageEntry extends MessageEntry {
     }
 
     public String getValue() {
-        return value;
+        return this.value;
     }
 }

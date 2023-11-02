@@ -2,14 +2,13 @@ package me.jishuna.jishlib.item.provider;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-
 import me.jishuna.jishlib.item.ItemBuilder;
 import me.jishuna.jishlib.message.Messages;
 
 public class TranslatedItemProvider implements ItemProvider {
     private final ItemBuilder builder;
-    private final String nameKey;
     private final String loreKey;
+    private final String nameKey;
 
     private TranslatedItemProvider(ItemBuilder builder, String nameKey, String loreKey) {
         this.builder = builder;
@@ -17,12 +16,12 @@ public class TranslatedItemProvider implements ItemProvider {
         this.loreKey = loreKey;
     }
 
-    public static TranslatedItemProvider create(Material material, String nameKey, String loreKey) {
-        return create(ItemBuilder.create(material), nameKey, loreKey);
-    }
-
     public static TranslatedItemProvider create(ItemBuilder builder, String nameKey, String loreKey) {
         return new TranslatedItemProvider(builder, nameKey, loreKey);
+    }
+
+    public static TranslatedItemProvider create(Material material, String nameKey, String loreKey) {
+        return create(ItemBuilder.create(material), nameKey, loreKey);
     }
 
     @Override

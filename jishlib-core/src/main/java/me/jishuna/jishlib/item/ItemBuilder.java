@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -48,6 +47,10 @@ public class ItemBuilder {
         return builder;
     }
 
+    public static ItemBuilder modifyClone(ItemStack item) {
+        return modifyItem(item.clone());
+    }
+
     public static ItemBuilder modifyItem(ItemStack item) {
         ItemBuilder builder = new ItemBuilder();
         builder.item = item;
@@ -56,27 +59,8 @@ public class ItemBuilder {
         return builder;
     }
 
-    public static ItemBuilder modifyClone(ItemStack item) {
-        return modifyItem(item.clone());
-    }
-
-    public <T extends ItemMeta> ItemBuilder modify(Class<T> metaType, Consumer<T> action) {
-        if (!metaType.isAssignableFrom(meta.getClass())) {
-            return this;
-        }
-
-        action.accept(metaType.cast(meta));
-        return this;
-    }
-
-    public ItemBuilder type(Material type) {
-        this.item.setType(type);
-        this.meta = Bukkit.getItemFactory().asMetaFor(this.meta, type);
-        return this;
-    }
-
-    public Material type() {
-        return this.item.getType();
+    public int amount() {
+        return this.item.getAmount();
     }
 
     public ItemBuilder amount(int amount) {
@@ -84,8 +68,114 @@ public class ItemBuilder {
         return this;
     }
 
-    public int amount() {
-        return this.item.getAmount();
+    public ItemStack build() {
+        ItemStack finalItem = this.item;
+        finalItem.setItemMeta(this.meta);
+
+        return finalItem;
+    }
+
+    public ItemBuilder clearLore() {
+        this.meta.setLore(new ArrayList<>());
+        return this;
+    }
+
+    @Override
+    public ItemBuilder clone() {
+        ItemBuilder clone = new ItemBuilder();
+        clone.item = this.item.clone();
+        clone.meta = this.meta.clone();
+
+        return clone;
+    }
+
+    public int durability() {
+        if (this.meta instanceof Damageable damageable) {
+            return damageable.getDamage();
+        }
+        return 0;
+    }
+
+    public ItemBuilder durability(int durability) {
+        if (this.meta instanceof Damageable damageable) {
+            damageable.setDamage(durability);
+        }
+        return this;
+    }
+
+    public ItemBuilder enchantment(Enchantment enchantment, int level) {
+        this.meta.addEnchant(enchantment, level, true);
+        return this;
+    }
+
+    public Set<ItemFlag> flags() {
+        return this.meta.getItemFlags();
+    }
+
+    public ItemBuilder flags(ItemFlag... flags) {
+        this.meta.addItemFlags(flags);
+        return this;
+    }
+
+    public int level(Enchantment enchantment) {
+        return this.meta.getEnchantLevel(enchantment);
+    }
+
+    public List<String> lore() {
+        return this.meta.hasLore() ? this.meta.getLore() : new ArrayList<>();
+    }
+
+    public ItemBuilder lore(List<String> lore) {
+        List<String> itemLore = lore();
+        itemLore.addAll(lore);
+
+        this.meta.setLore(itemLore);
+        return this;
+    }
+
+    public ItemBuilder lore(String... lore) {
+        List<String> itemLore = lore();
+        List<String> loreList = Arrays.stream(lore).toList();
+        itemLore.addAll(loreList);
+
+        this.meta.setLore(itemLore);
+        return this;
+    }
+
+    public Integer modelData() {
+        return this.meta.hasCustomModelData() ? this.meta.getCustomModelData() : null;
+    }
+
+    public ItemBuilder modelData(Integer value) {
+        this.meta.setCustomModelData(value);
+        return this;
+    }
+
+    public ItemBuilder modifier(Attribute attribute, AttributeModifier modifier) {
+        this.meta.addAttributeModifier(attribute, modifier);
+        return this;
+    }
+
+    public Collection<AttributeModifier> modifiers(Attribute attribute) {
+        if (!this.meta.hasAttributeModifiers()) {
+            return Collections.emptyList();
+        }
+
+        Collection<AttributeModifier> modifiers = this.meta.getAttributeModifiers(attribute);
+        return modifiers == null ? Collections.emptyList() : modifiers;
+    }
+
+    public <T extends ItemMeta> ItemBuilder modify(Class<T> metaType, Consumer<T> action) {
+        if (!metaType.isAssignableFrom(this.meta.getClass())) {
+            return this;
+        }
+
+        action.accept(metaType.cast(this.meta));
+        return this;
+    }
+
+    public String name() {
+        return this.meta.getDisplayName();
     }
 
     public ItemBuilder name(String name) {
@@ -101,60 +191,8 @@ public class ItemBuilder {
         return this;
     }
 
-    public String name() {
-        return this.meta.getDisplayName();
-    }
-
-    public ItemBuilder lore(List<String> lore) {
-        List<String> itemLore = lore();
-        itemLore.addAll(lore);
-
-        meta.setLore(itemLore);
-        return this;
-    }
-
-    public ItemBuilder lore(String... lore) {
-        List<String> itemLore = lore();
-        List<String> loreList = Arrays.stream(lore).toList();
-        itemLore.addAll(loreList);
-
-        meta.setLore(itemLore);
-        return this;
-    }
-
-    public ItemBuilder removeLore(int index) {
-        List<String> itemLore = lore();
-        itemLore.remove(index);
-
-        meta.setLore(itemLore);
-        return this;
-    }
-
-    public ItemBuilder clearLore() {
-        meta.setLore(new ArrayList<>());
-        return this;
-    }
-
-    public List<String> lore() {
-        return meta.hasLore() ? meta.getLore() : new ArrayList<>();
-    }
-
-    public ItemBuilder durability(int durability) {
-        if (this.meta instanceof Damageable damageable) {
-            damageable.setDamage(durability);
-        }
-        return this;
-    }
-
-    public int durability() {
-        if (this.meta instanceof Damageable damageable) {
-            return damageable.getDamage();
-        }
-        return 0;
-    }
-
-    public ItemBuilder enchantment(Enchantment enchantment, int level) {
-        this.meta.addEnchant(enchantment, level, true);
+    public <T, Z> ItemBuilder persistentData(NamespacedKey key, PersistentDataType<T, Z> type, Z value) {
+        this.meta.getPersistentDataContainer().set(key, type, value);
         return this;
     }
 
@@ -163,54 +201,16 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder storedEnchantment(Enchantment enchantment, int level) {
-        return modify(EnchantmentStorageMeta.class, meta -> meta.addStoredEnchant(enchantment, level, true));
-    }
-
-    public int level(Enchantment enchantment) {
-        return this.meta.getEnchantLevel(enchantment);
-    }
-
-    public ItemBuilder unbreakable(boolean unbreakable) {
-        this.meta.setUnbreakable(unbreakable);
-        return this;
-    }
-
-    public boolean unbreakable() {
-        return this.meta.isUnbreakable();
-    }
-
-    public ItemBuilder flags(ItemFlag... flags) {
-        this.meta.addItemFlags(flags);
-        return this;
-    }
-
     public ItemBuilder removeFlags(ItemFlag... flags) {
         this.meta.removeItemFlags(flags);
         return this;
     }
 
-    public Set<ItemFlag> flags() {
-        return this.meta.getItemFlags();
-    }
+    public ItemBuilder removeLore(int index) {
+        List<String> itemLore = lore();
+        itemLore.remove(index);
 
-    public <T, Z> ItemBuilder persistentData(NamespacedKey key, PersistentDataType<T, Z> type, Z value) {
-        this.meta.getPersistentDataContainer().set(key, type, value);
-        return this;
-    }
-
-    public ItemBuilder removePersistentData(NamespacedKey key) {
-        this.meta.getPersistentDataContainer().remove(key);
-        return this;
-    }
-
-    public ItemBuilder modelData(int index) {
-        this.meta.setCustomModelData(index);
-        return this;
-    }
-
-    public ItemBuilder modifier(Attribute attribute, AttributeModifier modifier) {
-        this.meta.addAttributeModifier(attribute, modifier);
+        this.meta.setLore(itemLore);
         return this;
     }
 
@@ -219,17 +219,17 @@ public class ItemBuilder {
         return this;
     }
 
-    public Collection<AttributeModifier> modifiers(Attribute attribute) {
-        if (!this.meta.hasAttributeModifiers()) {
-            return Collections.emptyList();
-        }
+    public ItemBuilder removePersistentData(NamespacedKey key) {
+        this.meta.getPersistentDataContainer().remove(key);
+        return this;
+    }
 
-        Collection<AttributeModifier> modifiers = this.meta.getAttributeModifiers(attribute);
-        return modifiers == null ? Collections.emptyList() : modifiers;
+    public ItemBuilder skullProfile(PlayerProfile profile) {
+        return modify(SkullMeta.class, skullMeta -> skullMeta.setOwnerProfile(profile));
     }
 
     public ItemBuilder skullTexture(String texture) {
-        return modify(SkullMeta.class, meta -> {
+        return modify(SkullMeta.class, skullMeta -> {
             PlayerProfile profile = Bukkit.createPlayerProfile(UUID.nameUUIDFromBytes(texture.getBytes()));
             PlayerTextures textures = profile.getTextures();
             try {
@@ -239,28 +239,30 @@ public class ItemBuilder {
             }
 
             profile.setTextures(textures);
-            meta.setOwnerProfile(profile);
+            skullMeta.setOwnerProfile(profile);
         });
     }
 
-    public ItemBuilder skullProfile(PlayerProfile profile) {
-        return modify(SkullMeta.class, meta -> {
-            meta.setOwnerProfile(profile);
-        });
+    public ItemBuilder storedEnchantment(Enchantment enchantment, int level) {
+        return modify(EnchantmentStorageMeta.class, storageMeta -> storageMeta.addStoredEnchant(enchantment, level, true));
     }
 
-    public ItemStack build() {
-        ItemStack finalItem = this.item;
-        finalItem.setItemMeta(this.meta);
-
-        return finalItem;
+    public Material type() {
+        return this.item.getType();
     }
 
-    public ItemBuilder clone() {
-        ItemBuilder clone = new ItemBuilder();
-        clone.item = this.item.clone();
-        clone.meta = this.meta.clone();
+    public ItemBuilder type(Material type) {
+        this.item.setType(type);
+        this.meta = Bukkit.getItemFactory().asMetaFor(this.meta, type);
+        return this;
+    }
 
-        return clone;
+    public boolean unbreakable() {
+        return this.meta.isUnbreakable();
+    }
+
+    public ItemBuilder unbreakable(boolean unbreakable) {
+        this.meta.setUnbreakable(unbreakable);
+        return this;
     }
 }
