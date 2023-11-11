@@ -94,6 +94,14 @@ public class CustomInventory<T extends Inventory> {
         return this.inventory.getItem(slot);
     }
 
+    public ItemProvider getProvider(int slot) {
+        return this.providers.get(slot);
+    }
+
+    public boolean hasItem(int slot) {
+        return this.inventory.getItem(slot) != null || this.providers.get(slot) != null;
+    }
+
     public int getSize() {
         return this.inventory.getSize();
     }

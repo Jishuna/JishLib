@@ -5,11 +5,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
-
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.Plugin;
-
 import me.jishuna.jishlib.collections.WeightedRandom;
 import me.jishuna.jishlib.config.adapter.CollectionAdapter;
 import me.jishuna.jishlib.config.adapter.ConfigMappableAdapter;
@@ -25,6 +23,8 @@ import me.jishuna.jishlib.config.adapter.WeightedRandomAdapter;
 import me.jishuna.jishlib.config.annotation.ConfigMappable;
 
 public class ConfigurationManager {
+    public static final MaterialAdapter MATERIAL_ADAPTER = new MaterialAdapter();
+    public static final NamespacedKeyAdapter NAMESPACE_ADAPTER = new NamespacedKeyAdapter();
 
     private final Map<ConfigType<?>, TypeAdapter<?>> adapters = new HashMap<>();
     private final Logger logger;
@@ -48,8 +48,8 @@ public class ConfigurationManager {
         registerTypeAdapter(Boolean.class, new PrimitiveAdapter<>(Boolean::parseBoolean));
 
         registerTypeAdapter(String.class, new StringTypeAdapter());
-        registerTypeAdapter(NamespacedKey.class, new NamespacedKeyAdapter());
-        registerTypeAdapter(Material.class, new MaterialAdapter());
+        registerTypeAdapter(NamespacedKey.class, NAMESPACE_ADAPTER);
+        registerTypeAdapter(Material.class, MATERIAL_ADAPTER);
 
     }
 

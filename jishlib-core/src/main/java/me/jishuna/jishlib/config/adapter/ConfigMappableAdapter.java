@@ -4,9 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.bukkit.configuration.ConfigurationSection;
-
 import me.jishuna.jishlib.config.ConfigField;
 import me.jishuna.jishlib.config.ConfigType;
 import me.jishuna.jishlib.config.ConfigurationManager;
@@ -29,6 +27,7 @@ public class ConfigMappableAdapter<T> implements TypeAdapter<T> {
         cacheFields(this.type.getType());
     }
 
+    @Override
     public T read(ConfigurationSection config, String path) {
         try {
             T object = this.type.getType().getDeclaredConstructor().newInstance();
@@ -71,12 +70,13 @@ public class ConfigMappableAdapter<T> implements TypeAdapter<T> {
         return null;
     }
 
-    public void write(ConfigurationSection config, String path, Object value, boolean replace) {
+    @Override
+    public void write(ConfigurationSection config, String path, T value, boolean replace) {
         for (ConfigField field : this.fields) {
             String fullPath = path + "." + field.getPath();
 
             if (!fullPath.isEmpty()) {
-                config.setComments(fullPath, field.getComments());
+                // config.setComments(fullPath, field.getComments());
             }
 
             ConfigType<?> type = ConfigType.get(field.getField());
@@ -93,8 +93,8 @@ public class ConfigMappableAdapter<T> implements TypeAdapter<T> {
                 continue;
             }
 
-            adapter.write(config, fullPath, writeValue, replace);
-            config.setComments(fullPath, field.getComments());
+            adapter.writeObject(config, fullPath, writeValue, replace);
+            // config.setComments(fullPath, field.getComments());
         }
     }
 

@@ -7,21 +7,18 @@ public interface StringAdapter<T> extends TypeAdapter<T> {
 
     public T fromString(String value);
 
+    @Override
     default T read(ConfigurationSection config, String path) {
         String value = config.getString(path);
         return value == null ? null : fromString(value);
     }
 
-    @SuppressWarnings("unchecked")
-    default void write(ConfigurationSection config, String path, Object value, boolean replace) {
-        if (value == null) {
-            return;
-        }
-        
-        if (config.isSet(path) && !replace) {
+    @Override
+    default void write(ConfigurationSection config, String path, T value, boolean replace) {
+        if ((value == null) || (config.isSet(path) && !replace)) {
             return;
         }
 
-        config.set(path, toString((T) value));
+        config.set(path, toString(value));
     }
 }

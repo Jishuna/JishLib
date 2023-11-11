@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class MessageReader {
             return this.messages;
         }
 
-        try (this.stream; BufferedReader reader = new BufferedReader(new InputStreamReader(this.stream))) {
+        try (this.stream; BufferedReader reader = new BufferedReader(new InputStreamReader(this.stream, StandardCharsets.UTF_8))) {
             while (reader.ready()) {
                 processLine(reader.readLine());
             }

@@ -77,9 +77,14 @@ public class JishLib {
     }
 
     public static void loadMessages(String fileName) {
+        File folder = getPluginInstance().getDataFolder();
         try {
+            if (!folder.exists() && !folder.mkdirs()) {
+                getLogger().severe("Failed to load messages: Failed to create message file");
+                return;
+            }
             MessageParser parser = MessageParser.empty();
-            File target = new File(getPluginInstance().getDataFolder(), fileName);
+            File target = new File(folder, fileName);
 
             if (target.exists()) {
                 MessageReader external = new MessageReader(new FileInputStream(target));

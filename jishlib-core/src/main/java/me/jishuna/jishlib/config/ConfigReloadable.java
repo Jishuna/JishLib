@@ -8,9 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.bukkit.configuration.file.YamlConfiguration;
-
 import me.jishuna.jishlib.config.adapter.TypeAdapter;
 import me.jishuna.jishlib.config.annotation.ConfigEntry;
 import me.jishuna.jishlib.config.annotation.PostLoad;
@@ -43,7 +41,7 @@ public abstract class ConfigReloadable<T> {
             return this;
         }
 
-        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(this.file);
         for (ConfigField field : this.fields) {
             if (field.isStatic() && !includeStatic) {
                 continue;
@@ -52,33 +50,35 @@ public abstract class ConfigReloadable<T> {
             String path = field.getPath();
 
             if (!config.isSet(path)) {
-                logger.log(Level.WARNING, "No configuration entry found for {0}", path);
+                this.logger.log(Level.WARNING, "No configuration entry found for {0}", path);
                 continue;
             }
 
             ConfigType<?> type = ConfigType.get(field.getField());
             TypeAdapter<?> adapter = this.manager.getAdapter(type);
             if (adapter == null) {
-                logger.log(Level.WARNING, "No configuration adapter found for {0}", type.getClass());
+                this.logger.log(Level.WARNING, "No configuration adapter found for {0}", type.getClass());
                 continue;
             }
 
             Object readValue = adapter.read(config, path);
             if (readValue == null) {
-                logger.log(Level.WARNING, "Failed to read value for {0} of type {1}",
-                        new Object[] { path, type.getType() });
+                this.logger
+                        .log(Level.WARNING, "Failed to read value for {0} of type {1}",
+                                new Object[] { path, type.getType() });
                 continue;
             }
 
             try {
                 setField(field, readValue);
             } catch (ReflectiveOperationException ex) {
-                logger.log(Level.WARNING, "Failed to read value for {0} of type {1}",
-                        new Object[] { path, type.getType() });
+                this.logger
+                        .log(Level.WARNING, "Failed to read value for {0} of type {1}",
+                                new Object[] { path, type.getType() });
                 ex.printStackTrace();
             }
         }
-        
+
         if (this.postLoadMethod != null) {
             this.postLoad(this.postLoadMethod);
         }
@@ -103,7 +103,7 @@ public abstract class ConfigReloadable<T> {
             return this;
         }
 
-        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(this.file);
 
         for (ConfigField field : this.fields) {
             String path = field.getPath();
@@ -115,24 +115,24 @@ public abstract class ConfigReloadable<T> {
             ConfigType<?> type = ConfigType.get(field.getField());
             TypeAdapter<?> adapter = this.manager.getAdapter(type);
             if (adapter == null) {
-                logger.log(Level.WARNING, "No configuration adapter found for {0}", type.getType());
+                this.logger.log(Level.WARNING, "No configuration adapter found for {0}", type.getType());
                 continue;
             }
 
             Object writeValue = getField(field);
             if (writeValue == null) {
-                logger.log(Level.WARNING, "null");
+                this.logger.log(Level.WARNING, "null");
                 continue;
             }
 
-            adapter.write(config, path, writeValue, replace);
+            adapter.writeObject(config, path, writeValue, replace);
             config.setComments(path, field.getComments());
         }
 
         try {
-            config.save(file);
+            config.save(this.file);
         } catch (IOException ex) {
-            logger.log(Level.WARNING, "Failed to save configuration file {0}", file.getName());
+            this.logger.log(Level.WARNING, "Failed to save configuration file {0}", this.file.getName());
             ex.printStackTrace();
         }
         return this;
@@ -141,23 +141,23 @@ public abstract class ConfigReloadable<T> {
     protected abstract void setField(ConfigField field, Object value) throws ReflectiveOperationException;
 
     protected abstract Object getField(ConfigField field);
-    
+
     protected abstract void postLoad(Method postLoadMethod2);
 
     private boolean prepareFile() {
         try {
-            if (!file.getParentFile().exists() && !file.getParentFile().mkdirs()) {
-                logger.log(Level.WARNING, "Error creating file {0}", file.getName());
+            if (!this.file.getParentFile().exists() && !this.file.getParentFile().mkdirs()) {
+                this.logger.log(Level.WARNING, "Error creating file {0}", this.file.getName());
                 return false;
             }
 
-            if (!file.exists()) {
-                return file.createNewFile();
+            if (!this.file.exists()) {
+                return this.file.createNewFile();
             }
 
             return true;
         } catch (IOException ex) {
-            logger.log(Level.WARNING, "Error creating file {0}", file.getName());
+            this.logger.log(Level.WARNING, "Error creating file {0}", this.file.getName());
             return false;
         }
     }
@@ -177,7 +177,7 @@ public abstract class ConfigReloadable<T> {
             cacheFields(superClass);
         }
     }
-    
+
     private Method findPostLoadMethod(Class<? super T> clazz) {
         for (Method method : clazz.getDeclaredMethods()) {
             if (method.isAnnotationPresent(PostLoad.class)) {

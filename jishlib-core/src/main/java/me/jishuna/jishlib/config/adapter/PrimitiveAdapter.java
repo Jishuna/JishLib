@@ -1,7 +1,6 @@
 package me.jishuna.jishlib.config.adapter;
 
 import java.util.function.Function;
-
 import org.bukkit.configuration.ConfigurationSection;
 
 public class PrimitiveAdapter<T> implements StringAdapter<T> {
@@ -13,11 +12,11 @@ public class PrimitiveAdapter<T> implements StringAdapter<T> {
     }
 
     @Override
-    public void write(ConfigurationSection config, String path, Object value, boolean replace) {
+    public void write(ConfigurationSection config, String path, T value, boolean replace) {
         if (config.isSet(path) && !replace) {
             return;
         }
-        
+
         config.set(path, value);
     }
 
@@ -28,6 +27,6 @@ public class PrimitiveAdapter<T> implements StringAdapter<T> {
 
     @Override
     public T fromString(String value) {
-        return reader.apply(value);
+        return this.reader.apply(value);
     }
 }

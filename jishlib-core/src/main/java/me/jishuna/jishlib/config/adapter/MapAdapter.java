@@ -2,9 +2,7 @@ package me.jishuna.jishlib.config.adapter;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import org.bukkit.configuration.ConfigurationSection;
-
 import me.jishuna.jishlib.config.ConfigType;
 import me.jishuna.jishlib.config.ConfigurationManager;
 
@@ -18,6 +16,7 @@ public class MapAdapter<K, V, T extends Map<K, V>> implements TypeAdapter<T> {
         this.valueAdapter = (TypeAdapter<V>) manager.getAdapter(type.getComponentTypes().get(1));
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public T read(ConfigurationSection config, String path) {
         T map = (T) new LinkedHashMap<>();
@@ -33,7 +32,7 @@ public class MapAdapter<K, V, T extends Map<K, V>> implements TypeAdapter<T> {
             if (isString && section.isConfigurationSection(key)) {
                 continue;
             }
-            
+
             K mapKey = this.keyAdapter.fromString(key);
             V mapValue = this.valueAdapter.read(section, key);
             map.put(mapKey, mapValue);
@@ -43,13 +42,14 @@ public class MapAdapter<K, V, T extends Map<K, V>> implements TypeAdapter<T> {
         return map;
     }
 
-    @SuppressWarnings("unchecked")
-    public void write(ConfigurationSection config, String path, Object value, boolean replace) {
-        ((T) value).forEach((k, v) -> {
+    @Override
+    public void write(ConfigurationSection config, String path, T value, boolean replace) {
+        value.forEach((k, v) -> {
             String newPath = new StringBuilder(path).append(".").append(this.keyAdapter.toString(k)).toString();
             if (!replace && config.isSet(newPath)) {
                 return;
             }
+
             this.valueAdapter.write(config, newPath, v, replace);
         });
     }

@@ -29,20 +29,19 @@ public class ReflectionHelper {
             } catch (ReflectiveOperationException ex) {
                 return null;
             }
-        } else {
-            boolean access = internal.canAccess(wrapped);
-            if (!access) {
-                internal.trySetAccessible();
-            }
+        }
+        boolean access = internal.canAccess(wrapped);
+        if (!access) {
+            internal.trySetAccessible();
+        }
 
-            try {
-                return internal.get(wrapped);
-            } catch (ReflectiveOperationException ex) {
-                return null;
-            } finally {
-                if (!access) {
-                    internal.setAccessible(false);
-                }
+        try {
+            return internal.get(wrapped);
+        } catch (ReflectiveOperationException ex) {
+            return null;
+        } finally {
+            if (!access) {
+                internal.setAccessible(false);
             }
         }
     }

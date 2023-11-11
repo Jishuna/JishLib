@@ -17,6 +17,6 @@ public class EnumAdapter<T extends Enum> implements StringAdapter<T> {
     @SuppressWarnings("unchecked")
     @Override
     public T fromString(String value) {
-        return (T) Enum.valueOf(clazz, value);
+        return (T) Enum.valueOf(this.clazz, value);
     }
 }

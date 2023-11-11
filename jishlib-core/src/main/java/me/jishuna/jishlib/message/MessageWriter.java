@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
 public class MessageWriter {
@@ -18,7 +19,7 @@ public class MessageWriter {
             return;
         }
 
-        try (this.stream; BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(this.stream))) {
+        try (this.stream; BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(this.stream, StandardCharsets.UTF_8))) {
             for (MessageEntry entry : messages) {
                 entry.write(writer);
             }
