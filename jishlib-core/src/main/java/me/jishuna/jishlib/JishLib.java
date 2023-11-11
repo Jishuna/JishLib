@@ -4,12 +4,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
-import org.bukkit.conversations.ConversationFactory;
 import org.bukkit.plugin.Plugin;
 import me.jishuna.jishlib.config.ConfigurationManager;
+import me.jishuna.jishlib.conversation.ConversationManager;
 import me.jishuna.jishlib.inventory.CustomInventoryListener;
 import me.jishuna.jishlib.inventory.CustomInventoryManager;
 import me.jishuna.jishlib.message.MessageParser;
@@ -20,15 +24,31 @@ import me.jishuna.jishlib.message.Messages;
 public class JishLib {
     private static JishLib instance;
 
+    private final String messageFile;
     private final ConfigurationManager configManager;
-    private final ConversationFactory conversationFactory;
-    private final CustomInventoryManager inventoryManager = new CustomInventoryManager();
+    private final ConversationManager conversationManager;
+    private final CustomInventoryManager inventoryManager;
     private final Plugin plugin;
 
-    private JishLib(Plugin plugin) {
+    private JishLib(Plugin plugin, Collection<Component> components, String messageFile) {
         this.plugin = plugin;
-        this.configManager = new ConfigurationManager(plugin);
-        this.conversationFactory = new ConversationFactory(plugin).withLocalEcho(false);
+        this.messageFile = messageFile;
+
+        this.configManager = getConfigurationManager(components, plugin);
+        this.inventoryManager = getInventoryManager(components, plugin);
+        this.conversationManager = getConversationManager(components, plugin);
+    }
+
+    public static Builder build(Plugin plugin) {
+        return new Builder(plugin);
+    }
+
+    public static Plugin getPlugin() {
+        return getInstance().plugin;
+    }
+
+    public static Logger getLogger() {
+        return getInstance().plugin.getLogger();
     }
 
     public static void cleanup() {
@@ -39,8 +59,12 @@ public class JishLib {
         return getInstance().configManager;
     }
 
-    public static ConversationFactory getConversationFactory() {
-        return getInstance().conversationFactory;
+    public static CustomInventoryManager getInventoryManager() {
+        return getInstance().inventoryManager;
+    }
+
+    public static ConversationManager getConversationManager() {
+        return getInstance().conversationManager;
     }
 
     public static JishLib getInstance() {
@@ -51,33 +75,14 @@ public class JishLib {
         return instance;
     }
 
-    public static CustomInventoryManager getInventoryManager() {
-        return getInstance().inventoryManager;
-    }
+    public static void reloadMessages() {
+        String fileName = getInstance().messageFile;
+        if (fileName == null) {
+            throw new IllegalStateException("Message file not set!");
+        }
 
-    public static Logger getLogger() {
-        return getInstance().plugin.getLogger();
-    }
+        File folder = getPlugin().getDataFolder();
 
-    public static Plugin getPlugin() {
-        return getInstance().plugin;
-    }
-
-    public static Plugin getPluginInstance() {
-        return getInstance().plugin;
-    }
-
-    /**
-     * Initialize JishLib for the provided plugin.
-     *
-     * @param plugin the plugin
-     */
-    public static void initialize(Plugin plugin) {
-        instance = new JishLib(plugin);
-    }
-
-    public static void loadMessages(String fileName) {
-        File folder = getPluginInstance().getDataFolder();
         try {
             if (!folder.exists() && !folder.mkdirs()) {
                 getLogger().severe("Failed to load messages: Failed to create message file");
@@ -94,7 +99,7 @@ public class JishLib {
                 return;
             }
 
-            MessageReader internal = new MessageReader(getPluginInstance().getResource(fileName));
+            MessageReader internal = new MessageReader(getPlugin().getResource(fileName));
             if (parser.merge(MessageParser.parse(internal.readMessages()))) {
                 MessageWriter writer = new MessageWriter(new FileOutputStream(target));
                 writer.writeMessages(parser.getRawMessages().values());
@@ -107,23 +112,68 @@ public class JishLib {
         }
     }
 
-    public static void registerEvents() {
-        Bukkit.getPluginManager().registerEvents(new CustomInventoryListener(getInventoryManager()), getPluginInstance());
-    }
-
     public static void run(Runnable task) {
-        Bukkit.getScheduler().runTask(getPluginInstance(), task);
+        Bukkit.getScheduler().runTask(getPlugin(), task);
     }
 
     public static void runAsync(Runnable task) {
-        Bukkit.getScheduler().runTaskAsynchronously(getPluginInstance(), task);
+        Bukkit.getScheduler().runTaskAsynchronously(getPlugin(), task);
     }
 
     public static void runLater(Runnable task, int ticks) {
-        Bukkit.getScheduler().runTaskLater(getPluginInstance(), task, ticks);
+        Bukkit.getScheduler().runTaskLater(getPlugin(), task, ticks);
     }
 
     public static void runLaterAsync(Runnable task, int ticks) {
-        Bukkit.getScheduler().runTaskLaterAsynchronously(getPluginInstance(), task, ticks);
+        Bukkit.getScheduler().runTaskLaterAsynchronously(getPlugin(), task, ticks);
+    }
+
+    private ConfigurationManager getConfigurationManager(Collection<Component> components, Plugin plugin) {
+        return components.contains(Component.CONFIGURATION) ? new ConfigurationManager(plugin) : null;
+    }
+
+    private CustomInventoryManager getInventoryManager(Collection<Component> components, Plugin plugin) {
+        if (components.contains(Component.INVENTORY)) {
+            CustomInventoryManager manager = new CustomInventoryManager();
+            Bukkit.getPluginManager().registerEvents(new CustomInventoryListener(manager), plugin);
+            return manager;
+        }
+
+        return null;
+    }
+
+    private ConversationManager getConversationManager(Collection<Component> components, Plugin plugin) {
+        if (components.contains(Component.CONVERSATION)) {
+            ConversationManager manager = new ConversationManager();
+            Bukkit.getPluginManager().registerEvents(manager, plugin);
+            return manager;
+        }
+
+        return null;
+    }
+
+    public static class Builder {
+        private final Plugin plugin;
+        private String messageFile = null;
+        private final List<Component> components = new ArrayList<>();
+
+        private Builder(Plugin plugin) {
+            this.plugin = plugin;
+        }
+
+        public Builder withComponents(Component... components) {
+            Collections.addAll(this.components, components);
+            return this;
+        }
+
+        public Builder withMessageFile(String fileName) {
+            this.messageFile = fileName;
+            return this;
+        }
+
+        public void initialize() {
+            instance = new JishLib(this.plugin, this.components, this.messageFile);
+            reloadMessages();
+        }
     }
 }

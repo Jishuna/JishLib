@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 import org.bukkit.configuration.ConfigurationSection;
 import me.jishuna.jishlib.config.ConfigType;
 import me.jishuna.jishlib.config.ConfigurationManager;
-import me.jishuna.jishlib.config.DummySection;
+import me.jishuna.jishlib.config.WrappedSection;
 
 public class CollectionAdapter<V, T extends Collection<V>> implements TypeAdapter<T> {
     private static Map<Class<?>, Supplier<? extends Collection<?>>> defaults;
@@ -74,7 +74,7 @@ public class CollectionAdapter<V, T extends Collection<V>> implements TypeAdapte
         List<Object> sections = new ArrayList<>();
 
         value.forEach(entry -> {
-            ConfigurationSection section = new DummySection(config);
+            WrappedSection section = new WrappedSection(config);
             this.adapter.write(section, "key", entry, replace);
             sections.add(section.getValues(false).get("key"));
         });

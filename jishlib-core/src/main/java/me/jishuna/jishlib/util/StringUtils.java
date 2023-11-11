@@ -1,17 +1,29 @@
 package me.jishuna.jishlib.util;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.md_5.bungee.api.ChatColor;
 import me.jishuna.jishlib.Constants;
 
 public class StringUtils {
-    private StringUtils() {
-    }
-
+    /**
+     * Converts the first letter of a string to uppercase and the rest to lowercase.
+     *
+     * @param input the string to capitalize
+     * @return the capitalized string
+     */
     public static String capitalize(String input) {
         return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
     }
 
+    /**
+     * Converts the first letter of each word in a string to uppercase and the rest
+     * to lowercase. <br>
+     * The string is split on spaces to obtain each word.
+     *
+     * @param input the string to capitalize
+     * @return the capitalized string
+     */
     public static String capitalizeAll(String input) {
         String[] parts = input.split(" ");
         StringBuilder builder = new StringBuilder();
@@ -23,27 +35,66 @@ public class StringUtils {
         return builder.toString().trim();
     }
 
+    /**
+     * Converts a legacy string into a {@link Component}.
+     *
+     * @param input the input string
+     * @return a {@link Component} representing the input string
+     */
     public static Component fromLegacy(String input) {
-        return Constants.SERIALIZER.deserialize(input);
+        return Constants.LEGACY_SERIALIZER.deserialize(input);
     }
 
+    /**
+     * Converts a {@link MiniMessage} string into a {@link Component}.
+     *
+     * @param input the input string
+     * @return a {@link Component} representing the input string
+     */
     public static Component fromMiniMessage(String input) {
         return Constants.MINI_MESSAGE.deserialize(input);
     }
 
+    /**
+     * Converts a legacy string into a {@link MiniMessage} string.
+     *
+     * @param input the input string
+     * @return a {@link MiniMessage} string representing the input string
+     */
     public static String legacyToMiniMessage(String input) {
         return toMiniMessage(fromLegacy(input));
     }
 
+    /**
+     * Converts a {@link MiniMessage} string into a legacy string.
+     *
+     * @param input the input string
+     * @return a legacy string representing the input string
+     */
     public static String miniMessageToLegacy(String input) {
         return ChatColor.translateAlternateColorCodes('&', toLegacy(fromMiniMessage(input)));
     }
 
+    /**
+     * Converts a {@link Component} into a legacy string.
+     *
+     * @param component the input component
+     * @return a legacy string representing the input string
+     */
     public static String toLegacy(Component component) {
-        return Constants.SERIALIZER.serialize(component);
+        return Constants.LEGACY_SERIALIZER.serialize(component);
     }
 
+    /**
+     * Converts a {@link Component} into a {@link MiniMessage} string.
+     *
+     * @param component the input component
+     * @return a {@link MiniMessage} string representing the input string
+     */
     public static String toMiniMessage(Component component) {
         return Constants.MINI_MESSAGE.serialize(component);
+    }
+
+    private StringUtils() {
     }
 }

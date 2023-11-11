@@ -1,4 +1,4 @@
-package me.jishuna.jishlib.commands;
+package me.jishuna.jishlib.command;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -15,6 +15,9 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.util.StringUtil;
 
+/**
+ * A command executor with a number of defined arguments.
+ */
 public class ArgumentCommandHandler extends SimpleCommandHandler {
     private final Map<String, SimpleCommandHandler> subcommands = new HashMap<>();
     private final Supplier<String> permMessage;
@@ -22,16 +25,37 @@ public class ArgumentCommandHandler extends SimpleCommandHandler {
 
     private CommandExecutor defaultExecutor;
 
+    /**
+     * Creates a new ArgumentCommandHandler with the given properties.
+     *
+     * @param permission   the permission required to use this command
+     * @param permMessage  a supplier for the message to send when a player does not
+     *                     have permission for this command
+     * @param usageMessage a supplier for the message to send when a player runs
+     *                     this command with an invalid argument
+     */
     public ArgumentCommandHandler(String permission, Supplier<String> permMessage, Supplier<String> usageMessage) {
         super(permission);
         this.permMessage = permMessage;
         this.usageMessage = usageMessage;
     }
 
+    /**
+     * A supplier for the message to send when a player does not have permission for
+     * this command.
+     *
+     * @return the permission message supplier
+     */
     public Supplier<String> getPermMessage() {
         return this.permMessage;
     }
 
+    /**
+     * A supplier for the message to send when a player runs this command with an
+     * invalid argument.
+     *
+     * @return the usage message supplier
+     */
     public Supplier<String> getUsageMessage() {
         return this.usageMessage;
     }
@@ -46,10 +70,9 @@ public class ArgumentCommandHandler extends SimpleCommandHandler {
         if (args.length == 0) {
             if (this.defaultExecutor != null) {
                 return this.defaultExecutor.onCommand(sender, command, alias, args);
-            } else {
-                sendUsage(sender, "none", this.subcommands.keySet());
-                return true;
             }
+            sendUsage(sender, "none", this.subcommands.keySet());
+            return true;
         }
         if (args.length > 0) {
             SimpleCommandHandler executor = this.subcommands.get(args[0]);
@@ -86,6 +109,14 @@ public class ArgumentCommandHandler extends SimpleCommandHandler {
         return Collections.emptyList();
     }
 
+    /**
+     * Sends the usage message to the given sender using the provided argument and
+     * collection of allowed arguments.
+     *
+     * @param sender      the sender to send to
+     * @param arg         the argument that was used
+     * @param allowedargs a collection of valud arguments
+     */
     public void sendUsage(CommandSender sender, String arg, Collection<String> allowedargs) {
         sender.sendMessage(MessageFormat.format(this.usageMessage.get(), arg, String.join(", ", allowedargs)));
     }

@@ -3,9 +3,9 @@ package me.jishuna.jishlib.config;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemorySection;
 
-public class DummySection extends MemorySection {
+public class WrappedSection extends MemorySection {
 
-    public DummySection(ConfigurationSection parent) {
+    public WrappedSection(ConfigurationSection parent) {
         super(parent, "");
     }
 }

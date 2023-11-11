@@ -1,7 +1,9 @@
-package me.jishuna.jishlib.config;
+package me.jishuna.jishlib.config.reloadable;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import me.jishuna.jishlib.config.ConfigField;
+import me.jishuna.jishlib.config.ConfigurationManager;
 
 public class ReloadableClass<T> extends ConfigReloadable<T> {
 

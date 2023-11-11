@@ -1,4 +1,4 @@
-package me.jishuna.jishlib.collections;
+package me.jishuna.jishlib.collection;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -7,7 +7,10 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
- * Big thanks to 7smile7, <a href=
+ * A task that distributes actions overs multiple ticks.
+ * <p>
+ * Big thanks to 7smile7. <br>
+ * <a href=
  * "https://www.spigotmc.org/threads/guide-on-workload-distribution-or-how-to-handle-heavy-splittable-tasks.409003/">
  * See his thread here</a>
  */
@@ -19,6 +22,13 @@ public class TypedDistributionTask<T> implements Runnable {
     protected final int distributionSize;
     protected int currentPosition = 0;
 
+    /**
+     * Crates a new TypedDistributionTask with the given arguments.
+     *
+     * @param action           the action to execute
+     * @param escapeCondition  the condition for an action to be removed
+     * @param distributionSize the number of groups to split actions into
+     */
     public TypedDistributionTask(Consumer<T> action, Predicate<T> escapeCondition, int distributionSize) {
         this.distributionSize = distributionSize;
         this.action = action;
@@ -30,6 +40,11 @@ public class TypedDistributionTask<T> implements Runnable {
         }
     }
 
+    /**
+     * Adds a given value to this task.
+     *
+     * @param value the value to add
+     */
     public void addValue(T value) {
         List<T> smallest = this.valueMatrix.get(0);
         if (!smallest.isEmpty()) {

@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.Plugin;
-import me.jishuna.jishlib.collections.WeightedRandom;
+import me.jishuna.jishlib.collection.WeightedRandom;
 import me.jishuna.jishlib.config.adapter.CollectionAdapter;
 import me.jishuna.jishlib.config.adapter.ConfigMappableAdapter;
 import me.jishuna.jishlib.config.adapter.EnumAdapter;
@@ -21,6 +21,8 @@ import me.jishuna.jishlib.config.adapter.StringTypeAdapter;
 import me.jishuna.jishlib.config.adapter.TypeAdapter;
 import me.jishuna.jishlib.config.adapter.WeightedRandomAdapter;
 import me.jishuna.jishlib.config.annotation.ConfigMappable;
+import me.jishuna.jishlib.config.reloadable.ReloadableClass;
+import me.jishuna.jishlib.config.reloadable.ReloadableObject;
 
 public class ConfigurationManager {
     public static final MaterialAdapter MATERIAL_ADAPTER = new MaterialAdapter();

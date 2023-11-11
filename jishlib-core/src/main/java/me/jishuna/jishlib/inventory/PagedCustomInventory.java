@@ -4,39 +4,23 @@ import java.util.List;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import me.jishuna.jishlib.util.NumberUtils;
+import me.jishuna.jishlib.inventory.session.InventorySession;
 
-public abstract class PagedCustomInventory<T, B extends Inventory> extends CustomInventory<B> {
+public abstract class PagedCustomInventory<T, B extends Inventory> extends PagedInventory<T, B> {
     private List<T> items;
-    private final int itemsPerPage;
-    private int maxPage;
-
-    private int page = 0;
 
     protected PagedCustomInventory(B inventory, List<T> items, int maxIndex) {
-        super(inventory);
+        super(inventory, maxIndex, Math.max(0, (int) Math.ceil(items.size() / (double) maxIndex) - 1));
         this.items = items;
-        this.itemsPerPage = maxIndex;
-        this.maxPage = Math.max(0, (int) Math.ceil(items.size() / (double) maxIndex) - 1);
     }
 
+    @Override
     protected abstract ItemStack asItemStack(T entry);
 
-    protected void changePage(int amount) {
-        int prev = this.page;
+    @Override
+    protected abstract void onItemClicked(InventoryClickEvent event, InventorySession session, T item);
 
-        this.page = NumberUtils.clamp(this.page + amount, 0, this.maxPage);
-        if (this.page != prev) {
-            refreshOptions();
-        }
-    }
-
-    protected int getPage() {
-        return this.page;
-    }
-
-    protected abstract void onItemClicked(InventoryClickEvent event, CustomInventorySession session, T item);
-
+    @Override
     protected void refreshOptions() {
         int startIndex = this.page * this.itemsPerPage;
         for (int i = 0; i < this.itemsPerPage; i++) {
@@ -49,12 +33,12 @@ public abstract class PagedCustomInventory<T, B extends Inventory> extends Custo
                 T entry = this.items.get(index);
 
                 ItemStack item = asItemStack(entry);
-                setButton(i, item, (event, session) -> onClick(event, session));
+                setButton(i, item, this::onClick);
             }
         }
     }
 
-    protected void updateList(List<T> items) {
+    protected void replaceContents(List<T> items) {
         this.items = items;
         this.maxPage = Math.max(0, (int) Math.ceil(items.size() / (double) this.itemsPerPage) - 1);
         this.page = 0;
@@ -62,7 +46,8 @@ public abstract class PagedCustomInventory<T, B extends Inventory> extends Custo
         refreshOptions();
     }
 
-    private void onClick(InventoryClickEvent event, CustomInventorySession session) {
+    @Override
+    protected void onClick(InventoryClickEvent event, InventorySession session) {
         int startIndex = this.page * this.itemsPerPage;
         T entry = this.items.get(startIndex + event.getSlot());
 

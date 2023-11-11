@@ -2,7 +2,7 @@ package me.jishuna.jishlib.config.adapter;
 
 import java.util.Map.Entry;
 import org.bukkit.configuration.ConfigurationSection;
-import me.jishuna.jishlib.collections.WeightedRandom;
+import me.jishuna.jishlib.collection.WeightedRandom;
 import me.jishuna.jishlib.config.ConfigType;
 import me.jishuna.jishlib.config.ConfigurationManager;
 

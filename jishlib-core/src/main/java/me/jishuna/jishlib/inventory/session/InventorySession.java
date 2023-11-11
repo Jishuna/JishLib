@@ -1,11 +1,13 @@
-package me.jishuna.jishlib.inventory;
+package me.jishuna.jishlib.inventory.session;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import org.bukkit.entity.HumanEntity;
 import me.jishuna.jishlib.JishLib;
+import me.jishuna.jishlib.inventory.CustomInventory;
+import me.jishuna.jishlib.inventory.CustomInventoryManager;
 
-public final class CustomInventorySession {
+public final class InventorySession {
     public enum State {
         NORMAL, SWITCHING, WAITING;
     }
@@ -17,7 +19,7 @@ public final class CustomInventorySession {
     private State state = State.SWITCHING;
     private CustomInventory<?> active;
 
-    public CustomInventorySession(HumanEntity player, CustomInventory<?> first, CustomInventoryManager manager) {
+    public InventorySession(HumanEntity player, CustomInventory<?> first, CustomInventoryManager manager) {
         this.player = player;
         this.active = first;
         this.manager = manager;
@@ -63,7 +65,7 @@ public final class CustomInventorySession {
         }
     }
 
-    protected void open(CustomInventory<?> inventory, boolean recordHistory) {
+    public void open(CustomInventory<?> inventory, boolean recordHistory) {
         if (recordHistory && this.active != null) {
             this.history.addFirst(this.active);
         }

@@ -5,36 +5,23 @@ import java.util.List;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import me.jishuna.jishlib.util.NumberUtils;
+import me.jishuna.jishlib.inventory.session.InventorySession;
 
-public abstract class PagedArrayCustomInventory<T, B extends Inventory> extends CustomInventory<B> {
-    private final List<T[]> items;
-    private final int itemsPerPage;
-    private final int maxPage;
-
-    private int page = 0;
+public abstract class PagedArrayCustomInventory<T, B extends Inventory> extends PagedInventory<T, B> {
+    private List<T[]> items;
 
     protected PagedArrayCustomInventory(B inventory, List<T[]> items, int maxIndex) {
-        super(inventory);
+        super(inventory, maxIndex, items.size() - 1);
         this.items = items;
-        this.itemsPerPage = maxIndex;
-        this.maxPage = this.items.size() - 1;
     }
 
+    @Override
     protected abstract ItemStack asItemStack(T entry);
 
-    protected void changePage(int amount) {
-        this.page = NumberUtils.clamp(this.page + amount, 0, this.maxPage);
+    @Override
+    protected abstract void onItemClicked(InventoryClickEvent event, InventorySession session, T item);
 
-        refreshOptions();
-    }
-
-    protected int getPage() {
-        return this.page;
-    }
-
-    protected abstract void onItemClicked(InventoryClickEvent event, CustomInventorySession session, T item);
-
+    @Override
     protected void refreshOptions() {
         T[] entry = this.items.get(this.page);
         ItemStack[] stackArray = Arrays.stream(entry).map(this::asItemStack).toArray(ItemStack[]::new);
@@ -44,12 +31,21 @@ public abstract class PagedArrayCustomInventory<T, B extends Inventory> extends 
                 clearItem(i);
                 removeButton(i);
             } else {
-                setButton(i, stackArray[i], (event, session) -> onClick(event, session));
+                setButton(i, stackArray[i], this::onClick);
             }
         }
     }
 
-    private void onClick(InventoryClickEvent event, CustomInventorySession session) {
+    protected void replaceContents(List<T[]> items) {
+        this.items = items;
+        this.maxPage = items.size() - 1;
+        this.page = 0;
+
+        refreshOptions();
+    }
+
+    @Override
+    protected void onClick(InventoryClickEvent event, InventorySession session) {
         T[] entry = this.items.get(this.page);
         onItemClicked(event, session, entry[event.getSlot()]);
     }

@@ -3,11 +3,17 @@ package me.jishuna.jishlib.util;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * Utility methods for {@link Inventory}.
+ */
 public class InventoryUtils {
-
-    private InventoryUtils() {
-    }
-
+    /**
+     * Gets the total amount of the provided itemstack in the provided inventory.
+     *
+     * @param inventory the inventory to search
+     * @param target    the item to look for
+     * @return the total number of matching items
+     */
     public static int getTotalAmount(Inventory inventory, ItemStack target) {
         int amount = 0;
 
@@ -21,5 +27,8 @@ public class InventoryUtils {
             }
         }
         return amount;
+    }
+
+    private InventoryUtils() {
     }
 }

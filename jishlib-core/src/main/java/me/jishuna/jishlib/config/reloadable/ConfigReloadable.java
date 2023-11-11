@@ -1,4 +1,4 @@
-package me.jishuna.jishlib.config;
+package me.jishuna.jishlib.config.reloadable;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.configuration.file.YamlConfiguration;
+import me.jishuna.jishlib.config.ConfigField;
+import me.jishuna.jishlib.config.ConfigType;
+import me.jishuna.jishlib.config.ConfigurationManager;
 import me.jishuna.jishlib.config.adapter.TypeAdapter;
 import me.jishuna.jishlib.config.annotation.ConfigEntry;
 import me.jishuna.jishlib.config.annotation.PostLoad;
@@ -42,6 +45,7 @@ public abstract class ConfigReloadable<T> {
         }
 
         YamlConfiguration config = YamlConfiguration.loadConfiguration(this.file);
+
         for (ConfigField field : this.fields) {
             if (field.isStatic() && !includeStatic) {
                 continue;
