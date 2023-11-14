@@ -1,4 +1,4 @@
-package me.jishuna.jishlib.collection;
+package me.jishuna.jishlib.datastructure;
 
 import java.util.Collection;
 import java.util.Collections;

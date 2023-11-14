@@ -6,11 +6,11 @@ import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-public class CustomType<T extends PDCSerializable> implements PersistentDataType<PersistentDataContainer, T> {
+public class PDCSerializableType<T extends PDCSerializable> implements PersistentDataType<PersistentDataContainer, T> {
     private final Class<T> type;
     private final BiFunction<PersistentDataContainer, PersistentDataAdapterContext, T> creator;
 
-    public CustomType(Class<T> type, BiFunction<PersistentDataContainer, PersistentDataAdapterContext, T> creator) {
+    public PDCSerializableType(Class<T> type, BiFunction<PersistentDataContainer, PersistentDataAdapterContext, T> creator) {
         this.type = type;
         this.creator = creator;
     }

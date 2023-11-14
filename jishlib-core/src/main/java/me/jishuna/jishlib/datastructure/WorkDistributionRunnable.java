@@ -1,4 +1,4 @@
-package me.jishuna.jishlib.collection;
+package me.jishuna.jishlib.datastructure;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -14,7 +14,7 @@ import java.util.function.Predicate;
  * "https://www.spigotmc.org/threads/guide-on-workload-distribution-or-how-to-handle-heavy-splittable-tasks.409003/">
  * See his thread here</a>
  */
-public class TypedDistributionTask<T> implements Runnable {
+public class WorkDistributionRunnable<T> implements Runnable {
 
     protected final Consumer<T> action;
     protected final Predicate<T> escapeCondition;
@@ -29,7 +29,7 @@ public class TypedDistributionTask<T> implements Runnable {
      * @param escapeCondition  the condition for an action to be removed
      * @param distributionSize the number of groups to split actions into
      */
-    public TypedDistributionTask(Consumer<T> action, Predicate<T> escapeCondition, int distributionSize) {
+    public WorkDistributionRunnable(Consumer<T> action, Predicate<T> escapeCondition, int distributionSize) {
         this.distributionSize = distributionSize;
         this.action = action;
         this.escapeCondition = escapeCondition;

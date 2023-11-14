@@ -173,7 +173,9 @@ public class JishLib {
 
         public void initialize() {
             instance = new JishLib(this.plugin, this.components, this.messageFile);
-            reloadMessages();
+            if (this.messageFile != null) {
+                reloadMessages();
+            }
         }
     }
 }

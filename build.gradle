@@ -12,6 +12,15 @@ jar.enabled = false
 
 dependencies {
 	implementation project(":jishlib-core")
+    
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.0'
+    testImplementation 'org.spigotmc:spigot-api:1.18.1-R0.1-SNAPSHOT'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 shadowJar {
@@ -21,6 +30,10 @@ shadowJar {
 
 build {
 	dependsOn shadowJar
+}
+
+publish {
+    dependsOn test
 }
 
 publishing {

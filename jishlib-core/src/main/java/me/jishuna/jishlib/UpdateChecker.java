@@ -15,6 +15,7 @@ import org.bukkit.util.Consumer;
  * href=https://www.spigotmc.org/wiki/creating-an-update-checker-that-checks-for-updates>https://www.spigotmc.org/wiki/creating-an-update-checker-that-checks-for-updates</a>
  */
 public class UpdateChecker {
+    private static final String URL = "https://api.spigotmc.org/legacy/update.php?resource=";
 
     private final JavaPlugin plugin;
     private final int resourceId;
@@ -36,7 +37,7 @@ public class UpdateChecker {
      * @param consumer the consumer to apply
      */
     public void checkVersion(final Consumer<String> consumer) {
-        try (InputStream inputStream = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + this.resourceId).openStream();
+        try (InputStream inputStream = new URL(URL + this.resourceId).openStream();
                 Scanner scanner = new Scanner(inputStream)) {
             if (scanner.hasNext()) {
                 consumer.accept(scanner.next());
