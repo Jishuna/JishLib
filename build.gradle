@@ -2,7 +2,7 @@ plugins {
 	id 'eclipse'
 	id 'java'
 	id 'maven-publish'
-	id "com.github.johnrengelman.shadow" version "7.1.0"
+	id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
 group 'me.jishuna'
@@ -11,7 +11,8 @@ group 'me.jishuna'
 jar.enabled = false
 
 dependencies {
-	implementation project(":jishlib-core")
+	implementation project(':jishlib-core')
+    implementation project(':jishlib-nms')
     
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.0'

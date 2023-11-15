@@ -1,11 +1,9 @@
-package me.jishuna.jishlib.inventory.session;
+package me.jishuna.jishlib.inventory;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import org.bukkit.entity.HumanEntity;
 import me.jishuna.jishlib.JishLib;
-import me.jishuna.jishlib.inventory.CustomInventory;
-import me.jishuna.jishlib.inventory.CustomInventoryManager;
 
 public final class InventorySession {
     public enum State {
@@ -14,22 +12,24 @@ public final class InventorySession {
 
     private final Deque<CustomInventory<?>> history = new ArrayDeque<>();
     private final HumanEntity player;
-    private final CustomInventoryManager manager;
 
     private State state = State.SWITCHING;
     private CustomInventory<?> active;
 
-    public InventorySession(HumanEntity player, CustomInventory<?> first, CustomInventoryManager manager) {
+    public InventorySession(HumanEntity player, CustomInventory<?> first) {
         this.player = player;
         this.active = first;
-        this.manager = manager;
     }
 
     public void changeTo(CustomInventory<?> inventory, boolean recordHistory) {
         JishLib.run(() -> {
             this.state = State.SWITCHING;
-            this.manager.openInventory(this.player, inventory, recordHistory);
+            open(inventory, recordHistory);
         });
+    }
+
+    public void close() {
+        JishLib.run(this.player::closeInventory);
     }
 
     public void closeAndWait() {
@@ -61,7 +61,7 @@ public final class InventorySession {
 
     public void reopen() {
         if (this.active != null) {
-            this.manager.openInventory(this.player, this.active, false);
+            open(this.active, false);
         }
     }
 
@@ -71,7 +71,7 @@ public final class InventorySession {
         }
 
         this.active = inventory;
-        this.player.openInventory(inventory.getBukkitInventory());
+        inventory.openDirect(this.player);
 
         if (this.state != State.NORMAL) {
             this.state = State.NORMAL;

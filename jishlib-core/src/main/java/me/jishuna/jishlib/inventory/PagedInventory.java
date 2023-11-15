@@ -3,7 +3,6 @@ package me.jishuna.jishlib.inventory;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import me.jishuna.jishlib.inventory.session.InventorySession;
 import me.jishuna.jishlib.util.NumberUtils;
 
 public abstract class PagedInventory<T, B extends Inventory> extends CustomInventory<B> {

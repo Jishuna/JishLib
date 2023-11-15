@@ -11,8 +11,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.function.Supplier;
 import org.bukkit.configuration.ConfigurationSection;
+import me.jishuna.jishlib.config.ConfigApi;
 import me.jishuna.jishlib.config.ConfigType;
-import me.jishuna.jishlib.config.ConfigurationManager;
 import me.jishuna.jishlib.config.WrappedSection;
 
 public class CollectionAdapter<V, T extends Collection<V>> implements TypeAdapter<T> {
@@ -29,8 +29,8 @@ public class CollectionAdapter<V, T extends Collection<V>> implements TypeAdapte
     private final ConfigType<T> type;
 
     @SuppressWarnings("unchecked")
-    public CollectionAdapter(ConfigurationManager manager, ConfigType<?> type) {
-        this.adapter = (TypeAdapter<V>) manager.getAdapter(type.getComponentTypes().get(0));
+    public CollectionAdapter(ConfigType<?> type) {
+        this.adapter = (TypeAdapter<V>) ConfigApi.getAdapter(type.getComponentTypes().get(0));
         this.type = (ConfigType<T>) type;
     }
 

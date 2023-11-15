@@ -3,7 +3,7 @@ package me.jishuna.jishlib.inventory.button;
 import java.util.function.BiConsumer;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import me.jishuna.jishlib.inventory.session.InventorySession;
+import me.jishuna.jishlib.inventory.InventorySession;
 import me.jishuna.jishlib.item.provider.FixedItemProvider;
 import me.jishuna.jishlib.item.provider.ItemProvider;
 

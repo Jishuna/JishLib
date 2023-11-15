@@ -43,12 +43,10 @@ public class Conversation {
     }
 
     public static class Builder {
-        private final ConversationManager manager;
         private final Player player;
         private final List<Prompt> prompts = new ArrayList<>();
 
-        protected Builder(ConversationManager manager, Player player) {
-            this.manager = manager;
+        protected Builder(Player player) {
             this.player = player;
         }
 
@@ -58,7 +56,7 @@ public class Conversation {
         }
 
         public void begin() {
-            this.manager.addConversation(this.player.getUniqueId(), new Conversation(this.player, this.prompts));
+            ConversationAPI.addConversation(this.player.getUniqueId(), new Conversation(this.player, this.prompts));
         }
 
     }

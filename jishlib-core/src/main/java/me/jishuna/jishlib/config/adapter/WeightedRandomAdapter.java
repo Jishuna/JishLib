@@ -2,8 +2,8 @@ package me.jishuna.jishlib.config.adapter;
 
 import java.util.Map.Entry;
 import org.bukkit.configuration.ConfigurationSection;
+import me.jishuna.jishlib.config.ConfigApi;
 import me.jishuna.jishlib.config.ConfigType;
-import me.jishuna.jishlib.config.ConfigurationManager;
 import me.jishuna.jishlib.datastructure.WeightedRandom;
 
 public class WeightedRandomAdapter<T> implements TypeAdapter<WeightedRandom<T>> {
@@ -11,8 +11,8 @@ public class WeightedRandomAdapter<T> implements TypeAdapter<WeightedRandom<T>> 
     private final StringAdapter<T> adapter;
 
     @SuppressWarnings("unchecked")
-    public WeightedRandomAdapter(ConfigurationManager manager, ConfigType<?> type) {
-        this.adapter = (StringAdapter<T>) manager.getStringAdapter(type.getComponentTypes().get(0));
+    public WeightedRandomAdapter(ConfigType<?> type) {
+        this.adapter = (StringAdapter<T>) ConfigApi.getStringAdapter(type.getComponentTypes().get(0));
     }
 
     @Override

@@ -7,27 +7,23 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.bukkit.configuration.file.YamlConfiguration;
+import me.jishuna.jishlib.JishLib;
+import me.jishuna.jishlib.config.ConfigApi;
 import me.jishuna.jishlib.config.ConfigField;
 import me.jishuna.jishlib.config.ConfigType;
-import me.jishuna.jishlib.config.ConfigurationManager;
 import me.jishuna.jishlib.config.adapter.TypeAdapter;
 import me.jishuna.jishlib.config.annotation.ConfigEntry;
 import me.jishuna.jishlib.config.annotation.PostLoad;
 
 public abstract class ConfigReloadable<T> {
-    protected final ConfigurationManager manager;
     protected final File file;
     protected final List<ConfigField> fields = new ArrayList<>();
     private final Method postLoadMethod;
-    protected final Logger logger;
 
-    protected ConfigReloadable(ConfigurationManager manager, File file, Class<T> clazz) {
-        this.manager = manager;
+    protected ConfigReloadable(File file, Class<T> clazz) {
         this.file = file;
         this.postLoadMethod = findPostLoadMethod(clazz);
-        this.logger = manager.getLogger();
 
         cacheFields(clazz);
     }
@@ -54,20 +50,21 @@ public abstract class ConfigReloadable<T> {
             String path = field.getPath();
 
             if (!config.isSet(path)) {
-                this.logger.log(Level.WARNING, "No configuration entry found for {0}", path);
+                JishLib.getLogger().log(Level.WARNING, "No configuration entry found for {0}", path);
                 continue;
             }
 
             ConfigType<?> type = ConfigType.get(field.getField());
-            TypeAdapter<?> adapter = this.manager.getAdapter(type);
+            TypeAdapter<?> adapter = ConfigApi.getAdapter(type);
             if (adapter == null) {
-                this.logger.log(Level.WARNING, "No configuration adapter found for {0}", type.getClass());
+                JishLib.getLogger().log(Level.WARNING, "No configuration adapter found for {0}", type.getClass());
                 continue;
             }
 
             Object readValue = adapter.read(config, path);
             if (readValue == null) {
-                this.logger
+                JishLib
+                        .getLogger()
                         .log(Level.WARNING, "Failed to read value for {0} of type {1}",
                                 new Object[] { path, type.getType() });
                 continue;
@@ -76,7 +73,8 @@ public abstract class ConfigReloadable<T> {
             try {
                 setField(field, readValue);
             } catch (ReflectiveOperationException ex) {
-                this.logger
+                JishLib
+                        .getLogger()
                         .log(Level.WARNING, "Failed to read value for {0} of type {1}",
                                 new Object[] { path, type.getType() });
                 ex.printStackTrace();
@@ -117,15 +115,15 @@ public abstract class ConfigReloadable<T> {
             }
 
             ConfigType<?> type = ConfigType.get(field.getField());
-            TypeAdapter<?> adapter = this.manager.getAdapter(type);
+            TypeAdapter<?> adapter = ConfigApi.getAdapter(type);
             if (adapter == null) {
-                this.logger.log(Level.WARNING, "No configuration adapter found for {0}", type.getType());
+                JishLib.getLogger().log(Level.WARNING, "No configuration adapter found for {0}", type.getType());
                 continue;
             }
 
             Object writeValue = getField(field);
             if (writeValue == null) {
-                this.logger.log(Level.WARNING, "null");
+                JishLib.getLogger().log(Level.WARNING, "null");
                 continue;
             }
 
@@ -136,7 +134,7 @@ public abstract class ConfigReloadable<T> {
         try {
             config.save(this.file);
         } catch (IOException ex) {
-            this.logger.log(Level.WARNING, "Failed to save configuration file {0}", this.file.getName());
+            JishLib.getLogger().log(Level.WARNING, "Failed to save configuration file {0}", this.file.getName());
             ex.printStackTrace();
         }
         return this;
@@ -151,7 +149,7 @@ public abstract class ConfigReloadable<T> {
     private boolean prepareFile() {
         try {
             if (!this.file.getParentFile().exists() && !this.file.getParentFile().mkdirs()) {
-                this.logger.log(Level.WARNING, "Error creating file {0}", this.file.getName());
+                JishLib.getLogger().log(Level.WARNING, "Error creating file {0}", this.file.getName());
                 return false;
             }
 
@@ -161,7 +159,7 @@ public abstract class ConfigReloadable<T> {
 
             return true;
         } catch (IOException ex) {
-            this.logger.log(Level.WARNING, "Error creating file {0}", this.file.getName());
+            JishLib.getLogger().log(Level.WARNING, "Error creating file {0}", this.file.getName());
             return false;
         }
     }

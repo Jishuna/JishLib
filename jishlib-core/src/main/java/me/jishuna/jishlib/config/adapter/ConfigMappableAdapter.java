@@ -5,22 +5,20 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.configuration.ConfigurationSection;
+import me.jishuna.jishlib.config.ConfigApi;
 import me.jishuna.jishlib.config.ConfigField;
 import me.jishuna.jishlib.config.ConfigType;
-import me.jishuna.jishlib.config.ConfigurationManager;
 import me.jishuna.jishlib.config.ReflectionHelper;
 import me.jishuna.jishlib.config.annotation.ConfigEntry;
 import me.jishuna.jishlib.config.annotation.PostLoad;
 
 public class ConfigMappableAdapter<T> implements TypeAdapter<T> {
-    private final ConfigurationManager manager;
     private final List<ConfigField> fields = new ArrayList<>();
     private final ConfigType<T> type;
     private final Method postLoadMethod;
 
     @SuppressWarnings("unchecked")
-    public ConfigMappableAdapter(ConfigurationManager manager, ConfigType<?> type) {
-        this.manager = manager;
+    public ConfigMappableAdapter(ConfigType<?> type) {
         this.type = (ConfigType<T>) type;
         this.postLoadMethod = findPostLoadMethod(this.type.getType());
 
@@ -41,7 +39,7 @@ public class ConfigMappableAdapter<T> implements TypeAdapter<T> {
                 }
 
                 ConfigType<?> type = ConfigType.get(field.getField());
-                TypeAdapter<?> adapter = this.manager.getAdapter(type);
+                TypeAdapter<?> adapter = ConfigApi.getAdapter(type);
                 if (adapter == null) {
                     // logger.log(Level.WARNING, "No configuration adapter found for {0}",
                     // type.getClass());
@@ -80,7 +78,7 @@ public class ConfigMappableAdapter<T> implements TypeAdapter<T> {
             }
 
             ConfigType<?> type = ConfigType.get(field.getField());
-            TypeAdapter<?> adapter = this.manager.getAdapter(type);
+            TypeAdapter<?> adapter = ConfigApi.getAdapter(type);
             if (adapter == null) {
                 // logger.log(Level.WARNING, "No configuration adapter found for {0}",
                 // type.getType());

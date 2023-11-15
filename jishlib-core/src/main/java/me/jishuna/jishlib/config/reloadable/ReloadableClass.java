@@ -3,12 +3,11 @@ package me.jishuna.jishlib.config.reloadable;
 import java.io.File;
 import java.lang.reflect.Method;
 import me.jishuna.jishlib.config.ConfigField;
-import me.jishuna.jishlib.config.ConfigurationManager;
 
 public class ReloadableClass<T> extends ConfigReloadable<T> {
 
-    public ReloadableClass(ConfigurationManager manager, File file, Class<T> clazz) {
-        super(manager, file, clazz);
+    public ReloadableClass(File file, Class<T> clazz) {
+        super(file, clazz);
     }
 
     @Override
@@ -42,7 +41,6 @@ public class ReloadableClass<T> extends ConfigReloadable<T> {
             try {
                 return field.getField().get(null);
             } catch (ReflectiveOperationException ex) {
-                return null;
             }
         }
         return null;

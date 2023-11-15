@@ -13,9 +13,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import me.jishuna.jishlib.JishLib;
 import me.jishuna.jishlib.inventory.button.Button;
-import me.jishuna.jishlib.inventory.session.InventorySession;
 import me.jishuna.jishlib.item.provider.ItemProvider;
 
 public class CustomInventory<T extends Inventory> {
@@ -114,7 +112,11 @@ public class CustomInventory<T extends Inventory> {
     }
 
     public void open(HumanEntity target) {
-        JishLib.getInventoryManager().openInventory(target, this, true);
+        InventoryAPI.openInventory(target, this, true);
+    }
+
+    protected void openDirect(HumanEntity target) {
+        target.openInventory(this.inventory);
     }
 
     @SafeVarargs
@@ -124,7 +126,7 @@ public class CustomInventory<T extends Inventory> {
         }
     }
 
-    public Inventory getBukkitInventory() {
+    public T getBukkitInventory() {
         return this.inventory;
     }
 

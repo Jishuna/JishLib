@@ -6,15 +6,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import me.jishuna.jishlib.inventory.session.InventorySession;
-import me.jishuna.jishlib.inventory.session.InventorySession.State;
+import org.bukkit.event.player.PlayerQuitEvent;
+import me.jishuna.jishlib.inventory.InventorySession.State;
 
 public class CustomInventoryListener implements Listener {
-    private final CustomInventoryManager manager;
-
-    public CustomInventoryListener(CustomInventoryManager manager) {
-        this.manager = manager;
-    }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onInventoryClick(InventoryClickEvent event) {
@@ -22,7 +17,7 @@ public class CustomInventoryListener implements Listener {
             return;
         }
 
-        InventorySession session = this.manager.getSession(event.getWhoClicked());
+        InventorySession session = InventoryAPI.getSession(event.getWhoClicked());
 
         if (session != null) {
             session.getActive().consumeClickEvent(event, session);
@@ -31,23 +26,28 @@ public class CustomInventoryListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onInventoryClose(InventoryCloseEvent event) {
-        InventorySession session = this.manager.getSession(event.getPlayer());
+        InventorySession session = InventoryAPI.getSession(event.getPlayer());
 
         if (session != null) {
             session.getActive().consumeCloseEvent(event, session);
 
             if (session.getState() == State.NORMAL) {
-                this.manager.destroySession(event.getPlayer());
+                InventoryAPI.destroySession(event.getPlayer());
             }
         }
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onvInventoryOpen(InventoryOpenEvent event) {
-        InventorySession session = this.manager.getSession(event.getPlayer());
+    public void onInventoryOpen(InventoryOpenEvent event) {
+        InventorySession session = InventoryAPI.getSession(event.getPlayer());
 
         if (session != null) {
             session.getActive().consumeOpenEvent(event, session);
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onLeave(PlayerQuitEvent event) {
+        InventoryAPI.destroySession(event.getPlayer());
     }
 }

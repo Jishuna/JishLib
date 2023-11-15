@@ -3,17 +3,17 @@ package me.jishuna.jishlib.config.adapter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.bukkit.configuration.ConfigurationSection;
+import me.jishuna.jishlib.config.ConfigApi;
 import me.jishuna.jishlib.config.ConfigType;
-import me.jishuna.jishlib.config.ConfigurationManager;
 
 public class MapAdapter<K, V, T extends Map<K, V>> implements TypeAdapter<T> {
     private final TypeAdapter<V> valueAdapter;
     private final StringAdapter<K> keyAdapter;
 
     @SuppressWarnings("unchecked")
-    public MapAdapter(ConfigurationManager manager, ConfigType<?> type) {
-        this.keyAdapter = (StringAdapter<K>) manager.getStringAdapter(type.getComponentTypes().get(0));
-        this.valueAdapter = (TypeAdapter<V>) manager.getAdapter(type.getComponentTypes().get(1));
+    public MapAdapter(ConfigType<?> type) {
+        this.keyAdapter = (StringAdapter<K>) ConfigApi.getStringAdapter(type.getComponentTypes().get(0));
+        this.valueAdapter = (TypeAdapter<V>) ConfigApi.getAdapter(type.getComponentTypes().get(1));
     }
 
     @Override

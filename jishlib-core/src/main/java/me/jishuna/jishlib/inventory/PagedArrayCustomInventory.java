@@ -3,11 +3,11 @@ package me.jishuna.jishlib.inventory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import me.jishuna.jishlib.inventory.session.InventorySession;
 
 public abstract class PagedArrayCustomInventory<T, B extends Inventory> extends PagedInventory<T, B> {
     private List<T[]> items;
@@ -40,6 +40,10 @@ public abstract class PagedArrayCustomInventory<T, B extends Inventory> extends 
                 setButton(i, stackArray[i], this::onClick);
             }
         }
+    }
+
+    protected Collection<T[]> getContents() {
+        return Collections.unmodifiableList(this.items);
     }
 
     protected void replaceContents(List<T[]> items) {
