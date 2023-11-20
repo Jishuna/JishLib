@@ -44,7 +44,7 @@ public abstract class PagedCustomInventory<T, B extends Inventory> extends Paged
         }
     }
 
-    protected Collection<T> getContents() {
+    protected List<T> getContents() {
         return Collections.unmodifiableList(this.items);
     }
 

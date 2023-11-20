@@ -5,7 +5,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import me.jishuna.jishlib.inventory.InventorySession.State;
 
@@ -34,15 +33,6 @@ public class CustomInventoryListener implements Listener {
             if (session.getState() == State.NORMAL) {
                 InventoryAPI.destroySession(event.getPlayer());
             }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onInventoryOpen(InventoryOpenEvent event) {
-        InventorySession session = InventoryAPI.getSession(event.getPlayer());
-
-        if (session != null) {
-            session.getActive().consumeOpenEvent(event, session);
         }
     }
 

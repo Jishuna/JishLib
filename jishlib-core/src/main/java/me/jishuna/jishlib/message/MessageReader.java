@@ -10,20 +10,22 @@ import java.util.List;
 
 public class MessageReader {
     private final List<String> commentBuffer = new ArrayList<>();
-
     private final List<MessageEntry> messages = new ArrayList<>();
-    private final InputStream stream;
 
-    public MessageReader(InputStream stream) {
-        this.stream = stream;
-    }
-
-    public List<MessageEntry> readMessages() {
-        if (this.stream == null) {
+    public List<MessageEntry> readMessages(InputStream stream) {
+        if (stream == null) {
             return this.messages;
         }
 
-        try (this.stream; BufferedReader reader = new BufferedReader(new InputStreamReader(this.stream, StandardCharsets.UTF_8))) {
+        return readMessages(new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8)));
+    }
+
+    public List<MessageEntry> readMessages(BufferedReader reader) {
+        if (reader == null) {
+            return this.messages;
+        }
+
+        try (reader) {
             while (reader.ready()) {
                 processLine(reader.readLine());
             }

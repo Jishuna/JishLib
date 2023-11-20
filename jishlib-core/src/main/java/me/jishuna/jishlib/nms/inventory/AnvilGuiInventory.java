@@ -10,8 +10,7 @@ import org.bukkit.inventory.AnvilInventory;
 import me.jishuna.jishlib.inventory.CustomInventory;
 import me.jishuna.jishlib.inventory.InventorySession;
 import me.jishuna.jishlib.item.ItemBuilder;
-import me.jishuna.jishlib.nms.NMS;
-import me.jishuna.jishlib.util.StringUtils;
+import me.jishuna.jishlib.nms.NMSAPI;
 
 public class AnvilGuiInventory extends CustomInventory<AnvilInventory> {
     private final CustomAnvilMenu menu;
@@ -33,7 +32,7 @@ public class AnvilGuiInventory extends CustomInventory<AnvilInventory> {
         addCloseConsumer((event, session) -> clearItem(0));
 
         onInputTextChange(input);
-        setButton(0, ItemBuilder.create(Material.PAPER).name("test").build(), (event, session) -> this.menu.update());
+        setButton(0, ItemBuilder.create(Material.PAPER).name(input).build(), (event, session) -> this.menu.update());
         setButton(2, this::outputClicked);
     }
 
@@ -46,7 +45,7 @@ public class AnvilGuiInventory extends CustomInventory<AnvilInventory> {
         this.valid = checkValid(this.input);
 
         if (this.valid) {
-            setItem(2, ItemBuilder.create(Material.PAPER).name(StringUtils.miniMessageToLegacy(this.input)).build());
+            setItem(2, ItemBuilder.create(Material.PAPER).name(this.input).build());
         } else {
             setItem(2, ItemBuilder.create(Material.BARRIER).name(ChatColor.RED + "Invalid Input").build());
         }
@@ -98,10 +97,9 @@ public class AnvilGuiInventory extends CustomInventory<AnvilInventory> {
             return this;
         }
 
-        public void open(HumanEntity player) {
-            CustomAnvilMenu menu = NMS.getAdapter().createAnvilMenu(player, this.title);
-            AnvilGuiInventory inv = new AnvilGuiInventory(menu, this.input, this.validator, this.callback);
-            inv.open(player);
+        public AnvilGuiInventory create(HumanEntity player) {
+            CustomAnvilMenu menu = NMSAPI.getAdapter().createAnvilMenu(player, this.title);
+            return new AnvilGuiInventory(menu, this.input, this.validator, this.callback);
         }
     }
 }

@@ -16,4 +16,6 @@ dependencyResolutionManagement {
 
 include 'jishlib-core'
 include 'jishlib-nms'
-include 'jishlib-nms:base'
+include 'jishlib-nms:latest'
+include 'jishlib-nms:1_19_4'
+include 'jishlib-nms:1_18_2'

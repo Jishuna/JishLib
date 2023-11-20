@@ -7,7 +7,9 @@ plugins {
 jar.enabled = false
 
 dependencies {
-    implementation project(path: (':jishlib-nms:base'), configuration: 'reobf')
+    implementation project(path: (':jishlib-nms:latest'), configuration: 'reobf')
+    implementation project(path: (':jishlib-nms:1_19_4'), configuration: 'reobf')
+    implementation project(path: (':jishlib-nms:1_18_2'), configuration: 'reobf')
 }
 
 

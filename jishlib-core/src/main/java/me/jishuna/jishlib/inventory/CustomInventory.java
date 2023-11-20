@@ -10,9 +10,9 @@ import java.util.function.Consumer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import me.jishuna.jishlib.JishLib;
 import me.jishuna.jishlib.inventory.button.Button;
 import me.jishuna.jishlib.item.provider.ItemProvider;
 
@@ -22,7 +22,7 @@ public class CustomInventory<T extends Inventory> {
 
     private final List<BiConsumer<InventoryClickEvent, InventorySession>> clickActions = new ArrayList<>();
     private final List<BiConsumer<InventoryCloseEvent, InventorySession>> closeActions = new ArrayList<>();
-    private final List<BiConsumer<InventoryOpenEvent, InventorySession>> openActions = new ArrayList<>();
+    private final List<BiConsumer<HumanEntity, InventorySession>> openActions = new ArrayList<>();
 
     private final T inventory;
 
@@ -38,7 +38,7 @@ public class CustomInventory<T extends Inventory> {
         this.closeActions.add(action);
     }
 
-    public void addOpenConsumer(BiConsumer<InventoryOpenEvent, InventorySession> action) {
+    public void addOpenConsumer(BiConsumer<HumanEntity, InventorySession> action) {
         this.openActions.add(action);
     }
 
@@ -54,6 +54,21 @@ public class CustomInventory<T extends Inventory> {
         for (int i : slots) {
             setItem(i, item);
         }
+    }
+
+    public void replaceItem(int slot, ItemProvider provider, int ticks) {
+        replaceItem(slot, provider.get(), ticks);
+    }
+
+    public void replaceItem(int slot, ItemStack item, int ticks) {
+        ItemStack previous = this.inventory.getItem(slot);
+        this.inventory.setItem(slot, item);
+        JishLib.runLater(() -> {
+            ItemStack current = this.inventory.getItem(slot);
+            if (current != null && current.isSimilar(item)) {
+                this.inventory.setItem(slot, previous);
+            }
+        }, ticks);
     }
 
     public void addItem(ItemStack item) {
@@ -119,6 +134,10 @@ public class CustomInventory<T extends Inventory> {
         target.openInventory(this.inventory);
     }
 
+    protected void onDiscard(InventorySession session) {
+        // For children to override
+    }
+
     @SafeVarargs
     public final void apply(Consumer<T>... consumers) {
         for (Consumer<T> consumer : consumers) {
@@ -146,9 +165,9 @@ public class CustomInventory<T extends Inventory> {
         this.closeActions.forEach(consumer -> consumer.accept(event, session));
     }
 
-    public final void consumeOpenEvent(InventoryOpenEvent event, InventorySession session) {
+    public final void consumeOpen(HumanEntity entity, InventorySession session) {
         processProviders();
-        this.openActions.forEach(consumer -> consumer.accept(event, session));
+        this.openActions.forEach(consumer -> consumer.accept(entity, session));
     }
 
     private void processProviders() {

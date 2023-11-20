@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import me.jishuna.jishlib.JishLib;
+import me.jishuna.jishlib.util.StringUtils;
 
 public final class MessageAPI {
     private static MessageHandler manager;
@@ -38,17 +39,16 @@ public final class MessageAPI {
             File target = new File(folder, fileName);
 
             if (target.exists()) {
-                MessageReader external = new MessageReader(new FileInputStream(target));
-                parser.merge(MessageParser.parse(external.readMessages()));
+                MessageReader external = new MessageReader();
+                parser.merge(MessageParser.parse(external.readMessages(new FileInputStream(target))));
             } else if (!target.createNewFile()) {
                 JishLib.getLogger().severe("Failed to load messages: Failed to create message file");
                 return;
             }
 
-            MessageReader internal = new MessageReader(JishLib.getPlugin().getResource(fileName));
-            if (parser.merge(MessageParser.parse(internal.readMessages()))) {
-                MessageWriter writer = new MessageWriter(new FileOutputStream(target));
-                writer.writeMessages(parser.getRawMessages().values());
+            MessageReader internal = new MessageReader();
+            if (parser.merge(MessageParser.parse(internal.readMessages(JishLib.getPlugin().getResource(fileName))))) {
+                MessageWriter.writeMessages(parser.getRawMessages().values(), new FileOutputStream(target));
             }
 
             loadFrom(parser);
@@ -65,9 +65,9 @@ public final class MessageAPI {
         for (Entry<String, MessageEntry> entry : parser.getRawMessages().entrySet()) {
             MessageEntry messageEntry = entry.getValue();
             if (messageEntry instanceof SingleMessageEntry single) {
-                messages.put(entry.getKey(), single.getValue());
+                messages.put(entry.getKey(), StringUtils.miniMessageToLegacy(single.getValue()));
             } else if (messageEntry instanceof ListMessageEntry list) {
-                lists.put(entry.getKey(), list.getValue());
+                lists.put(entry.getKey(), list.getValue().stream().map(StringUtils::miniMessageToLegacy).toList());
             }
         }
 

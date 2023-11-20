@@ -1,0 +1,10 @@
+plugins {
+    id 'java'
+	id 'io.papermc.paperweight.userdev' version '1.5.4'
+}
+
+dependencies {
+    compileOnly project(':jishlib-core')
+	compileOnly project(':jishlib-nms:latest')
+    paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.19.4-R0.1-SNAPSHOT")
+}

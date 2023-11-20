@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import me.jishuna.jishlib.util.StringUtils;
 
 public class MessageParser {
     private static final Pattern LIST_PATTERN = Pattern.compile("\"(.*?[^\\\\])\"");
@@ -64,7 +63,7 @@ public class MessageParser {
         if (message.startsWith("[") && message.endsWith("]")) {
             parsed = new ListMessageEntry(entry, parseListMessage(message));
         } else {
-            parsed = new SingleMessageEntry(entry, StringUtils.miniMessageToLegacy(message));
+            parsed = new SingleMessageEntry(entry, message);
         }
 
         this.messages.put(key, parsed);
@@ -77,6 +76,6 @@ public class MessageParser {
     }
 
     private String processMatch(MatchResult result) {
-        return StringUtils.miniMessageToLegacy(result.group(1).replace("\\\"", "\""));
+        return result.group(1).replace("\\\"", "\"");
     }
 }

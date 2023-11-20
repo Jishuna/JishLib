@@ -8,18 +8,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
 public class MessageWriter {
-    private final OutputStream stream;
-
-    public MessageWriter(OutputStream stream) {
-        this.stream = stream;
+    public static void writeMessages(Collection<? extends MessageEntry> messages, OutputStream stream) {
+        writeMessages(messages, new BufferedWriter(new OutputStreamWriter(stream, StandardCharsets.UTF_8)));
     }
 
-    public void writeMessages(Collection<? extends MessageEntry> messages) {
-        if (this.stream == null) {
+    public static void writeMessages(Collection<? extends MessageEntry> messages, BufferedWriter writer) {
+        if (writer == null) {
             return;
         }
 
-        try (this.stream; BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(this.stream, StandardCharsets.UTF_8))) {
+        try (writer) {
             for (MessageEntry entry : messages) {
                 entry.write(writer);
             }

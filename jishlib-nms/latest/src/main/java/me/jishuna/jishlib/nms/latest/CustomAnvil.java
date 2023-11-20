@@ -1,4 +1,4 @@
-package me.jishuna.jishlib.nms.base;
+package me.jishuna.jishlib.nms.latest;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;

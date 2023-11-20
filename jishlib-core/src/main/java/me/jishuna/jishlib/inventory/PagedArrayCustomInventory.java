@@ -42,7 +42,7 @@ public abstract class PagedArrayCustomInventory<T, B extends Inventory> extends 
         }
     }
 
-    protected Collection<T[]> getContents() {
+    protected List<T[]> getContents() {
         return Collections.unmodifiableList(this.items);
     }
 

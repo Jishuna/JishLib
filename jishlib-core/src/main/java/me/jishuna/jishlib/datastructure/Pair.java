@@ -1,19 +1,17 @@
 package me.jishuna.jishlib.datastructure;
 
-public class Pair<L, R> {
-    private final L left;
-    private final R right;
-
+public class Pair<L, R> extends MutablePair<L, R> {
     public Pair(L left, R right) {
-        this.left = left;
-        this.right = right;
+        super(left, right);
     }
 
-    public L getLeft() {
-        return this.left;
+    @Override
+    public void setLeft(L left) {
+        throw new UnsupportedOperationException("Pair is immutable");
     }
 
-    public R getRight() {
-        return this.right;
+    @Override
+    public void setRight(R right) {
+        throw new UnsupportedOperationException("Pair is immutable");
     }
 }

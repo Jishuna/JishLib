@@ -83,7 +83,10 @@ public class CollectionAdapter<V, T extends Collection<V>> implements TypeAdapte
     }
 
     private void writeStrings(ConfigurationSection config, String path, T value, boolean replace, StringAdapter<V> adapter) {
-        List<String> list = new ArrayList<>();
+        if (!replace && config.isSet(path)) {
+            return;
+        }
+        List<String> list = config.getStringList(path);
 
         value.forEach(entry -> {
             String toAdd = adapter.toString(entry);

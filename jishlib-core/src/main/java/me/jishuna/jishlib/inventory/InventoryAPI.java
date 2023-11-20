@@ -23,7 +23,10 @@ public final class InventoryAPI {
     }
 
     public static void destroySession(UUID id) {
-        getInstance().inventoryMap.remove(id);
+        InventorySession session = getInstance().inventoryMap.remove(id);
+        if (session != null) {
+            session.onDiscard();
+        }
     }
 
     public static InventorySession getSession(HumanEntity player) {
