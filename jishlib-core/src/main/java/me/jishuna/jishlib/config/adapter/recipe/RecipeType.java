@@ -1,11 +1,12 @@
 package me.jishuna.jishlib.config.adapter.recipe;
 
+import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 
 public enum RecipeType {
-    SHAPED(ShapedRecipe.class), SHAPELESS(ShapelessRecipe.class);
+    SHAPED(ShapedRecipe.class), SHAPELESS(ShapelessRecipe.class), FURNACE(FurnaceRecipe.class);
 
     private final Class<? extends Recipe> clazz;
 
@@ -14,6 +15,6 @@ public enum RecipeType {
     }
 
     public Class<? extends Recipe> getRecipeClass() {
-        return clazz;
+        return this.clazz;
     }
 }

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
@@ -22,10 +23,11 @@ import me.jishuna.jishlib.config.adapter.StringAdapter;
 import me.jishuna.jishlib.config.adapter.StringTypeAdapter;
 import me.jishuna.jishlib.config.adapter.TypeAdapter;
 import me.jishuna.jishlib.config.adapter.WeightedRandomAdapter;
+import me.jishuna.jishlib.config.adapter.recipe.FurnaceRecipeAdapter;
 import me.jishuna.jishlib.config.adapter.recipe.RecipeAdapter;
+import me.jishuna.jishlib.config.adapter.recipe.RecipeChoiceAdapter;
 import me.jishuna.jishlib.config.adapter.recipe.ShapedRecipeAdapter;
 import me.jishuna.jishlib.config.adapter.recipe.ShapelessRecipeAdapter;
-import me.jishuna.jishlib.config.adapter.recipe.choice.RecipeChoiceAdapter;
 import me.jishuna.jishlib.config.reloadable.ReloadableClass;
 import me.jishuna.jishlib.config.reloadable.ReloadableObject;
 import me.jishuna.jishlib.datastructure.WeightedRandom;
@@ -141,6 +143,7 @@ public final class ConfigApi {
             registerTypeAdapter(Recipe.class, new RecipeAdapter());
             registerTypeAdapter(ShapedRecipe.class, new ShapedRecipeAdapter());
             registerTypeAdapter(ShapelessRecipe.class, new ShapelessRecipeAdapter());
+            registerTypeAdapter(FurnaceRecipe.class, new FurnaceRecipeAdapter());
         }
 
         public <T> void registerTypeAdapter(Class<T> clazz, TypeAdapter<T> adapter) {

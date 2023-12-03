@@ -12,10 +12,6 @@ public class CustomInventoryListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onInventoryClick(InventoryClickEvent event) {
-        if (event.getClickedInventory() == null) {
-            return;
-        }
-
         InventorySession session = InventoryAPI.getSession(event.getWhoClicked());
 
         if (session != null) {

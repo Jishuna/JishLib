@@ -3,8 +3,6 @@ package me.jishuna.jishlib.config.adapter.recipe;
 import java.util.Map;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.Recipe;
-import org.bukkit.inventory.ShapedRecipe;
-import org.bukkit.inventory.ShapelessRecipe;
 import me.jishuna.jishlib.config.ConfigApi;
 import me.jishuna.jishlib.config.adapter.TypeAdapter;
 
@@ -25,10 +23,6 @@ public class RecipeAdapter implements TypeAdapter<Recipe> {
             return;
         }
 
-        if (value instanceof ShapedRecipe shaped) {
-            ConfigApi.getAdapter(ShapedRecipe.class).write(config, path, shaped, replace);
-        } else if (value instanceof ShapelessRecipe shapeless) {
-            ConfigApi.getAdapter(ShapelessRecipe.class).write(config, path, shapeless, replace);
-        }
+        ConfigApi.getAdapter(value.getClass()).writeObject(config, path, value, replace);
     }
 }

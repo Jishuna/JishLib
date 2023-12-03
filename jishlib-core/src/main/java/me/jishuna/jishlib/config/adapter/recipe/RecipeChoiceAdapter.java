@@ -1,4 +1,4 @@
-package me.jishuna.jishlib.config.adapter.recipe.choice;
+package me.jishuna.jishlib.config.adapter.recipe;
 
 import java.util.ArrayList;
 import java.util.List;
