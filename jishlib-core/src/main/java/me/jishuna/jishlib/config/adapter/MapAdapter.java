@@ -18,23 +18,19 @@ public class MapAdapter<K, V, T extends Map<K, V>> implements TypeAdapter<T> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public T read(ConfigurationSection config, String path) {
+    public T read(Object value) {
         T map = (T) new LinkedHashMap<>();
 
-        if (!config.isConfigurationSection(path)) {
-            return map;
-        }
-
-        ConfigurationSection section = config.getConfigurationSection(path);
+        Map<String, Object> section = (Map<String, Object>) value;
         boolean isString = (this.keyAdapter instanceof StringTypeAdapter);
 
-        for (String key : section.getKeys(isString)) {
-            if (isString && section.isConfigurationSection(key)) {
+        for (String key : section.keySet()) {
+            if (isString && section.get(key) instanceof Map<?, ?>) {
                 continue;
             }
 
             K mapKey = this.keyAdapter.fromString(key);
-            V mapValue = this.valueAdapter.read(section, key);
+            V mapValue = this.valueAdapter.read(section.get(key));
             map.put(mapKey, mapValue);
 
         }

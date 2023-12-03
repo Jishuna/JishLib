@@ -14,7 +14,7 @@ public class ConfigType<T> {
 
     public static ConfigType<?> create(Type type) {
         if (type instanceof Class) {
-            return create((Class<?>) type, new ArrayList<>());
+            return new ConfigType<>((Class<?>) type, new ArrayList<>());
         }
         return create(type.getTypeName());
     }
@@ -34,15 +34,10 @@ public class ConfigType<T> {
                     .stream()
                     .map(ConfigType::create)
                     .collect(Collectors.toList());
-            return create(clazz, componentTypes);
+            return new ConfigType<>(clazz, componentTypes);
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException("All parameter types for config must be known at compiletime", e);
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> ConfigType<T> create(Class<?> clazz, List<ConfigType<?>> componentTypes) {
-        return new ConfigType<>((Class<T>) clazz, componentTypes);
     }
 
     private static List<String> splitOnComma(String str, int start, int end) {
@@ -109,7 +104,7 @@ public class ConfigType<T> {
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder().append(this.clazz.getName());
-        if (this.componentTypes.size() > 0) {
+        if (!this.componentTypes.isEmpty()) {
             str.append("<").append(this.componentTypes.stream().map(ConfigType::toString).collect(Collectors.joining(", "))).append(">");
         }
         return str.toString();

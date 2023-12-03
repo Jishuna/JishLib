@@ -148,16 +148,30 @@ public class ItemBuilder {
         return this.meta.hasLore() ? this.meta.getLore() : new ArrayList<>();
     }
 
+    public ItemBuilder damage(int damage) {
+        if (this.meta instanceof Damageable damageable) {
+            damageable.setDamage(damage);
+        }
+        return this;
+    }
+
+    public int damage() {
+        if (this.meta instanceof Damageable damageable) {
+            return damageable.getDamage();
+        }
+        return 0;
+    }
+
     public ItemBuilder durability(int durability) {
         if (this.meta instanceof Damageable damageable) {
-            damageable.setDamage(durability);
+            damageable.setDamage(this.item.getType().getMaxDurability() - durability);
         }
         return this;
     }
 
     public int durability() {
         if (this.meta instanceof Damageable damageable) {
-            return damageable.getDamage();
+            return this.item.getType().getMaxDurability() - damageable.getDamage();
         }
         return 0;
     }

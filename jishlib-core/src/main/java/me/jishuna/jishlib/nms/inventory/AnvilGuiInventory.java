@@ -11,6 +11,7 @@ import me.jishuna.jishlib.inventory.CustomInventory;
 import me.jishuna.jishlib.inventory.InventorySession;
 import me.jishuna.jishlib.item.ItemBuilder;
 import me.jishuna.jishlib.nms.NMSAPI;
+import me.jishuna.jishlib.util.StringUtils;
 
 public class AnvilGuiInventory extends CustomInventory<AnvilInventory> {
     private final CustomAnvilMenu menu;
@@ -20,7 +21,7 @@ public class AnvilGuiInventory extends CustomInventory<AnvilInventory> {
     private boolean valid;
     private String input;
 
-    private AnvilGuiInventory(CustomAnvilMenu menu, String input, Predicate<String> validator, BiConsumer<InventorySession, String> callback) {
+    private AnvilGuiInventory(CustomAnvilMenu menu, String input, Material inputType, Predicate<String> validator, BiConsumer<InventorySession, String> callback) {
         super((AnvilInventory) menu.getInventory());
         this.menu = menu;
         this.validator = validator;
@@ -32,7 +33,7 @@ public class AnvilGuiInventory extends CustomInventory<AnvilInventory> {
         addCloseConsumer((event, session) -> clearItem(0));
 
         onInputTextChange(input);
-        setButton(0, ItemBuilder.create(Material.PAPER).name(input).build(), (event, session) -> this.menu.update());
+        setButton(0, ItemBuilder.create(inputType).name(input).build(), (event, session) -> this.menu.update());
         setButton(2, this::outputClicked);
     }
 
@@ -45,7 +46,7 @@ public class AnvilGuiInventory extends CustomInventory<AnvilInventory> {
         this.valid = checkValid(this.input);
 
         if (this.valid) {
-            setItem(2, ItemBuilder.create(Material.PAPER).name(this.input).build());
+            setItem(2, ItemBuilder.create(Material.PAPER).name(StringUtils.miniMessageToLegacy(this.input)).build());
         } else {
             setItem(2, ItemBuilder.create(Material.BARRIER).name(ChatColor.RED + "Invalid Input").build());
         }
@@ -70,6 +71,7 @@ public class AnvilGuiInventory extends CustomInventory<AnvilInventory> {
     public static class Builder {
         private String input = "";
         private String title = "Anvil";
+        private Material inputType = Material.PAPER;
         private Predicate<String> validator = s -> true;
         private BiConsumer<InventorySession, String> callback = (s, i) -> {
         };
@@ -79,6 +81,14 @@ public class AnvilGuiInventory extends CustomInventory<AnvilInventory> {
 
         public Builder initialInput(String input) {
             this.input = input;
+            return this;
+        }
+
+        public Builder inputType(Material material) {
+            if (material != null && !material.isAir()) {
+                this.inputType = material;
+            }
+
             return this;
         }
 
@@ -99,7 +109,7 @@ public class AnvilGuiInventory extends CustomInventory<AnvilInventory> {
 
         public AnvilGuiInventory create(HumanEntity player) {
             CustomAnvilMenu menu = NMSAPI.getAdapter().createAnvilMenu(player, this.title);
-            return new AnvilGuiInventory(menu, this.input, this.validator, this.callback);
+            return new AnvilGuiInventory(menu, this.input, this.inputType, this.validator, this.callback);
         }
     }
 }

@@ -7,9 +7,12 @@ import java.util.HashMap;
 import java.util.Map;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.RecipeChoice;
+import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.ShapelessRecipe;
 import me.jishuna.jishlib.JishLib;
 import me.jishuna.jishlib.config.adapter.CollectionAdapter;
-import me.jishuna.jishlib.config.adapter.ConfigMappableAdapter;
 import me.jishuna.jishlib.config.adapter.EnumAdapter;
 import me.jishuna.jishlib.config.adapter.MapAdapter;
 import me.jishuna.jishlib.config.adapter.MaterialAdapter;
@@ -19,15 +22,15 @@ import me.jishuna.jishlib.config.adapter.StringAdapter;
 import me.jishuna.jishlib.config.adapter.StringTypeAdapter;
 import me.jishuna.jishlib.config.adapter.TypeAdapter;
 import me.jishuna.jishlib.config.adapter.WeightedRandomAdapter;
-import me.jishuna.jishlib.config.annotation.ConfigMappable;
+import me.jishuna.jishlib.config.adapter.recipe.RecipeAdapter;
+import me.jishuna.jishlib.config.adapter.recipe.ShapedRecipeAdapter;
+import me.jishuna.jishlib.config.adapter.recipe.ShapelessRecipeAdapter;
+import me.jishuna.jishlib.config.adapter.recipe.choice.RecipeChoiceAdapter;
 import me.jishuna.jishlib.config.reloadable.ReloadableClass;
 import me.jishuna.jishlib.config.reloadable.ReloadableObject;
 import me.jishuna.jishlib.datastructure.WeightedRandom;
 
 public final class ConfigApi {
-    public static final MaterialAdapter MATERIAL_ADAPTER = new MaterialAdapter();
-    public static final NamespacedKeyAdapter NAMESPACE_ADAPTER = new NamespacedKeyAdapter();
-
     private static ConfigurationManager manager;
 
     public static void initialize() {
@@ -49,6 +52,10 @@ public final class ConfigApi {
         return new ReloadableClass<>(file, target);
     }
 
+    public static <T> StringAdapter<T> getStringAdapter(Class<T> clazz) {
+        return getStringAdapter(new ConfigType<>(clazz));
+    }
+
     public static <T> StringAdapter<T> getStringAdapter(ConfigType<T> type) {
         TypeAdapter<T> adapter = getAdapter(type);
 
@@ -56,6 +63,10 @@ public final class ConfigApi {
             return stringAdapter;
         }
         return null;
+    }
+
+    public static <T> TypeAdapter<T> getAdapter(Class<T> clazz) {
+        return getAdapter(new ConfigType<>(clazz));
     }
 
     @SuppressWarnings("unchecked")
@@ -87,9 +98,6 @@ public final class ConfigApi {
             return new WeightedRandomAdapter<>(type);
         }
 
-        if (type.getType().isAnnotationPresent(ConfigMappable.class)) {
-            return new ConfigMappableAdapter<>(type);
-        }
         return null;
     }
 
@@ -122,9 +130,17 @@ public final class ConfigApi {
             registerTypeAdapter(boolean.class, new PrimitiveAdapter<>(Boolean::parseBoolean));
             registerTypeAdapter(Boolean.class, new PrimitiveAdapter<>(Boolean::parseBoolean));
 
+            registerTypeAdapter(char.class, new PrimitiveAdapter<>(s -> s.charAt(0)));
+            registerTypeAdapter(Character.class, new PrimitiveAdapter<>(s -> s.charAt(0)));
+
             registerTypeAdapter(String.class, new StringTypeAdapter());
-            registerTypeAdapter(NamespacedKey.class, NAMESPACE_ADAPTER);
-            registerTypeAdapter(Material.class, MATERIAL_ADAPTER);
+            registerTypeAdapter(NamespacedKey.class, new NamespacedKeyAdapter());
+            registerTypeAdapter(Material.class, new MaterialAdapter());
+
+            registerTypeAdapter(RecipeChoice.class, new RecipeChoiceAdapter());
+            registerTypeAdapter(Recipe.class, new RecipeAdapter());
+            registerTypeAdapter(ShapedRecipe.class, new ShapedRecipeAdapter());
+            registerTypeAdapter(ShapelessRecipe.class, new ShapelessRecipeAdapter());
         }
 
         public <T> void registerTypeAdapter(Class<T> clazz, TypeAdapter<T> adapter) {

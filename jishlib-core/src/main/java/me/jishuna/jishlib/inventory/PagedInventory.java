@@ -25,7 +25,7 @@ public abstract class PagedInventory<T, B extends Inventory> extends CustomInven
 
     protected abstract void onClick(InventoryClickEvent event, InventorySession session);
 
-    protected void changePage(int amount) {
+    public void changePage(int amount) {
         int prev = this.page;
 
         this.page = NumberUtils.clamp(this.page + amount, 0, this.maxPage);

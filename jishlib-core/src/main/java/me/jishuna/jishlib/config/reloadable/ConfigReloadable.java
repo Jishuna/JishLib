@@ -61,7 +61,7 @@ public abstract class ConfigReloadable<T> {
                 continue;
             }
 
-            Object readValue = adapter.read(config, path);
+            Object readValue = adapter.read(config.get(path));
             if (readValue == null) {
                 JishLib
                         .getLogger()

@@ -8,9 +8,8 @@ public interface StringAdapter<T> extends TypeAdapter<T> {
     public T fromString(String value);
 
     @Override
-    default T read(ConfigurationSection config, String path) {
-        String value = config.getString(path);
-        return value == null ? null : fromString(value);
+    default T read(Object value) {
+        return value == null ? null : fromString(value.toString());
     }
 
     @Override

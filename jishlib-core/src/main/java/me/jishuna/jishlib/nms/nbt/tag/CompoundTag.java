@@ -118,6 +118,14 @@ public class CompoundTag implements CollectionTag<Map<String, NBTTag<?>>> {
         return 0;
     }
 
+    public String getString(String key) {
+        NBTTag<?> tag = this.tagMap.get(key);
+        if (tag instanceof StringTag string) {
+            return string.getValue();
+        }
+        return "";
+    }
+
     public boolean has(String key) {
         return this.tagMap.containsKey(key);
     }

@@ -42,7 +42,7 @@ public class NMSAPI {
         return adapter;
     }
 
-    private static String getServerVersion() {
+    public static String getServerVersion() {
         String version = Bukkit.getServer().getBukkitVersion();
         if (version.contains("-")) {
             return version.substring(0, version.indexOf('-'));

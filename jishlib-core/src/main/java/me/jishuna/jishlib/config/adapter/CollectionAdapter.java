@@ -36,29 +36,17 @@ public class CollectionAdapter<V, T extends Collection<V>> implements TypeAdapte
 
     @Override
     @SuppressWarnings("unchecked")
-    public T read(ConfigurationSection config, String path) {
+    public T read(Object value) {
+        List<?> list = (List<?>) value;
 
         T collection = (T) defaults.get(this.type.getType()).get();
         if (this.adapter instanceof StringAdapter<V> stringAdapter) {
-            List<String> list = config.getStringList(path);
-
-            list.forEach(value -> collection.add(stringAdapter.fromString(value)));
+            list.forEach(o -> collection.add(stringAdapter.fromString(o.toString())));
             return collection;
         }
 
-        if (!config.isList(path)) {
-            return collection;
-        }
-
-        List<?> list = config.getList(path);
-        for (Object value : list) {
-            if (!(value instanceof Map<?, ?> map)) {
-                continue;
-            }
-
-            String fullPath = path + ".key";
-            config.createSection(fullPath, map);
-            collection.add(this.adapter.read(config, fullPath));
+        for (Object entry : list) {
+            collection.add(this.adapter.read(entry));
 
         }
         return collection;

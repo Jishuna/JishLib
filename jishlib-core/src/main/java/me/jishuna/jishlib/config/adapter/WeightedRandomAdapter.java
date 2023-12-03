@@ -16,15 +16,15 @@ public class WeightedRandomAdapter<T> implements TypeAdapter<WeightedRandom<T>> 
     }
 
     @Override
-    public WeightedRandom<T> read(ConfigurationSection config, String path) {
-        ConfigurationSection section = config.getConfigurationSection(path);
+    public WeightedRandom<T> read(Object value) {
+        ConfigurationSection section = (ConfigurationSection) value;
         WeightedRandom<T> random = new WeightedRandom<>();
 
         for (String key : section.getKeys(false)) {
             double weight = section.getDouble(key);
-            T value = this.adapter.fromString(key);
+            T entry = this.adapter.fromString(key);
 
-            random.add(weight, value);
+            random.add(weight, entry);
         }
         return random;
     }

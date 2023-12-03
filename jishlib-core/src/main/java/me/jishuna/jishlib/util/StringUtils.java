@@ -95,6 +95,24 @@ public class StringUtils {
         return Constants.MINI_MESSAGE.serialize(component);
     }
 
+    public static boolean containsIgnoreCase(String input, String match) {
+        if (input == null || match == null) {
+            return false;
+        }
+
+        final int length = match.length();
+        if (length == 0) {
+            return true;
+        }
+
+        for (int i = input.length() - length; i >= 0; i--) {
+            if (input.regionMatches(true, i, match, 0, length)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private StringUtils() {
     }
 }
