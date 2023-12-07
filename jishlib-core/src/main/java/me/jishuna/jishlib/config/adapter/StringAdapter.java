@@ -1,23 +1,21 @@
 package me.jishuna.jishlib.config.adapter;
 
-import org.bukkit.configuration.ConfigurationSection;
+import me.jishuna.jishlib.util.StringUtils;
 
-public interface StringAdapter<T> extends TypeAdapter<T> {
-    public String toString(T value);
-
-    public T fromString(String value);
+public class StringAdapter implements GenericStringAdapter<String> {
 
     @Override
-    default T read(Object value) {
-        return value == null ? null : fromString(value.toString());
+    public Class<String> getRuntimeType() {
+        return String.class;
     }
 
     @Override
-    default void write(ConfigurationSection config, String path, T value, boolean replace) {
-        if ((value == null) || (config.isSet(path) && !replace)) {
-            return;
-        }
+    public String toString(String value) {
+        return StringUtils.legacyToMiniMessage(value);
+    }
 
-        config.set(path, toString(value));
+    @Override
+    public String fromString(String value) {
+        return StringUtils.miniMessageToLegacy(value);
     }
 }

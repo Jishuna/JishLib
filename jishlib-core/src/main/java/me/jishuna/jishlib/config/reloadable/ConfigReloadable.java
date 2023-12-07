@@ -34,6 +34,7 @@ public abstract class ConfigReloadable<T> {
         return this;
     }
 
+    @SuppressWarnings("unchecked")
     public ConfigReloadable<T> load(boolean includeStatic) {
         if (!prepareFile()) {
             // File error
@@ -55,28 +56,30 @@ public abstract class ConfigReloadable<T> {
             }
 
             ConfigType<?> type = ConfigType.get(field.getField());
-            TypeAdapter<?> adapter = ConfigApi.getAdapter(type);
+            TypeAdapter<Object, Object> adapter = (TypeAdapter<Object, Object>) ConfigApi.getAdapter(type);
             if (adapter == null) {
                 JishLib.getLogger().log(Level.WARNING, "No configuration adapter found for {0}", type.getClass());
                 continue;
             }
 
-            Object readValue = adapter.read(config.get(path));
+            Object savedValue = config.get(path);
+            Class<Object> saved = adapter.getSavedType();
+            if (!saved.isInstance(savedValue)) {
+                JishLib.getLogger().log(Level.WARNING, "Wrong saved type {0} != {1}", new Object[] { savedValue.getClass(), saved });
+                continue;
+            }
+
+            Object readValue = adapter.read(saved.cast(savedValue));
+
             if (readValue == null) {
-                JishLib
-                        .getLogger()
-                        .log(Level.WARNING, "Failed to read value for {0} of type {1}",
-                                new Object[] { path, type.getType() });
+                JishLib.getLogger().log(Level.WARNING, "Failed to read value for {0} of type {1}", new Object[] { path, type.getType() });
                 continue;
             }
 
             try {
                 setField(field, readValue);
             } catch (ReflectiveOperationException ex) {
-                JishLib
-                        .getLogger()
-                        .log(Level.WARNING, "Failed to read value for {0} of type {1}",
-                                new Object[] { path, type.getType() });
+                JishLib.getLogger().log(Level.WARNING, "Failed to read value for {0} of type {1}", new Object[] { path, type.getType() });
                 ex.printStackTrace();
             }
         }
@@ -99,6 +102,7 @@ public abstract class ConfigReloadable<T> {
         return this;
     }
 
+    @SuppressWarnings("unchecked")
     public ConfigReloadable<T> save(boolean replace) {
         if (!prepareFile()) {
             // File error
@@ -115,7 +119,7 @@ public abstract class ConfigReloadable<T> {
             }
 
             ConfigType<?> type = ConfigType.get(field.getField());
-            TypeAdapter<?> adapter = ConfigApi.getAdapter(type);
+            TypeAdapter<Object, Object> adapter = (TypeAdapter<Object, Object>) ConfigApi.getAdapter(type);
             if (adapter == null) {
                 JishLib.getLogger().log(Level.WARNING, "No configuration adapter found for {0}", type.getType());
                 continue;
@@ -127,7 +131,23 @@ public abstract class ConfigReloadable<T> {
                 continue;
             }
 
-            adapter.writeObject(config, path, writeValue, replace);
+            Class<Object> saved = adapter.getSavedType();
+            Class<Object> runtime = adapter.getRuntimeType();
+            if (!runtime.isInstance(writeValue)) {
+                JishLib.getLogger().log(Level.WARNING, "Wrong runtime type {0} != {1}", new Object[] { writeValue.getClass(), runtime });
+                continue;
+            }
+
+            Object existing = config.get(path);
+            if (existing != null && !saved.isInstance(existing)) {
+                JishLib.getLogger().log(Level.WARNING, "Wrong saved type {0} != {1}", new Object[] { existing.getClass(), saved });
+                existing = null;
+            }
+
+            Object value = adapter.write(runtime.cast(writeValue), saved.cast(existing), replace);
+            if (value != null) {
+                config.set(path, value);
+            }
             config.setComments(path, field.getComments());
         }
 

@@ -10,12 +10,10 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.function.Supplier;
-import org.bukkit.configuration.ConfigurationSection;
 import me.jishuna.jishlib.config.ConfigApi;
 import me.jishuna.jishlib.config.ConfigType;
-import me.jishuna.jishlib.config.WrappedSection;
 
-public class CollectionAdapter<V, T extends Collection<V>> implements TypeAdapter<T> {
+public class CollectionAdapter<S, R> implements TypeAdapter<List<S>, Collection<R>> {
     private static Map<Class<?>, Supplier<? extends Collection<?>>> defaults;
 
     static {
@@ -25,63 +23,55 @@ public class CollectionAdapter<V, T extends Collection<V>> implements TypeAdapte
         defaults.put(Queue.class, ArrayDeque::new);
     }
 
-    private final TypeAdapter<V> adapter;
-    private final ConfigType<T> type;
+    private final TypeAdapter<S, R> adapter;
+    private final ConfigType<Collection<R>> type;
 
     @SuppressWarnings("unchecked")
     public CollectionAdapter(ConfigType<?> type) {
-        this.adapter = (TypeAdapter<V>) ConfigApi.getAdapter(type.getComponentTypes().get(0));
-        this.type = (ConfigType<T>) type;
+        this.adapter = (TypeAdapter<S, R>) ConfigApi.getAdapter(type.getComponentTypes().get(0));
+        this.type = (ConfigType<Collection<R>>) type;
     }
 
-    @Override
     @SuppressWarnings("unchecked")
-    public T read(Object value) {
-        List<?> list = (List<?>) value;
+    @Override
+    public Class<List<S>> getSavedType() {
+        return (Class<List<S>>) (Object) List.class;
+    }
 
-        T collection = (T) defaults.get(this.type.getType()).get();
-        if (this.adapter instanceof StringAdapter<V> stringAdapter) {
-            list.forEach(o -> collection.add(stringAdapter.fromString(o.toString())));
+    @SuppressWarnings("unchecked")
+    @Override
+    public Class<Collection<R>> getRuntimeType() {
+        return (Class<Collection<R>>) (Object) Collection.class;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Collection<R> read(List<S> value) {
+        Collection<R> collection = (Collection<R>) defaults.get(this.type.getType()).get();
+
+        if (this.adapter instanceof TypeAdapterString stringAdapter) {
+            value.forEach(o -> collection.add((R) stringAdapter.fromString(o.toString())));
             return collection;
         }
 
-        for (Object entry : list) {
+        for (S entry : value) {
             collection.add(this.adapter.read(entry));
-
         }
+
         return collection;
     }
 
     @Override
-    public void write(ConfigurationSection config, String path, T value, boolean replace) {
-        if (this.adapter instanceof StringAdapter<V> stringAdapter) {
-            writeStrings(config, path, value, replace, stringAdapter);
-            return;
-        }
+    public List<S> write(Collection<R> value, List<S> existing, boolean replace) {
+        List<S> list = new ArrayList<>();
 
-        List<Object> sections = new ArrayList<>();
-
-        value.forEach(entry -> {
-            WrappedSection section = new WrappedSection(config);
-            this.adapter.write(section, "key", entry, replace);
-            sections.add(section.getValues(false).get("key"));
-        });
-
-        config.set(path, sections);
-    }
-
-    private void writeStrings(ConfigurationSection config, String path, T value, boolean replace, StringAdapter<V> adapter) {
-        if (!replace && config.isSet(path)) {
-            return;
-        }
-        List<String> list = config.getStringList(path);
-
-        value.forEach(entry -> {
-            String toAdd = adapter.toString(entry);
-            if (!list.contains(toAdd)) {
-                list.add(toAdd);
+        for (R entry : value) {
+            S saveValue = this.adapter.write(entry, null, replace);
+            if (saveValue != null) {
+                list.add(saveValue);
             }
-        });
-        config.set(path, list);
+        }
+
+        return list;
     }
 }

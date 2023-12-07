@@ -1,15 +1,12 @@
 package me.jishuna.jishlib.config.adapter;
 
-import org.bukkit.configuration.ConfigurationSection;
+public interface TypeAdapter<S, R> {
 
-public interface TypeAdapter<T> {
+    public Class<S> getSavedType();
 
-    public T read(Object value);
+    public Class<R> getRuntimeType();
 
-    public void write(ConfigurationSection config, String path, T value, boolean replace);
+    public R read(S value);
 
-    @SuppressWarnings("unchecked")
-    public default void writeObject(ConfigurationSection config, String path, Object value, boolean replace) {
-        write(config, path, (T) value, replace);
-    }
+    public S write(R value, S existing, boolean replace);
 }
