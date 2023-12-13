@@ -39,6 +39,10 @@ public class PrimitiveAdapter<R> implements TypeAdapterString<R, R> {
 
     @Override
     public R write(R value, R existing, boolean replace) {
+        if (existing != null && !replace) {
+            return null;
+        }
+
         return value;
     }
 }

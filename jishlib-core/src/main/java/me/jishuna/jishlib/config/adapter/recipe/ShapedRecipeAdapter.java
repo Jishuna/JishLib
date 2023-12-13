@@ -57,11 +57,11 @@ public class ShapedRecipeAdapter implements TypeAdapter<Map<String, Object>, Sha
             existing = new LinkedHashMap<>();
         }
 
-        existing.put("type", RecipeType.SHAPED.name());
-        existing.put("name", value.getKey().toString());
-        existing.put("output", value.getResult().getType().getKey().toString());
-        existing.put("amount", value.getResult().getAmount());
-        existing.put("shape", value.getShape());
+        existing.putIfAbsent("type", RecipeType.SHAPED.name());
+        existing.putIfAbsent("name", value.getKey().toString());
+        existing.putIfAbsent("output", value.getResult().getType().getKey().toString());
+        existing.putIfAbsent("amount", value.getResult().getAmount());
+        existing.putIfAbsent("shape", value.getShape());
 
         Object ingredients = null;
         if (existing.containsKey("ingredients")) {
@@ -69,7 +69,7 @@ public class ShapedRecipeAdapter implements TypeAdapter<Map<String, Object>, Sha
         }
 
         ingredients = ConfigApi.getAdapter(this.ingredientMapType).write(value.getChoiceMap(), ingredients, replace);
-        existing.put("ingredients", ingredients);
+        existing.putIfAbsent("ingredients", ingredients);
 
         return existing;
     }

@@ -18,6 +18,7 @@ import me.jishuna.jishlib.config.adapter.EnumAdapter;
 import me.jishuna.jishlib.config.adapter.MapAdapter;
 import me.jishuna.jishlib.config.adapter.MaterialAdapter;
 import me.jishuna.jishlib.config.adapter.NamespacedKeyAdapter;
+import me.jishuna.jishlib.config.adapter.NativeAdapter;
 import me.jishuna.jishlib.config.adapter.PrimitiveAdapter;
 import me.jishuna.jishlib.config.adapter.StringAdapter;
 import me.jishuna.jishlib.config.adapter.TypeAdapter;
@@ -65,7 +66,7 @@ public final class ConfigApi {
         if (adapter instanceof TypeAdapterString<?, ?> stringAdapter) {
             return (TypeAdapterString<S, R>) stringAdapter;
         }
-        
+
         return null;
     }
 
@@ -100,7 +101,7 @@ public final class ConfigApi {
             return new WeightedRandomAdapter<>(type);
         }
 
-        return null;
+        return new NativeAdapter<>(type.getType());
     }
 
     private static ConfigurationManager getInstance() {
@@ -121,7 +122,7 @@ public final class ConfigApi {
             registerTypeAdapter(Long.class, new PrimitiveAdapter<>(Long.class, Long::parseLong));
 
             registerTypeAdapter(int.class, new PrimitiveAdapter<>(Integer.class, Integer::parseInt));
-            registerTypeAdapter(Integer.class, new PrimitiveAdapter<>(Integer.class,Integer::parseInt));
+            registerTypeAdapter(Integer.class, new PrimitiveAdapter<>(Integer.class, Integer::parseInt));
 
             registerTypeAdapter(double.class, new PrimitiveAdapter<>(Double.class, Double::parseDouble));
             registerTypeAdapter(Double.class, new PrimitiveAdapter<>(Double.class, Double::parseDouble));
@@ -130,7 +131,7 @@ public final class ConfigApi {
             registerTypeAdapter(Float.class, new PrimitiveAdapter<>(Float.class, Float::parseFloat));
 
             registerTypeAdapter(boolean.class, new PrimitiveAdapter<>(Boolean.class, Boolean::parseBoolean));
-            registerTypeAdapter(Boolean.class, new PrimitiveAdapter<>(Boolean.class,Boolean::parseBoolean));
+            registerTypeAdapter(Boolean.class, new PrimitiveAdapter<>(Boolean.class, Boolean::parseBoolean));
 
             registerTypeAdapter(char.class, new PrimitiveAdapter<>(Character.class, s -> s.charAt(0)));
             registerTypeAdapter(Character.class, new PrimitiveAdapter<>(Character.class, s -> s.charAt(0)));

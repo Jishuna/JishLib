@@ -13,6 +13,10 @@ public interface GenericStringAdapter<R> extends TypeAdapterString<String, R> {
 
     @Override
     default String write(R value, String existing, boolean replace) {
+        if (existing != null && !replace) {
+            return null;
+        }
+
         return toString(value);
     }
 }

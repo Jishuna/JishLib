@@ -76,6 +76,7 @@ public abstract class ConfigReloadable<T> {
                 continue;
             }
 
+            System.out.println(field.getPath() + " - " + readValue);
             try {
                 setField(field, readValue);
             } catch (ReflectiveOperationException ex) {

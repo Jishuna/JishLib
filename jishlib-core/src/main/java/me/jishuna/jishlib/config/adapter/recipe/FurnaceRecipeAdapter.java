@@ -45,12 +45,12 @@ public class FurnaceRecipeAdapter implements TypeAdapter<Map<String, Object>, Fu
             existing = new LinkedHashMap<>();
         }
 
-        existing.put("type", RecipeType.FURNACE.name());
-        existing.put("name", value.getKey().toString());
-        existing.put("output", value.getResult().getType().getKey().toString());
-        existing.put("amount", value.getResult().getAmount());
-        existing.put("cooking-time", value.getCookingTime());
-        existing.put("experience", value.getExperience());
+        existing.putIfAbsent("type", RecipeType.FURNACE.name());
+        existing.putIfAbsent("name", value.getKey().toString());
+        existing.putIfAbsent("output", value.getResult().getType().getKey().toString());
+        existing.putIfAbsent("amount", value.getResult().getAmount());
+        existing.putIfAbsent("cooking-time", value.getCookingTime());
+        existing.putIfAbsent("experience", value.getExperience());
 
         Object input = null;
         if (existing.containsKey("input")) {
@@ -58,7 +58,7 @@ public class FurnaceRecipeAdapter implements TypeAdapter<Map<String, Object>, Fu
         }
         input = ConfigApi.getAdapter(RecipeChoice.class).write(value.getInputChoice(), input, replace);
 
-        existing.put("input", input);
+        existing.putIfAbsent("input", input);
 
         return existing;
     }

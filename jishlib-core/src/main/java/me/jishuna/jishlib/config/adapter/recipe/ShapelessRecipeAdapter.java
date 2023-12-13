@@ -54,10 +54,10 @@ public class ShapelessRecipeAdapter implements TypeAdapter<Map<String, Object>, 
             existing = new LinkedHashMap<>();
         }
 
-        existing.put("type", RecipeType.SHAPELESS.name());
-        existing.put("name", value.getKey().toString());
-        existing.put("output", value.getResult().getType().getKey().toString());
-        existing.put("amount", value.getResult().getAmount());
+        existing.putIfAbsent("type", RecipeType.SHAPELESS.name());
+        existing.putIfAbsent("name", value.getKey().toString());
+        existing.putIfAbsent("output", value.getResult().getType().getKey().toString());
+        existing.putIfAbsent("amount", value.getResult().getAmount());
 
         Object ingredients = null;
         if (existing.containsKey("ingredients")) {
@@ -65,7 +65,7 @@ public class ShapelessRecipeAdapter implements TypeAdapter<Map<String, Object>, 
         }
 
         ingredients = ConfigApi.getAdapter(this.ingredientListType).write(value.getChoiceList(), ingredients, replace);
-        existing.put("ingredients", ingredients);
+        existing.putIfAbsent("ingredients", ingredients);
 
         return existing;
     }

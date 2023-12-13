@@ -63,6 +63,10 @@ public class CollectionAdapter<S, R> implements TypeAdapter<List<S>, Collection<
 
     @Override
     public List<S> write(Collection<R> value, List<S> existing, boolean replace) {
+        if (existing != null && !replace) {
+            return null;
+        }
+
         List<S> list = new ArrayList<>();
 
         for (R entry : value) {
