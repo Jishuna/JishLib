@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.FurnaceRecipe;
@@ -14,6 +15,7 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 import me.jishuna.jishlib.JishLib;
 import me.jishuna.jishlib.config.adapter.CollectionAdapter;
+import me.jishuna.jishlib.config.adapter.ColorAdapter;
 import me.jishuna.jishlib.config.adapter.EnumAdapter;
 import me.jishuna.jishlib.config.adapter.MapAdapter;
 import me.jishuna.jishlib.config.adapter.MaterialAdapter;
@@ -139,6 +141,7 @@ public final class ConfigApi {
             registerTypeAdapter(String.class, new StringAdapter());
             registerTypeAdapter(NamespacedKey.class, new NamespacedKeyAdapter());
             registerTypeAdapter(Material.class, new MaterialAdapter());
+            registerTypeAdapter(Color.class, new ColorAdapter());
 
             registerTypeAdapter(RecipeChoice.class, new RecipeChoiceAdapter());
             registerTypeAdapter(Recipe.class, new RecipeAdapter());

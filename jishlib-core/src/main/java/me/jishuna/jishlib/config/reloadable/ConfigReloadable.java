@@ -6,7 +6,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
+import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import me.jishuna.jishlib.JishLib;
 import me.jishuna.jishlib.config.ConfigApi;
@@ -62,10 +64,10 @@ public abstract class ConfigReloadable<T> {
                 continue;
             }
 
-            Object savedValue = config.get(path);
             Class<Object> saved = adapter.getSavedType();
+            Object savedValue = getSavedValue(config, path, saved);
             if (!saved.isInstance(savedValue)) {
-                JishLib.getLogger().log(Level.WARNING, "Wrong saved type {0} != {1}", new Object[] { savedValue.getClass(), saved });
+                JishLib.getLogger().log(Level.WARNING, "Wrong saved type for {0}, {1} != {2}", new Object[] { path, savedValue.getClass(), saved });
                 continue;
             }
 
@@ -76,7 +78,6 @@ public abstract class ConfigReloadable<T> {
                 continue;
             }
 
-            System.out.println(field.getPath() + " - " + readValue);
             try {
                 setField(field, readValue);
             } catch (ReflectiveOperationException ex) {
@@ -135,21 +136,21 @@ public abstract class ConfigReloadable<T> {
             Class<Object> saved = adapter.getSavedType();
             Class<Object> runtime = adapter.getRuntimeType();
             if (!runtime.isInstance(writeValue)) {
-                JishLib.getLogger().log(Level.WARNING, "Wrong runtime type {0} != {1}", new Object[] { writeValue.getClass(), runtime });
+                JishLib.getLogger().log(Level.WARNING, "Wrong runtime type for {0}, {1} != {2}", new Object[] { path, writeValue.getClass(), runtime });
                 continue;
             }
 
-            Object existing = config.get(path);
+            Object existing = getSavedValue(config, path, saved);
             if (existing != null && !saved.isInstance(existing)) {
-                JishLib.getLogger().log(Level.WARNING, "Wrong saved type {0} != {1}", new Object[] { existing.getClass(), saved });
+                JishLib.getLogger().log(Level.WARNING, "Wrong saved type for {0}, {1} != {2}", new Object[] { path, existing.getClass(), saved });
                 existing = null;
             }
 
             Object value = adapter.write(runtime.cast(writeValue), saved.cast(existing), replace);
             if (value != null) {
                 config.set(path, value);
+                config.setComments(path, field.getComments());
             }
-            config.setComments(path, field.getComments());
         }
 
         try {
@@ -165,7 +166,16 @@ public abstract class ConfigReloadable<T> {
 
     protected abstract Object getField(ConfigField field);
 
-    protected abstract void postLoad(Method postLoadMethod2);
+    protected abstract void postLoad(Method postLoadMethod);
+
+    private Object getSavedValue(YamlConfiguration config, String path, Class<Object> expectedType) {
+        Object saved = config.get(path);
+
+        if (saved instanceof MemorySection section && Map.class.isAssignableFrom(expectedType)) {
+            return section.getValues(false);
+        }
+        return saved;
+    }
 
     private boolean prepareFile() {
         try {

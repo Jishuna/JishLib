@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import org.bukkit.configuration.MemorySection;
 import me.jishuna.jishlib.JishLib;
 import me.jishuna.jishlib.config.ConfigApi;
 import me.jishuna.jishlib.config.ConfigField;
@@ -62,10 +63,10 @@ public class NativeAdapter<T> implements TypeAdapter<Map<String, Object>, T> {
                 continue;
             }
 
-            Object savedValue = value.get(path);
             Class<Object> saved = adapter.getSavedType();
+            Object savedValue = getSavedValue(value, path, saved);
             if (!saved.isInstance(savedValue)) {
-                JishLib.getLogger().log(Level.WARNING, "Wrong saved type {0} != {1}", new Object[] { savedValue.getClass(), saved });
+                JishLib.getLogger().log(Level.WARNING, "Wrong saved type for {0}, {1} != {2}", new Object[] { path, savedValue.getClass(), saved });
                 continue;
             }
 
@@ -113,13 +114,13 @@ public class NativeAdapter<T> implements TypeAdapter<Map<String, Object>, T> {
             Class<Object> saved = adapter.getSavedType();
             Class<Object> runtime = adapter.getRuntimeType();
             if (!runtime.isInstance(writeValue)) {
-                JishLib.getLogger().log(Level.WARNING, "Wrong runtime type {0} != {1}", new Object[] { writeValue.getClass(), runtime });
+                JishLib.getLogger().log(Level.WARNING, "Wrong runtime type for {0}, {1} != {2}", new Object[] { path, writeValue.getClass(), runtime });
                 continue;
             }
 
-            Object existing = map.get(path);
+            Object existing = getSavedValue(map, path, saved);
             if (existing != null && !saved.isInstance(existing)) {
-                JishLib.getLogger().log(Level.WARNING, "Wrong saved type {0} != {1}", new Object[] { existing.getClass(), saved });
+                JishLib.getLogger().log(Level.WARNING, "Wrong saved type for {0}, {1} != {2}", new Object[] { path, existing.getClass(), saved });
                 existing = null;
             }
 
@@ -129,6 +130,15 @@ public class NativeAdapter<T> implements TypeAdapter<Map<String, Object>, T> {
             }
         }
         return map;
+    }
+
+    private Object getSavedValue(Map<String, Object> value, String path, Class<Object> expectedType) {
+        Object saved = value.get(path);
+
+        if (saved instanceof MemorySection section && Map.class.isAssignableFrom(expectedType)) {
+            return section.getValues(false);
+        }
+        return saved;
     }
 
     private void cacheFields(Class<? super T> clazz) {

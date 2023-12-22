@@ -1,13 +1,13 @@
 package me.jishuna.jishlib.config.adapter;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Map.Entry;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.YamlConfiguration;
 import me.jishuna.jishlib.config.ConfigApi;
 import me.jishuna.jishlib.config.ConfigType;
 import me.jishuna.jishlib.datastructure.WeightedRandom;
 
-public class WeightedRandomAdapter<R> implements TypeAdapter<ConfigurationSection, WeightedRandom<R>> {
+public class WeightedRandomAdapter<R> implements TypeAdapter<Map<String, Object>, WeightedRandom<R>> {
 
     private final TypeAdapterString<Object, R> adapter;
 
@@ -16,9 +16,10 @@ public class WeightedRandomAdapter<R> implements TypeAdapter<ConfigurationSectio
         this.adapter = (TypeAdapterString<Object, R>) ConfigApi.getStringAdapter(type.getComponentTypes().get(0));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Class<ConfigurationSection> getSavedType() {
-        return ConfigurationSection.class;
+    public Class<Map<String, Object>> getSavedType() {
+        return (Class<Map<String, Object>>) (Object) Map.class;
     }
 
     @SuppressWarnings("unchecked")
@@ -28,29 +29,36 @@ public class WeightedRandomAdapter<R> implements TypeAdapter<ConfigurationSectio
     }
 
     @Override
-    public WeightedRandom<R> read(ConfigurationSection value) {
+    public WeightedRandom<R> read(Map<String, Object> map) {
         WeightedRandom<R> random = new WeightedRandom<>();
 
-        for (String key : value.getKeys(false)) {
-            double weight = value.getDouble(key);
-            R entry = this.adapter.fromString(key);
+        for (Entry<String, Object> entry : map.entrySet()) {
+            Object value = entry.getValue();
+            if (!(value instanceof Number number)) {
+                continue;
+            }
 
-            random.add(weight, entry);
+            double weight = number.doubleValue();
+            R val = this.adapter.fromString(entry.getKey());
+
+            random.add(weight, val);
         }
         return random;
     }
 
     @Override
-    public ConfigurationSection write(WeightedRandom<R> value, ConfigurationSection existing, boolean replace) {
+    public Map<String, Object> write(WeightedRandom<R> value, Map<String, Object> existing, boolean replace) {
         if (existing == null) {
-            existing = new YamlConfiguration();
+            existing = new LinkedHashMap<>();
         }
 
+        double lastKey = 0;
         for (Entry<Double, R> entry : value.getEntries()) {
             String key = this.adapter.toString(entry.getValue());
 
-            if (!existing.isSet(key) || replace) {
-                existing.set(key, entry.getKey());
+            if (!existing.containsKey(key) || replace) {
+                existing.put(key, entry.getKey() - lastKey);
+                lastKey = entry.getKey();
             }
         }
 

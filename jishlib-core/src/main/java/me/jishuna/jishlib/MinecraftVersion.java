@@ -14,6 +14,7 @@ public class MinecraftVersion {
     public static final SemanticVersion MC1_20_1 = new SemanticVersion(1, 20, 1);
     public static final SemanticVersion MC1_20_2 = new SemanticVersion(1, 20, 2);
     public static final SemanticVersion MC1_20_3 = new SemanticVersion(1, 20, 3);
+    public static final SemanticVersion MC1_20_4 = new SemanticVersion(1, 20, 4);
 
     private MinecraftVersion() {
     }
