@@ -15,7 +15,7 @@ public class NMSAPI {
     private static NMSAdapter adapter;
 
     static {
-        ADAPTER_MAP.put("1.20.2", "latest");
+        ADAPTER_MAP.put("1.20.4", "latest");
         ADAPTER_MAP.put("1.19.4", "v1_19_4");
         ADAPTER_MAP.put("1.18.2", "v1_18_2");
     }

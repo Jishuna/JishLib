@@ -11,6 +11,7 @@ import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.LongArrayTag;
 import net.minecraft.nbt.LongTag;
+import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.ShortTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
@@ -38,7 +39,7 @@ public class NBTUtils {
     public CompoundTag fromBytes(byte[] data) {
         CompoundTag compound;
         try {
-            compound = net.minecraft.nbt.NbtIo.readCompressed(new java.io.ByteArrayInputStream(data));
+            compound = net.minecraft.nbt.NbtIo.readCompressed(new java.io.ByteArrayInputStream(data), NbtAccounter.unlimitedHeap());
         } catch (IOException ex) {
             throw new NMSException("Failed to read NBT from bytes", ex);
         }

@@ -16,6 +16,7 @@ import org.bukkit.inventory.ShapelessRecipe;
 import me.jishuna.jishlib.JishLib;
 import me.jishuna.jishlib.config.adapter.CollectionAdapter;
 import me.jishuna.jishlib.config.adapter.ColorAdapter;
+import me.jishuna.jishlib.config.adapter.ConfigSerializableAdapter;
 import me.jishuna.jishlib.config.adapter.EnumAdapter;
 import me.jishuna.jishlib.config.adapter.MapAdapter;
 import me.jishuna.jishlib.config.adapter.MaterialAdapter;
@@ -88,19 +89,24 @@ public final class ConfigApi {
     }
 
     private static TypeAdapter<?, ?> createAdapter(ConfigType<?> type) {
+        if (ConfigSerializable.class.isAssignableFrom(type.getType())) {
+            return new ConfigSerializableAdapter<>(type);
+        }
+
+        if (WeightedRandom.class.isAssignableFrom(type.getType())) {
+            return new WeightedRandomAdapter<>(type);
+        }
+
         if (Enum.class.isAssignableFrom(type.getType())) {
             return new EnumAdapter<>(type.getType());
         }
+
         if (Collection.class.isAssignableFrom(type.getType())) {
             return new CollectionAdapter<>(type);
         }
 
         if (Map.class.isAssignableFrom(type.getType())) {
             return new MapAdapter<>(type);
-        }
-
-        if (WeightedRandom.class.isAssignableFrom(type.getType())) {
-            return new WeightedRandomAdapter<>(type);
         }
 
         return new NativeAdapter<>(type.getType());
