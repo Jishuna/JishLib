@@ -94,6 +94,29 @@ public class FileUtils {
         }
     }
 
+    public static void copyFolder(File source, File target) throws IOException {
+        copyFolder(source.toPath(), target.toPath());
+    }
+
+    public static void copyFolder(Path source, Path target) throws IOException {
+        Files.walkFileTree(source, new SimpleFileVisitor<Path>() {
+
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
+                    throws IOException {
+                Files.createDirectories(target.resolve(source.relativize(dir).toString()));
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                    throws IOException {
+                Files.copy(file, target.resolve(source.relativize(file).toString()));
+                return FileVisitResult.CONTINUE;
+            }
+        });
+    }
+
     /**
      * Gets the human readable size of a file/directory.
      *
