@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.function.Supplier;
-import me.jishuna.jishlib.config.ConfigApi;
+import me.jishuna.jishlib.config.ConfigAPI;
 import me.jishuna.jishlib.config.ConfigType;
 
 public class CollectionAdapter<S, R> implements TypeAdapter<List<S>, Collection<R>> {
@@ -28,7 +28,7 @@ public class CollectionAdapter<S, R> implements TypeAdapter<List<S>, Collection<
 
     @SuppressWarnings("unchecked")
     public CollectionAdapter(ConfigType<?> type) {
-        this.adapter = (TypeAdapter<S, R>) ConfigApi.getAdapter(type.getComponentTypes().get(0));
+        this.adapter = (TypeAdapter<S, R>) ConfigAPI.getAdapter(type.getComponentTypes().get(0));
         this.type = (ConfigType<Collection<R>>) type;
     }
 

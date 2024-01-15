@@ -8,7 +8,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapelessRecipe;
-import me.jishuna.jishlib.config.ConfigApi;
+import me.jishuna.jishlib.config.ConfigAPI;
 import me.jishuna.jishlib.config.ConfigType;
 import me.jishuna.jishlib.config.adapter.TypeAdapter;
 import me.jishuna.jishlib.util.NumberUtils;
@@ -31,15 +31,15 @@ public class ShapelessRecipeAdapter implements TypeAdapter<Map<String, Object>, 
     @SuppressWarnings("unchecked")
     @Override
     public ShapelessRecipe read(Map<String, Object> value) {
-        NamespacedKey key = ConfigApi.getAdapter(NamespacedKey.class).read(value.get("name"));
-        Material output = ConfigApi.getAdapter(Material.class).read(value.get("output"));
-        int amount = NumberUtils.clamp(ConfigApi.getAdapter(int.class).read(value.get("amount")), 1, 64);
+        NamespacedKey key = ConfigAPI.getAdapter(NamespacedKey.class).read(value.get("name"));
+        Material output = ConfigAPI.getAdapter(Material.class).read(value.get("output"));
+        int amount = NumberUtils.clamp(ConfigAPI.getAdapter(int.class).read(value.get("amount")), 1, 64);
 
         ItemStack item = new ItemStack(output, amount);
 
         ShapelessRecipe recipe = new ShapelessRecipe(key, item);
 
-        List<RecipeChoice> choices = ConfigApi.getAdapter(this.ingredientListType).read(value.get("ingredients"));
+        List<RecipeChoice> choices = ConfigAPI.getAdapter(this.ingredientListType).read(value.get("ingredients"));
 
         for (RecipeChoice choice : choices) {
             recipe.addIngredient(choice);
@@ -61,10 +61,10 @@ public class ShapelessRecipeAdapter implements TypeAdapter<Map<String, Object>, 
 
         Object ingredients = null;
         if (existing.containsKey("ingredients")) {
-            ingredients = ConfigApi.getAdapter(this.ingredientListType).read(existing.get("ingredients"));
+            ingredients = ConfigAPI.getAdapter(this.ingredientListType).read(existing.get("ingredients"));
         }
 
-        ingredients = ConfigApi.getAdapter(this.ingredientListType).write(value.getChoiceList(), ingredients, replace);
+        ingredients = ConfigAPI.getAdapter(this.ingredientListType).write(value.getChoiceList(), ingredients, replace);
         existing.putIfAbsent("ingredients", ingredients);
 
         return existing;

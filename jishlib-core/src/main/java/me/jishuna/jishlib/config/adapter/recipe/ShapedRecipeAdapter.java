@@ -6,10 +6,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.MemorySection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
-import me.jishuna.jishlib.config.ConfigApi;
+import me.jishuna.jishlib.config.ConfigAPI;
 import me.jishuna.jishlib.config.ConfigType;
 import me.jishuna.jishlib.config.adapter.TypeAdapter;
 import me.jishuna.jishlib.util.NumberUtils;
@@ -32,9 +33,9 @@ public class ShapedRecipeAdapter implements TypeAdapter<Map<String, Object>, Sha
     @SuppressWarnings("unchecked")
     @Override
     public ShapedRecipe read(Map<String, Object> value) {
-        NamespacedKey key = ConfigApi.getAdapter(NamespacedKey.class).read(value.get("name"));
-        Material output = ConfigApi.getAdapter(Material.class).read(value.get("output"));
-        int amount = NumberUtils.clamp(ConfigApi.getAdapter(int.class).read(value.get("amount")), 1, 64);
+        NamespacedKey key = ConfigAPI.getAdapter(NamespacedKey.class).read(value.get("name"));
+        Material output = ConfigAPI.getAdapter(Material.class).read(value.get("output"));
+        int amount = NumberUtils.clamp(ConfigAPI.getAdapter(int.class).read(value.get("amount")), 1, 64);
 
         ItemStack item = new ItemStack(output, amount);
 
@@ -42,7 +43,7 @@ public class ShapedRecipeAdapter implements TypeAdapter<Map<String, Object>, Sha
         List<?> list = (List<?>) value.get("shape");
         recipe.shape(list.stream().map(Object::toString).toArray(String[]::new));
 
-        Map<Character, RecipeChoice> ingredients = ConfigApi.getAdapter(this.ingredientMapType).read(value.get("ingredients"));
+        Map<Character, RecipeChoice> ingredients = ConfigAPI.getAdapter(this.ingredientMapType).read(readIngredients(value));
 
         for (Entry<Character, RecipeChoice> entry : ingredients.entrySet()) {
             recipe.setIngredient(entry.getKey(), entry.getValue());
@@ -65,13 +66,22 @@ public class ShapedRecipeAdapter implements TypeAdapter<Map<String, Object>, Sha
 
         Object ingredients = null;
         if (existing.containsKey("ingredients")) {
-            ingredients = ConfigApi.getAdapter(this.ingredientMapType).read(existing.get("ingredients"));
+            ingredients = ConfigAPI.getAdapter(this.ingredientMapType).read(readIngredients(existing));
         }
 
-        ingredients = ConfigApi.getAdapter(this.ingredientMapType).write(value.getChoiceMap(), ingredients, replace);
+        ingredients = ConfigAPI.getAdapter(this.ingredientMapType).write(value.getChoiceMap(), ingredients, replace);
         existing.putIfAbsent("ingredients", ingredients);
 
         return existing;
+    }
+
+    private Object readIngredients(Map<String, Object> map) {
+        Object ingredientMap = map.get("ingredients");
+        if (ingredientMap instanceof MemorySection section) {
+            ingredientMap = section.getValues(false);
+        }
+
+        return ingredientMap;
     }
 
 }

@@ -3,7 +3,7 @@ package me.jishuna.jishlib.config.adapter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import me.jishuna.jishlib.config.ConfigApi;
+import me.jishuna.jishlib.config.ConfigAPI;
 import me.jishuna.jishlib.config.ConfigType;
 
 public class MapAdapter<K, V> implements TypeAdapter<Map<String, Object>, Map<K, V>> {
@@ -12,8 +12,8 @@ public class MapAdapter<K, V> implements TypeAdapter<Map<String, Object>, Map<K,
 
     @SuppressWarnings("unchecked")
     public MapAdapter(ConfigType<?> type) {
-        this.keyAdapter = (TypeAdapterString<Object, K>) ConfigApi.getStringAdapter(type.getComponentTypes().get(0));
-        this.valueAdapter = (TypeAdapter<Object, V>) ConfigApi.getAdapter(type.getComponentTypes().get(1));
+        this.keyAdapter = (TypeAdapterString<Object, K>) ConfigAPI.getStringAdapter(type.getComponentTypes().get(0));
+        this.valueAdapter = (TypeAdapter<Object, V>) ConfigAPI.getAdapter(type.getComponentTypes().get(1));
     }
 
     @SuppressWarnings("unchecked")

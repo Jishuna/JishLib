@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import org.bukkit.configuration.MemorySection;
 import me.jishuna.jishlib.JishLib;
-import me.jishuna.jishlib.config.ConfigApi;
+import me.jishuna.jishlib.config.ConfigAPI;
 import me.jishuna.jishlib.config.ConfigField;
 import me.jishuna.jishlib.config.ConfigType;
 import me.jishuna.jishlib.config.ReflectionHelper;
@@ -57,7 +57,7 @@ public class NativeAdapter<T> implements TypeAdapter<Map<String, Object>, T> {
             }
 
             ConfigType<?> type = ConfigType.get(field.getField());
-            TypeAdapter<Object, Object> adapter = (TypeAdapter<Object, Object>) ConfigApi.getAdapter(type);
+            TypeAdapter<Object, Object> adapter = (TypeAdapter<Object, Object>) ConfigAPI.getAdapter(type);
             if (adapter == null) {
                 JishLib.getLogger().log(Level.WARNING, "No configuration adapter found for {0}", type.getClass());
                 continue;
@@ -99,7 +99,7 @@ public class NativeAdapter<T> implements TypeAdapter<Map<String, Object>, T> {
             String path = field.getPath();
 
             ConfigType<?> type = ConfigType.get(field.getField());
-            TypeAdapter<Object, Object> adapter = (TypeAdapter<Object, Object>) ConfigApi.getAdapter(type);
+            TypeAdapter<Object, Object> adapter = (TypeAdapter<Object, Object>) ConfigAPI.getAdapter(type);
             if (adapter == null) {
                 JishLib.getLogger().log(Level.WARNING, "No configuration adapter found for {0}", type.getType());
                 continue;

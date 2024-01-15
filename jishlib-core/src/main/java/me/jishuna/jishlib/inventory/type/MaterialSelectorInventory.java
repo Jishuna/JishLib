@@ -28,7 +28,7 @@ public class MaterialSelectorInventory extends PagedCustomInventory<Material, In
         super(Bukkit.createInventory(null, 54, title), ALL_ITEMS, 45);
         this.callback = callback;
 
-        addClickConsumer(event -> event.setCancelled(true));
+        cancelAllClicks();
 
         populator.accept(this);
         refreshOptions();

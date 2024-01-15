@@ -1,6 +1,5 @@
 package me.jishuna.jishlib.config;
 
-import com.google.common.base.Preconditions;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,7 +12,6 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
-import me.jishuna.jishlib.JishLib;
 import me.jishuna.jishlib.config.adapter.CollectionAdapter;
 import me.jishuna.jishlib.config.adapter.ColorAdapter;
 import me.jishuna.jishlib.config.adapter.ConfigSerializableAdapter;
@@ -36,15 +34,8 @@ import me.jishuna.jishlib.config.reloadable.ReloadableClass;
 import me.jishuna.jishlib.config.reloadable.ReloadableObject;
 import me.jishuna.jishlib.datastructure.WeightedRandom;
 
-public final class ConfigApi {
+public final class ConfigAPI {
     private static ConfigurationManager manager;
-
-    public static void initialize() {
-        Preconditions.checkArgument(manager == null, "ConfigApi already initialized!");
-        Preconditions.checkArgument(JishLib.isInitialized(), "JishLib must be initialized first!");
-
-        manager = new ConfigurationManager();
-    }
 
     public static <S, R> void registerTypeAdapter(Class<R> clazz, TypeAdapter<S, R> adapter) {
         getInstance().adapters.put(new ConfigType<>(clazz), adapter);
@@ -114,12 +105,12 @@ public final class ConfigApi {
 
     private static ConfigurationManager getInstance() {
         if (manager == null) {
-            throw new IllegalStateException("ConfigApi not initialized!");
+            manager = new ConfigurationManager();
         }
         return manager;
     }
 
-    private ConfigApi() {
+    private ConfigAPI() {
     }
 
     static final class ConfigurationManager {

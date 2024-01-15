@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import org.bukkit.entity.HumanEntity;
@@ -30,8 +31,8 @@ public class CustomInventory<T extends Inventory> {
         this.inventory = inventory;
     }
 
-    public void addClickConsumer(Consumer<InventoryClickEvent> action) {
-        this.clickActions.add((event, session) -> action.accept(event));
+    public void addClickConsumer(BiConsumer<InventoryClickEvent, InventorySession> action) {
+        this.clickActions.add(action);
     }
 
     public void addCloseConsumer(BiConsumer<InventoryCloseEvent, InventorySession> action) {
@@ -40,6 +41,10 @@ public class CustomInventory<T extends Inventory> {
 
     public void addOpenConsumer(BiConsumer<HumanEntity, InventorySession> action) {
         this.openActions.add(action);
+    }
+
+    public void cancelAllClicks() {
+        this.clickActions.add((event, session) -> event.setCancelled(true));
     }
 
     public void setItem(int slot, ItemProvider provider) {
@@ -175,4 +180,23 @@ public class CustomInventory<T extends Inventory> {
             this.inventory.setItem(entry.getKey(), entry.getValue().get());
         }
     }
+
+    @Override
+    public int hashCode() {
+        return this.inventory.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (!(obj instanceof CustomInventory<?> other)) {
+            return false;
+        }
+
+        return Objects.equals(this.inventory, other.inventory);
+    }
+
 }

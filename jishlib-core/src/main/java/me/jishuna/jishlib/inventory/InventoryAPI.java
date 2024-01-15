@@ -1,6 +1,5 @@
 package me.jishuna.jishlib.inventory;
 
-import com.google.common.base.Preconditions;
 import java.util.HashMap;
 import java.util.UUID;
 import org.bukkit.Bukkit;
@@ -9,14 +8,6 @@ import me.jishuna.jishlib.JishLib;
 
 public final class InventoryAPI {
     private static InventoryManager manager;
-
-    public static void initialize() {
-        Preconditions.checkArgument(manager == null, "InventoryAPI already initialized!");
-        Preconditions.checkArgument(JishLib.isInitialized(), "JishLib must be initialized first!");
-
-        manager = new InventoryManager();
-        Bukkit.getPluginManager().registerEvents(new CustomInventoryListener(), JishLib.getPlugin());
-    }
 
     public static void destroySession(HumanEntity player) {
         destroySession(player.getUniqueId());
@@ -55,8 +46,10 @@ public final class InventoryAPI {
 
     private static InventoryManager getInstance() {
         if (manager == null) {
-            throw new IllegalStateException("InventoryAPI not initialized!");
+            manager = new InventoryManager();
+            Bukkit.getPluginManager().registerEvents(new CustomInventoryListener(), JishLib.getPlugin());
         }
+
         return manager;
     }
 

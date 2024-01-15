@@ -29,7 +29,7 @@ public class AnvilGuiInventory extends CustomInventory<AnvilInventory> {
 
         menu.setCallbackTarget(this);
 
-        addClickConsumer(event -> event.setCancelled(true));
+        cancelAllClicks();
         addCloseConsumer((event, session) -> clearItem(0));
 
         onInputTextChange(input);

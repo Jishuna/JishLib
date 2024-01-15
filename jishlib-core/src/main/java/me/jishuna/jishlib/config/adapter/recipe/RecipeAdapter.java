@@ -2,7 +2,7 @@ package me.jishuna.jishlib.config.adapter.recipe;
 
 import java.util.Map;
 import org.bukkit.inventory.Recipe;
-import me.jishuna.jishlib.config.ConfigApi;
+import me.jishuna.jishlib.config.ConfigAPI;
 import me.jishuna.jishlib.config.adapter.TypeAdapter;
 
 public class RecipeAdapter implements TypeAdapter<Map<String, Object>, Recipe> {
@@ -20,15 +20,15 @@ public class RecipeAdapter implements TypeAdapter<Map<String, Object>, Recipe> {
 
     @Override
     public Recipe read(Map<String, Object> value) {
-        RecipeType type = ConfigApi.getAdapter(RecipeType.class).read(value.get("type"));
+        RecipeType type = ConfigAPI.getAdapter(RecipeType.class).read(value.get("type"));
 
-        return ConfigApi.getAdapter(type.getRecipeClass()).read(value);
+        return ConfigAPI.getAdapter(type.getRecipeClass()).read(value);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public Map<String, Object> write(Recipe value, Map<String, Object> existing, boolean replace) {
-        TypeAdapter<Object, Recipe> adapter = (TypeAdapter<Object, Recipe>) ConfigApi.getAdapter(value.getClass());
+        TypeAdapter<Object, Recipe> adapter = (TypeAdapter<Object, Recipe>) ConfigAPI.getAdapter(value.getClass());
 
         return (Map<String, Object>) adapter.write(value, existing, replace);
     }

@@ -7,7 +7,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
-import me.jishuna.jishlib.config.ConfigApi;
+import me.jishuna.jishlib.config.ConfigAPI;
 import me.jishuna.jishlib.config.adapter.TypeAdapter;
 import me.jishuna.jishlib.util.NumberUtils;
 
@@ -26,13 +26,13 @@ public class FurnaceRecipeAdapter implements TypeAdapter<Map<String, Object>, Fu
 
     @Override
     public FurnaceRecipe read(Map<String, Object> value) {
-        NamespacedKey key = ConfigApi.getAdapter(NamespacedKey.class).read(value.get("name"));
-        Material output = ConfigApi.getAdapter(Material.class).read(value.get("output"));
-        int amount = NumberUtils.clamp(ConfigApi.getAdapter(int.class).read(value.get("amount")), 1, 64);
+        NamespacedKey key = ConfigAPI.getAdapter(NamespacedKey.class).read(value.get("name"));
+        Material output = ConfigAPI.getAdapter(Material.class).read(value.get("output"));
+        int amount = NumberUtils.clamp(ConfigAPI.getAdapter(int.class).read(value.get("amount")), 1, 64);
 
-        RecipeChoice input = ConfigApi.getAdapter(RecipeChoice.class).read(value.get("input"));
-        int cookingTime = NumberUtils.clamp(ConfigApi.getAdapter(int.class).read(value.get("cooking-time")), 0, Integer.MAX_VALUE);
-        float experience = (float) NumberUtils.clamp(ConfigApi.getAdapter(double.class).read(value.get("experience")), 0, Float.MAX_VALUE);
+        RecipeChoice input = ConfigAPI.getAdapter(RecipeChoice.class).read(value.get("input"));
+        int cookingTime = NumberUtils.clamp(ConfigAPI.getAdapter(int.class).read(value.get("cooking-time")), 0, Integer.MAX_VALUE);
+        float experience = (float) NumberUtils.clamp(ConfigAPI.getAdapter(double.class).read(value.get("experience")), 0, Float.MAX_VALUE);
 
         ItemStack item = new ItemStack(output, amount);
 
@@ -54,9 +54,9 @@ public class FurnaceRecipeAdapter implements TypeAdapter<Map<String, Object>, Fu
 
         Object input = null;
         if (existing.containsKey("input")) {
-            input = ConfigApi.getAdapter(RecipeChoice.class).read(existing.get("input"));
+            input = ConfigAPI.getAdapter(RecipeChoice.class).read(existing.get("input"));
         }
-        input = ConfigApi.getAdapter(RecipeChoice.class).write(value.getInputChoice(), input, replace);
+        input = ConfigAPI.getAdapter(RecipeChoice.class).write(value.getInputChoice(), input, replace);
 
         existing.putIfAbsent("input", input);
 

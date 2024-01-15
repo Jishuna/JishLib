@@ -5,7 +5,7 @@ import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.RecipeChoice.MaterialChoice;
-import me.jishuna.jishlib.config.ConfigApi;
+import me.jishuna.jishlib.config.ConfigAPI;
 import me.jishuna.jishlib.config.adapter.TypeAdapter;
 
 public class RecipeChoiceAdapter implements TypeAdapter<Object, RecipeChoice> {
@@ -22,13 +22,13 @@ public class RecipeChoiceAdapter implements TypeAdapter<Object, RecipeChoice> {
     @Override
     public RecipeChoice read(Object value) {
         if (!(value instanceof List<?> list)) {
-            Material type = ConfigApi.getStringAdapter(Material.class).fromString(value.toString());
+            Material type = ConfigAPI.getStringAdapter(Material.class).fromString(value.toString());
             return type == null ? null : new MaterialChoice(type);
         }
 
         List<Material> materials = new ArrayList<>();
         for (Object entry : list) {
-            materials.add(ConfigApi.getStringAdapter(Material.class).fromString(entry.toString()));
+            materials.add(ConfigAPI.getStringAdapter(Material.class).fromString(entry.toString()));
         }
 
         return new MaterialChoice(materials);

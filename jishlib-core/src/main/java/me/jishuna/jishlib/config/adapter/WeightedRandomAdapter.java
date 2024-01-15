@@ -3,7 +3,7 @@ package me.jishuna.jishlib.config.adapter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import me.jishuna.jishlib.config.ConfigApi;
+import me.jishuna.jishlib.config.ConfigAPI;
 import me.jishuna.jishlib.config.ConfigType;
 import me.jishuna.jishlib.datastructure.WeightedRandom;
 
@@ -13,7 +13,7 @@ public class WeightedRandomAdapter<R> implements TypeAdapter<Map<String, Object>
 
     @SuppressWarnings("unchecked")
     public WeightedRandomAdapter(ConfigType<?> type) {
-        this.adapter = (TypeAdapterString<Object, R>) ConfigApi.getStringAdapter(type.getComponentTypes().get(0));
+        this.adapter = (TypeAdapterString<Object, R>) ConfigAPI.getStringAdapter(type.getComponentTypes().get(0));
     }
 
     @SuppressWarnings("unchecked")
