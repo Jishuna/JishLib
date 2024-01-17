@@ -3,9 +3,10 @@ package me.jishuna.jishlib.util;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
 import me.jishuna.jishlib.Constants;
 
-public class StringUtils {
+public final class StringUtils {
     /**
      * Converts the first letter of a string to uppercase and the rest to lowercase.
      *
@@ -111,6 +112,19 @@ public class StringUtils {
             }
         }
         return false;
+    }
+
+    public static BaseComponent combineComponents(BaseComponent[] components) {
+        BaseComponent parent = components[0];
+        if (components.length == 1) {
+            return parent;
+        }
+
+        for (int i = 1; i < components.length; i++) {
+            parent.addExtra(components[i]);
+        }
+
+        return parent;
     }
 
     private StringUtils() {
