@@ -62,10 +62,6 @@ public class CustomConfig extends YamlConfiguration {
             value = newList;
         }
 
-        if (value != null) {
-            System.out.println("Config get: [Path: %s, Type: %s, Value: %s]".formatted(path, value.getClass().getName(), value.toString()));
-        }
-
         return value;
     }
 
