@@ -1,28 +1,34 @@
 package me.jishuna.jishlib.config.adapter.recipe;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.configuration.MemorySection;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 import me.jishuna.jishlib.config.ConfigAPI;
 import me.jishuna.jishlib.config.ConfigType;
+import me.jishuna.jishlib.config.CustomConfig;
 import me.jishuna.jishlib.config.adapter.TypeAdapter;
 import me.jishuna.jishlib.util.NumberUtils;
 
-public class ShapedRecipeAdapter implements TypeAdapter<Map<String, Object>, ShapedRecipe> {
-    @SuppressWarnings("rawtypes")
-    ConfigType<Map> ingredientMapType = new ConfigType<>(Map.class, List.of(new ConfigType<>(char.class), new ConfigType<>(RecipeChoice.class)));
+public class ShapedRecipeAdapter implements TypeAdapter<ConfigurationSection, ShapedRecipe> {
+    private static final String INGREDIENTS = "ingredients";
+    private static final String SHAPE = "shape";
+    private static final String AMOUNT = "amount";
+    private static final String OUTPUT = "output";
+    private static final String NAME = "name";
+    private static final String TYPE = "type";
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
+    private final ConfigType<Map> ingredientMapType = new ConfigType<>(Map.class, List.of(new ConfigType<>(char.class), new ConfigType<>(RecipeChoice.class)));
+
     @Override
-    public Class<Map<String, Object>> getSavedType() {
-        return (Class<Map<String, Object>>) (Object) Map.class;
+    public Class<ConfigurationSection> getSavedType() {
+        return ConfigurationSection.class;
     }
 
     @Override
@@ -32,18 +38,18 @@ public class ShapedRecipeAdapter implements TypeAdapter<Map<String, Object>, Sha
 
     @SuppressWarnings("unchecked")
     @Override
-    public ShapedRecipe read(Map<String, Object> value) {
-        NamespacedKey key = ConfigAPI.getAdapter(NamespacedKey.class).read(value.get("name"));
-        Material output = ConfigAPI.getAdapter(Material.class).read(value.get("output"));
-        int amount = NumberUtils.clamp(ConfigAPI.getAdapter(int.class).read(value.get("amount")), 1, 64);
+    public ShapedRecipe read(ConfigurationSection section) {
+        NamespacedKey key = ConfigAPI.getAdapter(NamespacedKey.class).read(section.get(NAME));
+        Material output = ConfigAPI.getAdapter(Material.class).read(section.get(OUTPUT));
+        int amount = NumberUtils.clamp(section.getInt(AMOUNT), 1, 64);
 
         ItemStack item = new ItemStack(output, amount);
 
         ShapedRecipe recipe = new ShapedRecipe(key, item);
-        List<?> list = (List<?>) value.get("shape");
+        List<?> list = section.getList(SHAPE);
         recipe.shape(list.stream().map(Object::toString).toArray(String[]::new));
 
-        Map<Character, RecipeChoice> ingredients = ConfigAPI.getAdapter(this.ingredientMapType).read(readIngredients(value));
+        Map<Character, RecipeChoice> ingredients = ConfigAPI.getAdapter(this.ingredientMapType).read(section.get(INGREDIENTS));
 
         for (Entry<Character, RecipeChoice> entry : ingredients.entrySet()) {
             recipe.setIngredient(entry.getKey(), entry.getValue());
@@ -53,35 +59,19 @@ public class ShapedRecipeAdapter implements TypeAdapter<Map<String, Object>, Sha
     }
 
     @Override
-    public Map<String, Object> write(ShapedRecipe value, Map<String, Object> existing, boolean replace) {
+    public ConfigurationSection write(ShapedRecipe value, ConfigurationSection existing, boolean replace) {
         if (existing == null) {
-            existing = new LinkedHashMap<>();
+            existing = new CustomConfig();
         }
 
-        existing.putIfAbsent("type", RecipeType.SHAPED.name());
-        existing.putIfAbsent("name", value.getKey().toString());
-        existing.putIfAbsent("output", value.getResult().getType().getKey().toString());
-        existing.putIfAbsent("amount", value.getResult().getAmount());
-        existing.putIfAbsent("shape", value.getShape());
-
-        Object ingredients = null;
-        if (existing.containsKey("ingredients")) {
-            ingredients = ConfigAPI.getAdapter(this.ingredientMapType).read(readIngredients(existing));
-        }
-
-        ingredients = ConfigAPI.getAdapter(this.ingredientMapType).write(value.getChoiceMap(), ingredients, replace);
-        existing.putIfAbsent("ingredients", ingredients);
+        ConfigAPI.setIfAbsent(existing, TYPE, RecipeType.SHAPED::name);
+        ConfigAPI.setIfAbsent(existing, NAME, () -> value.getKey().toString());
+        ConfigAPI.setIfAbsent(existing, OUTPUT, () -> value.getResult().getType().getKey().toString());
+        ConfigAPI.setIfAbsent(existing, AMOUNT, () -> value.getResult().getAmount());
+        ConfigAPI.setIfAbsent(existing, SHAPE, value::getShape);
+        ConfigAPI.setIfAbsent(existing, INGREDIENTS, () -> ConfigAPI.getAdapter(this.ingredientMapType).write(value.getChoiceMap(), null, replace));
 
         return existing;
-    }
-
-    private Object readIngredients(Map<String, Object> map) {
-        Object ingredientMap = map.get("ingredients");
-        if (ingredientMap instanceof MemorySection section) {
-            ingredientMap = section.getValues(false);
-        }
-
-        return ingredientMap;
     }
 
 }

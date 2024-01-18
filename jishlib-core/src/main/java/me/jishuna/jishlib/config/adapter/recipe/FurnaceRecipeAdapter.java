@@ -1,22 +1,28 @@
 package me.jishuna.jishlib.config.adapter.recipe;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
 import me.jishuna.jishlib.config.ConfigAPI;
+import me.jishuna.jishlib.config.CustomConfig;
 import me.jishuna.jishlib.config.adapter.TypeAdapter;
 import me.jishuna.jishlib.util.NumberUtils;
 
-public class FurnaceRecipeAdapter implements TypeAdapter<Map<String, Object>, FurnaceRecipe> {
+public class FurnaceRecipeAdapter implements TypeAdapter<ConfigurationSection, FurnaceRecipe> {
+    private static final String INPUT = "input";
+    private static final String EXPERIENCE = "experience";
+    private static final String AMOUNT = "amount";
+    private static final String OUTPUT = "output";
+    private static final String NAME = "name";
+    private static final String TYPE = "type";
+    private static final String COOKING_TIME = "cooking-time";
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Class<Map<String, Object>> getSavedType() {
-        return (Class<Map<String, Object>>) (Object) Map.class;
+    public Class<ConfigurationSection> getSavedType() {
+        return ConfigurationSection.class;
     }
 
     @Override
@@ -25,14 +31,14 @@ public class FurnaceRecipeAdapter implements TypeAdapter<Map<String, Object>, Fu
     }
 
     @Override
-    public FurnaceRecipe read(Map<String, Object> value) {
-        NamespacedKey key = ConfigAPI.getAdapter(NamespacedKey.class).read(value.get("name"));
-        Material output = ConfigAPI.getAdapter(Material.class).read(value.get("output"));
-        int amount = NumberUtils.clamp(ConfigAPI.getAdapter(int.class).read(value.get("amount")), 1, 64);
+    public FurnaceRecipe read(ConfigurationSection section) {
+        NamespacedKey key = ConfigAPI.getAdapter(NamespacedKey.class).read(section.get(NAME));
+        Material output = ConfigAPI.getAdapter(Material.class).read(section.get(OUTPUT));
+        int amount = NumberUtils.clamp(section.getInt(AMOUNT), 1, 64);
 
-        RecipeChoice input = ConfigAPI.getAdapter(RecipeChoice.class).read(value.get("input"));
-        int cookingTime = NumberUtils.clamp(ConfigAPI.getAdapter(int.class).read(value.get("cooking-time")), 0, Integer.MAX_VALUE);
-        float experience = (float) NumberUtils.clamp(ConfigAPI.getAdapter(double.class).read(value.get("experience")), 0, Float.MAX_VALUE);
+        RecipeChoice input = ConfigAPI.getAdapter(RecipeChoice.class).read(section.get(INPUT));
+        int cookingTime = NumberUtils.clamp(section.getInt(COOKING_TIME), 0, Integer.MAX_VALUE);
+        float experience = (float) NumberUtils.clamp(section.getDouble(EXPERIENCE), 0, Float.MAX_VALUE);
 
         ItemStack item = new ItemStack(output, amount);
 
@@ -40,25 +46,18 @@ public class FurnaceRecipeAdapter implements TypeAdapter<Map<String, Object>, Fu
     }
 
     @Override
-    public Map<String, Object> write(FurnaceRecipe value, Map<String, Object> existing, boolean replace) {
+    public ConfigurationSection write(FurnaceRecipe value, ConfigurationSection existing, boolean replace) {
         if (existing == null) {
-            existing = new LinkedHashMap<>();
+            existing = new CustomConfig();
         }
 
-        existing.putIfAbsent("type", RecipeType.FURNACE.name());
-        existing.putIfAbsent("name", value.getKey().toString());
-        existing.putIfAbsent("output", value.getResult().getType().getKey().toString());
-        existing.putIfAbsent("amount", value.getResult().getAmount());
-        existing.putIfAbsent("cooking-time", value.getCookingTime());
-        existing.putIfAbsent("experience", value.getExperience());
-
-        Object input = null;
-        if (existing.containsKey("input")) {
-            input = ConfigAPI.getAdapter(RecipeChoice.class).read(existing.get("input"));
-        }
-        input = ConfigAPI.getAdapter(RecipeChoice.class).write(value.getInputChoice(), input, replace);
-
-        existing.putIfAbsent("input", input);
+        ConfigAPI.setIfAbsent(existing, TYPE, RecipeType.FURNACE::name);
+        ConfigAPI.setIfAbsent(existing, NAME, () -> value.getKey().toString());
+        ConfigAPI.setIfAbsent(existing, OUTPUT, () -> value.getResult().getType().getKey().toString());
+        ConfigAPI.setIfAbsent(existing, AMOUNT, () -> value.getResult().getAmount());
+        ConfigAPI.setIfAbsent(existing, COOKING_TIME, value::getCookingTime);
+        ConfigAPI.setIfAbsent(existing, EXPERIENCE, value::getExperience);
+        ConfigAPI.setIfAbsent(existing, INPUT, () -> ConfigAPI.getAdapter(RecipeChoice.class).write(value.getInputChoice(), null, replace));
 
         return existing;
     }

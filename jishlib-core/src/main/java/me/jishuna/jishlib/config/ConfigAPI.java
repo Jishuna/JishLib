@@ -4,9 +4,11 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.RecipeChoice;
@@ -36,6 +38,12 @@ import me.jishuna.jishlib.datastructure.WeightedRandom;
 
 public final class ConfigAPI {
     private static ConfigurationManager manager;
+
+    public static void setIfAbsent(ConfigurationSection section, String path, Supplier<Object> value) {
+        if (!section.isSet(path)) {
+            section.set(path, value.get());
+        }
+    }
 
     public static <S, R> void registerTypeAdapter(Class<R> clazz, TypeAdapter<S, R> adapter) {
         getInstance().adapters.put(new ConfigType<>(clazz), adapter);
@@ -73,7 +81,7 @@ public final class ConfigAPI {
         TypeAdapter<?, ?> adapter = getInstance().adapters.get(type);
         if (adapter == null) {
             adapter = createAdapter(type);
-            getInstance().adapters.put(type, adapter);
+            getInstance().registerTypeAdapter(type, adapter);
         }
 
         return (TypeAdapter<S, R>) adapter;
@@ -147,8 +155,12 @@ public final class ConfigAPI {
             registerTypeAdapter(FurnaceRecipe.class, new FurnaceRecipeAdapter());
         }
 
-        public <S, R> void registerTypeAdapter(Class<R> clazz, TypeAdapter<S, R> adapter) {
-            this.adapters.put(new ConfigType<>(clazz), adapter);
+        protected <R> void registerTypeAdapter(Class<R> clazz, TypeAdapter<?, ?> adapter) {
+            registerTypeAdapter(new ConfigType<>(clazz), adapter);
+        }
+
+        protected <R> void registerTypeAdapter(ConfigType<R> type, TypeAdapter<?, ?> adapter) {
+            this.adapters.put(type, adapter);
         }
     }
 }

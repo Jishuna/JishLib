@@ -1,16 +1,15 @@
 package me.jishuna.jishlib.config.adapter.recipe;
 
-import java.util.Map;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.Recipe;
 import me.jishuna.jishlib.config.ConfigAPI;
 import me.jishuna.jishlib.config.adapter.TypeAdapter;
 
-public class RecipeAdapter implements TypeAdapter<Map<String, Object>, Recipe> {
+public class RecipeAdapter implements TypeAdapter<ConfigurationSection, Recipe> {
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Class<Map<String, Object>> getSavedType() {
-        return (Class<Map<String, Object>>) (Object) Map.class;
+    public Class<ConfigurationSection> getSavedType() {
+        return ConfigurationSection.class;
     }
 
     @Override
@@ -19,17 +18,17 @@ public class RecipeAdapter implements TypeAdapter<Map<String, Object>, Recipe> {
     }
 
     @Override
-    public Recipe read(Map<String, Object> value) {
-        RecipeType type = ConfigAPI.getAdapter(RecipeType.class).read(value.get("type"));
+    public Recipe read(ConfigurationSection section) {
+        RecipeType type = ConfigAPI.getAdapter(RecipeType.class).read(section.get("type"));
 
-        return ConfigAPI.getAdapter(type.getRecipeClass()).read(value);
+        return ConfigAPI.getAdapter(type.getRecipeClass()).read(section);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public Map<String, Object> write(Recipe value, Map<String, Object> existing, boolean replace) {
+    public ConfigurationSection write(Recipe value, ConfigurationSection existing, boolean replace) {
         TypeAdapter<Object, Recipe> adapter = (TypeAdapter<Object, Recipe>) ConfigAPI.getAdapter(value.getClass());
 
-        return (Map<String, Object>) adapter.write(value, existing, replace);
+        return (ConfigurationSection) adapter.write(value, existing, replace);
     }
 }

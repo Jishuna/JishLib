@@ -1,13 +1,13 @@
 package me.jishuna.jishlib.config.adapter;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Map.Entry;
+import org.bukkit.configuration.ConfigurationSection;
 import me.jishuna.jishlib.config.ConfigAPI;
 import me.jishuna.jishlib.config.ConfigType;
+import me.jishuna.jishlib.config.CustomConfig;
 import me.jishuna.jishlib.datastructure.WeightedRandom;
 
-public class WeightedRandomAdapter<R> implements TypeAdapter<Map<String, Object>, WeightedRandom<R>> {
+public class WeightedRandomAdapter<R> implements TypeAdapter<ConfigurationSection, WeightedRandom<R>> {
 
     private final TypeAdapterString<Object, R> adapter;
 
@@ -16,10 +16,9 @@ public class WeightedRandomAdapter<R> implements TypeAdapter<Map<String, Object>
         this.adapter = (TypeAdapterString<Object, R>) ConfigAPI.getStringAdapter(type.getComponentTypes().get(0));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Class<Map<String, Object>> getSavedType() {
-        return (Class<Map<String, Object>>) (Object) Map.class;
+    public Class<ConfigurationSection> getSavedType() {
+        return ConfigurationSection.class;
     }
 
     @SuppressWarnings("unchecked")
@@ -29,10 +28,10 @@ public class WeightedRandomAdapter<R> implements TypeAdapter<Map<String, Object>
     }
 
     @Override
-    public WeightedRandom<R> read(Map<String, Object> map) {
+    public WeightedRandom<R> read(ConfigurationSection section) {
         WeightedRandom<R> random = new WeightedRandom<>();
 
-        for (Entry<String, Object> entry : map.entrySet()) {
+        for (Entry<String, Object> entry : section.getValues(false).entrySet()) {
             Object value = entry.getValue();
             if (!(value instanceof Number number)) {
                 continue;
@@ -47,17 +46,17 @@ public class WeightedRandomAdapter<R> implements TypeAdapter<Map<String, Object>
     }
 
     @Override
-    public Map<String, Object> write(WeightedRandom<R> value, Map<String, Object> existing, boolean replace) {
+    public ConfigurationSection write(WeightedRandom<R> value, ConfigurationSection existing, boolean replace) {
         if (existing == null) {
-            existing = new LinkedHashMap<>();
+            existing = new CustomConfig();
         }
 
         double lastKey = 0;
         for (Entry<Double, R> entry : value.getEntries()) {
             String key = this.adapter.toString(entry.getValue());
 
-            if (!existing.containsKey(key) || replace) {
-                existing.put(key, entry.getKey() - lastKey);
+            if (!existing.isSet(key) || replace) {
+                existing.set(key, entry.getKey() - lastKey);
                 lastKey = entry.getKey();
             }
         }

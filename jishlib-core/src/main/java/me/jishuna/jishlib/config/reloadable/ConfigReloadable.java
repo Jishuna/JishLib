@@ -6,14 +6,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
-import org.bukkit.configuration.MemorySection;
-import org.bukkit.configuration.file.YamlConfiguration;
 import me.jishuna.jishlib.JishLib;
 import me.jishuna.jishlib.config.ConfigAPI;
 import me.jishuna.jishlib.config.ConfigField;
 import me.jishuna.jishlib.config.ConfigType;
+import me.jishuna.jishlib.config.CustomConfig;
 import me.jishuna.jishlib.config.adapter.TypeAdapter;
 import me.jishuna.jishlib.config.annotation.ConfigEntry;
 import me.jishuna.jishlib.config.annotation.PostLoad;
@@ -43,7 +41,7 @@ public abstract class ConfigReloadable<T> {
             return this;
         }
 
-        YamlConfiguration config = YamlConfiguration.loadConfiguration(this.file);
+        CustomConfig config = CustomConfig.loadConfiguration(this.file);
 
         for (ConfigField field : this.fields) {
             if (field.isStatic() && !includeStatic) {
@@ -51,11 +49,6 @@ public abstract class ConfigReloadable<T> {
             }
 
             String path = field.getPath();
-
-            if (!config.isSet(path)) {
-                JishLib.getLogger().log(Level.WARNING, "No configuration entry found for {0}", path);
-                continue;
-            }
 
             ConfigType<?> type = ConfigType.get(field.getField());
             TypeAdapter<Object, Object> adapter = (TypeAdapter<Object, Object>) ConfigAPI.getAdapter(type);
@@ -65,14 +58,18 @@ public abstract class ConfigReloadable<T> {
             }
 
             Class<Object> saved = adapter.getSavedType();
-            Object savedValue = getSavedValue(config, path, saved);
+            Object savedValue = config.get(path);
+            if (savedValue == null) {
+                JishLib.getLogger().log(Level.WARNING, "No configuration entry found for {0}", path);
+                continue;
+            }
+
             if (!saved.isInstance(savedValue)) {
                 JishLib.getLogger().log(Level.WARNING, "Wrong saved type for {0}, {1} != {2}", new Object[] { path, savedValue.getClass(), saved });
                 continue;
             }
 
             Object readValue = adapter.read(saved.cast(savedValue));
-
             if (readValue == null) {
                 JishLib.getLogger().log(Level.WARNING, "Failed to read value for {0} of type {1}", new Object[] { path, type.getType() });
                 continue;
@@ -111,7 +108,7 @@ public abstract class ConfigReloadable<T> {
             return this;
         }
 
-        YamlConfiguration config = YamlConfiguration.loadConfiguration(this.file);
+        CustomConfig config = CustomConfig.loadConfiguration(this.file);
 
         for (ConfigField field : this.fields) {
             String path = field.getPath();
@@ -140,7 +137,7 @@ public abstract class ConfigReloadable<T> {
                 continue;
             }
 
-            Object existing = getSavedValue(config, path, saved);
+            Object existing = config.get(path);
             if (existing != null && !saved.isInstance(existing)) {
                 JishLib.getLogger().log(Level.WARNING, "Wrong saved type for {0}, {1} != {2}", new Object[] { path, existing.getClass(), saved });
                 existing = null;
@@ -167,15 +164,6 @@ public abstract class ConfigReloadable<T> {
     protected abstract Object getField(ConfigField field);
 
     protected abstract void postLoad(Method postLoadMethod);
-
-    private Object getSavedValue(YamlConfiguration config, String path, Class<Object> expectedType) {
-        Object saved = config.get(path);
-
-        if (saved instanceof MemorySection section && Map.class.isAssignableFrom(expectedType)) {
-            return section.getValues(false);
-        }
-        return saved;
-    }
 
     private boolean prepareFile() {
         try {

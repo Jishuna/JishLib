@@ -3,19 +3,18 @@ package me.jishuna.jishlib.config.adapter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
-import org.bukkit.configuration.MemorySection;
+import org.bukkit.configuration.ConfigurationSection;
 import me.jishuna.jishlib.JishLib;
 import me.jishuna.jishlib.config.ConfigAPI;
 import me.jishuna.jishlib.config.ConfigField;
 import me.jishuna.jishlib.config.ConfigType;
 import me.jishuna.jishlib.config.ReflectionHelper;
+import me.jishuna.jishlib.config.CustomConfig;
 import me.jishuna.jishlib.config.annotation.ConfigEntry;
 
-public class NativeAdapter<T> implements TypeAdapter<Map<String, Object>, T> {
+public class NativeAdapter<T> implements TypeAdapter<ConfigurationSection, T> {
     private final Class<T> clazz;
     private final List<ConfigField> fields = new ArrayList<>();
 
@@ -25,10 +24,9 @@ public class NativeAdapter<T> implements TypeAdapter<Map<String, Object>, T> {
         cacheFields(clazz);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Class<Map<String, Object>> getSavedType() {
-        return (Class<Map<String, Object>>) (Object) Map.class;
+    public Class<ConfigurationSection> getSavedType() {
+        return ConfigurationSection.class;
     }
 
     @Override
@@ -38,7 +36,7 @@ public class NativeAdapter<T> implements TypeAdapter<Map<String, Object>, T> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public T read(Map<String, Object> value) {
+    public T read(ConfigurationSection value) {
         T object;
         try {
             Constructor<T> constructor = this.clazz.getDeclaredConstructor();
@@ -51,7 +49,7 @@ public class NativeAdapter<T> implements TypeAdapter<Map<String, Object>, T> {
         for (ConfigField field : this.fields) {
             String path = field.getPath();
 
-            if (!value.containsKey(path)) {
+            if (!value.isSet(path)) {
                 JishLib.getLogger().log(Level.WARNING, "No configuration entry found for {0}", path);
                 continue;
             }
@@ -90,9 +88,9 @@ public class NativeAdapter<T> implements TypeAdapter<Map<String, Object>, T> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Map<String, Object> write(T value, Map<String, Object> map, boolean replace) {
-        if (map == null) {
-            map = new LinkedHashMap<>();
+    public ConfigurationSection write(T value, ConfigurationSection section, boolean replace) {
+        if (section == null) {
+            section = new CustomConfig();
         }
 
         for (ConfigField field : this.fields) {
@@ -118,7 +116,7 @@ public class NativeAdapter<T> implements TypeAdapter<Map<String, Object>, T> {
                 continue;
             }
 
-            Object existing = getSavedValue(map, path, saved);
+            Object existing = getSavedValue(section, path, saved);
             if (existing != null && !saved.isInstance(existing)) {
                 JishLib.getLogger().log(Level.WARNING, "Wrong saved type for {0}, {1} != {2}", new Object[] { path, existing.getClass(), saved });
                 existing = null;
@@ -126,19 +124,14 @@ public class NativeAdapter<T> implements TypeAdapter<Map<String, Object>, T> {
 
             Object val = adapter.write(runtime.cast(writeValue), saved.cast(existing), replace);
             if (val != null) {
-                map.put(path, val);
+                section.set(path, val);
             }
         }
-        return map;
+        return section;
     }
 
-    private Object getSavedValue(Map<String, Object> value, String path, Class<Object> expectedType) {
-        Object saved = value.get(path);
-
-        if (saved instanceof MemorySection section && Map.class.isAssignableFrom(expectedType)) {
-            return section.getValues(false);
-        }
-        return saved;
+    private Object getSavedValue(ConfigurationSection value, String path, Class<Object> expectedType) {
+        return value.get(path);
     }
 
     private void cacheFields(Class<? super T> clazz) {
