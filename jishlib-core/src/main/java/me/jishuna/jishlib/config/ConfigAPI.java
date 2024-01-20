@@ -17,6 +17,7 @@ import org.bukkit.inventory.ShapelessRecipe;
 import me.jishuna.jishlib.config.adapter.CollectionAdapter;
 import me.jishuna.jishlib.config.adapter.ColorAdapter;
 import me.jishuna.jishlib.config.adapter.ConfigSerializableAdapter;
+import me.jishuna.jishlib.config.adapter.EntityIdentifierAdapter;
 import me.jishuna.jishlib.config.adapter.EnumAdapter;
 import me.jishuna.jishlib.config.adapter.MapAdapter;
 import me.jishuna.jishlib.config.adapter.MaterialAdapter;
@@ -35,6 +36,7 @@ import me.jishuna.jishlib.config.adapter.recipe.ShapelessRecipeAdapter;
 import me.jishuna.jishlib.config.reloadable.ReloadableClass;
 import me.jishuna.jishlib.config.reloadable.ReloadableObject;
 import me.jishuna.jishlib.datastructure.WeightedRandom;
+import me.jishuna.jishlib.entity.EntityIdentifier;
 
 public final class ConfigAPI {
     private static ConfigurationManager manager;
@@ -147,6 +149,7 @@ public final class ConfigAPI {
             registerTypeAdapter(NamespacedKey.class, new NamespacedKeyAdapter());
             registerTypeAdapter(Material.class, new MaterialAdapter());
             registerTypeAdapter(Color.class, new ColorAdapter());
+            registerTypeAdapter(EntityIdentifier.class, new EntityIdentifierAdapter());
 
             registerTypeAdapter(RecipeChoice.class, new RecipeChoiceAdapter());
             registerTypeAdapter(Recipe.class, new RecipeAdapter());
