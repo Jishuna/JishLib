@@ -36,6 +36,10 @@ public final class StringUtils {
         return builder.toString().trim();
     }
 
+    public static String formatObject(Object object) {
+        return capitalizeAll(object.toString().replace('_', ' '));
+    }
+
     /**
      * Converts a legacy string into a {@link Component}.
      *

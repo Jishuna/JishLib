@@ -13,7 +13,9 @@ public enum Direction {
 
     static {
         for (Direction direction : values()) {
-            bukkitMap.put(direction.blockFace, direction);
+            if (direction != NONE) {
+                bukkitMap.put(direction.blockFace, direction);
+            }
         }
     }
 

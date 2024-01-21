@@ -1,12 +1,12 @@
 package me.jishuna.jishlib.config;
 
+import com.google.common.base.Preconditions;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -28,7 +28,7 @@ public class CustomConfig extends YamlConfiguration {
     }
 
     public static CustomConfig loadConfiguration(@NotNull File file) {
-        Validate.notNull(file, "File cannot be null");
+        Preconditions.checkArgument(file != null, "File cannot be null");
 
         CustomConfig config = new CustomConfig();
 
