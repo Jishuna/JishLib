@@ -24,7 +24,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.profile.PlayerProfile;
 import me.jishuna.jishlib.util.Utils;
 
-public class ItemBuilder {
+public class ItemBuilder implements ItemstackRepresentable {
 
     private ItemStack item;
     private ItemMeta meta;
@@ -102,6 +102,10 @@ public class ItemBuilder {
     }
 
     public ItemBuilder name(String name, boolean append) {
+        if (name == null) {
+            return this;
+        }
+
         if (append) {
             this.meta.setDisplayName(this.meta.getDisplayName() + name);
         } else {
@@ -111,10 +115,14 @@ public class ItemBuilder {
     }
 
     public String name() {
-        return this.meta.getDisplayName();
+        return this.meta.hasDisplayName() ? this.meta.getDisplayName() : null;
     }
 
     public ItemBuilder lore(List<String> lore) {
+        if (lore == null) {
+            return this;
+        }
+
         List<String> itemLore = lore();
         itemLore.addAll(lore);
 
@@ -293,5 +301,10 @@ public class ItemBuilder {
         clone.meta = this.meta.clone();
 
         return clone;
+    }
+
+    @Override
+    public ItemStack asItemStack() {
+        return build();
     }
 }

@@ -22,6 +22,10 @@ public class Utils {
         return ((long) chunk.getZ() << 32) | (chunk.getX() & 0xFFFFFFFFL);
     }
 
+    public static long getChunkKey(int x, int z) {
+        return ((long) z << 32) | (x & 0xFFFFFFFFL);
+    }
+
     /**
      * Gets the servers {@link ServerMode}.
      *

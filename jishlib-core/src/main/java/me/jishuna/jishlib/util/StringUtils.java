@@ -67,6 +67,10 @@ public final class StringUtils {
      * @return a {@link MiniMessage} string representing the input string
      */
     public static String legacyToMiniMessage(String input) {
+        if (input == null) {
+            return input;
+        }
+
         return toMiniMessage(fromLegacy(input));
     }
 
@@ -77,6 +81,10 @@ public final class StringUtils {
      * @return a legacy string representing the input string
      */
     public static String miniMessageToLegacy(String input) {
+        if (input == null) {
+            return input;
+        }
+
         return ChatColor.translateAlternateColorCodes('&', toLegacy(fromMiniMessage(input)));
     }
 

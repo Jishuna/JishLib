@@ -70,6 +70,10 @@ public class Registry<K, V> implements Iterable<Entry<K, V>> {
         return this.registryMap.remove(key);
     }
 
+    public void clear() {
+        this.registryMap.clear();
+    }
+
     public Collection<K> getKeys() {
         return Collections.unmodifiableSet(this.registryMap.keySet());
     }

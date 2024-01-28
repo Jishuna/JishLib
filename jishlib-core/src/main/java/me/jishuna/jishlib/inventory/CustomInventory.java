@@ -15,11 +15,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import me.jishuna.jishlib.JishLib;
 import me.jishuna.jishlib.inventory.button.Button;
-import me.jishuna.jishlib.item.provider.ItemProvider;
+import me.jishuna.jishlib.item.ItemstackRepresentable;
 
 public class CustomInventory<T extends Inventory> {
     private final Map<Integer, BiConsumer<InventoryClickEvent, InventorySession>> buttons = new HashMap<>();
-    private final Map<Integer, ItemProvider> providers = new HashMap<>();
+    private final Map<Integer, ItemstackRepresentable> providers = new HashMap<>();
 
     private final List<BiConsumer<InventoryClickEvent, InventorySession>> clickActions = new ArrayList<>();
     private final List<BiConsumer<InventoryCloseEvent, InventorySession>> closeActions = new ArrayList<>();
@@ -47,7 +47,7 @@ public class CustomInventory<T extends Inventory> {
         this.clickActions.add((event, session) -> event.setCancelled(true));
     }
 
-    public void setItem(int slot, ItemProvider provider) {
+    public void setItem(int slot, ItemstackRepresentable provider) {
         this.providers.put(slot, provider);
     }
 
@@ -61,8 +61,8 @@ public class CustomInventory<T extends Inventory> {
         }
     }
 
-    public void replaceItem(int slot, ItemProvider provider, int ticks) {
-        replaceItem(slot, provider.get(), ticks);
+    public void replaceItem(int slot, ItemstackRepresentable provider, int ticks) {
+        replaceItem(slot, provider.asItemStack(), ticks);
     }
 
     public void replaceItem(int slot, ItemStack item, int ticks) {
@@ -88,7 +88,7 @@ public class CustomInventory<T extends Inventory> {
         return this.inventory.getItem(slot);
     }
 
-    public ItemProvider getProvider(int slot) {
+    public ItemstackRepresentable getProvider(int slot) {
         return this.providers.get(slot);
     }
 
@@ -117,7 +117,7 @@ public class CustomInventory<T extends Inventory> {
         this.providers.put(slot, button.getProvider());
     }
 
-    public void setButton(int slot, ItemProvider provider, BiConsumer<InventoryClickEvent, InventorySession> action) {
+    public void setButton(int slot, ItemstackRepresentable provider, BiConsumer<InventoryClickEvent, InventorySession> action) {
         this.buttons.put(slot, action);
         this.providers.put(slot, provider);
     }
@@ -176,8 +176,8 @@ public class CustomInventory<T extends Inventory> {
     }
 
     private void processProviders() {
-        for (Entry<Integer, ItemProvider> entry : this.providers.entrySet()) {
-            this.inventory.setItem(entry.getKey(), entry.getValue().get());
+        for (Entry<Integer, ItemstackRepresentable> entry : this.providers.entrySet()) {
+            this.inventory.setItem(entry.getKey(), entry.getValue().asItemStack());
         }
     }
 
