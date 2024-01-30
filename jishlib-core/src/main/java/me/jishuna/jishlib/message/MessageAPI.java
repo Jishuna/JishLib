@@ -2,20 +2,23 @@ package me.jishuna.jishlib.message;
 
 import com.google.common.base.Preconditions;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Level;
+import java.util.Objects;
+import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.bukkit.Bukkit;
 import me.jishuna.jishlib.JishLib;
 import me.jishuna.jishlib.util.StringUtils;
 
 public final class MessageAPI {
+    private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("%\\S*%");
+
     private static MessageHandler manager;
     private static String fileName;
 
@@ -30,65 +33,87 @@ public final class MessageAPI {
     public static void reload() {
         File folder = JishLib.getPlugin().getDataFolder();
 
-        try {
-            if (!folder.exists() && !folder.mkdirs()) {
-                JishLib.getLogger().severe("Failed to load messages: Failed to create message file");
-                return;
-            }
-            MessageParser parser = MessageParser.empty();
-            File target = new File(folder, fileName);
+        if (!folder.exists() && !folder.mkdirs()) {
+            JishLib.getLogger().severe("Failed to load messages: Failed to create message file");
+            return;
+        }
 
-            if (target.exists()) {
-                MessageReader external = new MessageReader();
-                parser.merge(MessageParser.parse(external.readMessages(new FileInputStream(target))));
-            } else if (!target.createNewFile()) {
-                JishLib.getLogger().severe("Failed to load messages: Failed to create message file");
-                return;
-            }
+        MessageLoader loader = new MessageLoader(fileName);
+        loadFrom(loader.load());
+    }
 
-            MessageReader internal = new MessageReader();
-            if (parser.merge(MessageParser.parse(internal.readMessages(JishLib.getPlugin().getResource(fileName))))) {
-                MessageWriter.writeMessages(parser.getRawMessages().values(), new FileOutputStream(target));
-            }
+    private static void loadFrom(Map<String, Object> data) {
+        Map<String, String> strings = new HashMap<>();
+        Map<String, List<String>> lists = new HashMap<>();
 
-            loadFrom(parser);
-        } catch (IOException e) {
-            JishLib.getLogger().log(Level.SEVERE, "Failed to load messages: {0}", e.getMessage());
-            e.printStackTrace();
+        readRecursivly(data, strings, lists);
+
+        manager = new MessageHandler(strings, lists);
+    }
+
+    private static void readRecursivly(Map<?, ?> data, Map<String, String> strings, Map<String, List<String>> lists) {
+        for (Entry<?, ?> entry : data.entrySet()) {
+            String key = entry.getKey().toString();
+            Object value = entry.getValue();
+
+            if (value instanceof Map<?, ?> map) {
+                readRecursivly(map, strings, lists);
+            } else if (value instanceof List<?> list) {
+                lists.put(key, list.stream().map(MessageAPI::convertObject).toList());
+            } else if (value != null) {
+                strings.put(key, convertObject(value));
+            }
         }
     }
 
-    private static void loadFrom(MessageParser parser) {
-        Map<String, String> messages = new HashMap<>();
-        Map<String, List<String>> lists = new HashMap<>();
-
-        for (Entry<String, MessageEntry> entry : parser.getRawMessages().entrySet()) {
-            MessageEntry messageEntry = entry.getValue();
-            if (messageEntry instanceof SingleMessageEntry single) {
-                messages.put(entry.getKey(), StringUtils.miniMessageToLegacy(single.getValue()));
-            } else if (messageEntry instanceof ListMessageEntry list) {
-                lists.put(entry.getKey(), list.getValue().stream().map(StringUtils::miniMessageToLegacy).toList());
-            }
+    private static String convertObject(Object value) {
+        if (value == null) {
+            return "";
         }
 
-        manager = new MessageHandler(messages, lists);
+        return StringUtils.miniMessageToLegacy(value.toString());
     }
 
     public static String get(String key) {
         return getInstance().messages.getOrDefault(key, key);
     }
 
-    public static String get(String key, Object... format) {
+    public static String getLegacy(String key, Object... format) {
         return MessageFormat.format(getInstance().messages.getOrDefault(key, key), format);
+    }
+
+    public static String get(String key, Map<String, Supplier<Object>> placeholders) {
+        return replacePlaceholders(getInstance().messages.getOrDefault(key, key), placeholders);
     }
 
     public static List<String> getList(String key) {
         return getInstance().lists.getOrDefault(key, Collections.emptyList());
     }
 
-    public static List<String> getList(String key, Object... format) {
+    public static List<String> getListLegacy(String key, Object... format) {
         List<String> list = getInstance().lists.getOrDefault(key, Collections.emptyList());
         return list.stream().map(string -> MessageFormat.format(string, format)).toList();
+    }
+
+    public static List<String> getList(String key, Map<String, Supplier<Object>> placeholders) {
+        List<String> list = getInstance().lists.getOrDefault(key, Collections.emptyList());
+        return list.stream().map(string -> replacePlaceholders(string, placeholders)).toList();
+    }
+
+    private static String replacePlaceholders(String string, Map<String, Supplier<Object>> placeholders) {
+        if (placeholders.isEmpty()) {
+            return string;
+        }
+
+        Matcher matcher = PLACEHOLDER_PATTERN.matcher(string);
+
+        return matcher.replaceAll(match -> {
+            String key = match.group();
+            key = key.substring(1, key.length() - 1);
+            Supplier<Object> replacement = placeholders.get(key);
+
+            return replacement == null ? "[Invalid Placeholder: " + key + "]" : Objects.toString(replacement.get());
+        });
     }
 
     private static MessageHandler getInstance() {
@@ -96,6 +121,14 @@ public final class MessageAPI {
             throw new IllegalStateException("MessageAPI not initialized!");
         }
         return manager;
+    }
+
+    public static void printAll() {
+        getInstance().messages.forEach((k, v) -> Bukkit.getConsoleSender().sendMessage(k + ": " + v));
+        getInstance().lists.forEach((k, v) -> {
+            Bukkit.getConsoleSender().sendMessage(k + ":");
+            v.forEach(s -> Bukkit.getConsoleSender().sendMessage(" - " + s));
+        });
     }
 
     private MessageAPI() {
