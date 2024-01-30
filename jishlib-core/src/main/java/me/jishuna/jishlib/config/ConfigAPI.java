@@ -35,12 +35,14 @@ import me.jishuna.jishlib.config.adapter.WeightedRandomAdapter;
 import me.jishuna.jishlib.config.adapter.recipe.FurnaceRecipeAdapter;
 import me.jishuna.jishlib.config.adapter.recipe.RecipeAdapter;
 import me.jishuna.jishlib.config.adapter.recipe.RecipeChoiceAdapter;
+import me.jishuna.jishlib.config.adapter.recipe.RecipeTemplateAdapter;
 import me.jishuna.jishlib.config.adapter.recipe.ShapedRecipeAdapter;
 import me.jishuna.jishlib.config.adapter.recipe.ShapelessRecipeAdapter;
 import me.jishuna.jishlib.config.reloadable.ReloadableClass;
 import me.jishuna.jishlib.config.reloadable.ReloadableObject;
 import me.jishuna.jishlib.datastructure.WeightedRandom;
 import me.jishuna.jishlib.entity.EntityIdentifier;
+import me.jishuna.jishlib.recipe.RecipeTemplate;
 
 public final class ConfigAPI {
     private static ConfigurationManager manager;
@@ -162,6 +164,8 @@ public final class ConfigAPI {
             registerTypeAdapter(ShapedRecipe.class, new ShapedRecipeAdapter());
             registerTypeAdapter(ShapelessRecipe.class, new ShapelessRecipeAdapter());
             registerTypeAdapter(FurnaceRecipe.class, new FurnaceRecipeAdapter());
+
+            registerTypeAdapter(RecipeTemplate.class, new RecipeTemplateAdapter());
         }
 
         protected <R> void registerTypeAdapter(Class<R> clazz, TypeAdapter<?, ?> adapter) {
