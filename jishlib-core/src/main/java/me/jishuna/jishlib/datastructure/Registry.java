@@ -26,6 +26,10 @@ public class Registry<K, V> implements Iterable<Entry<K, V>> {
     }
 
     public void register(K key, V value, boolean replace) {
+        if (key == null) {
+            return;
+        }
+
         if (replace) {
             this.registryMap.put(key, value);
         } else {
@@ -50,10 +54,18 @@ public class Registry<K, V> implements Iterable<Entry<K, V>> {
     }
 
     public V get(K key) {
+        if (key == null) {
+            return null;
+        }
+
         return this.registryMap.get(key);
     }
 
     public V get(K key, V def) {
+        if (key == null) {
+            return null;
+        }
+
         V value = this.registryMap.get(key);
         return value != null ? value : def;
     }
@@ -63,10 +75,18 @@ public class Registry<K, V> implements Iterable<Entry<K, V>> {
     }
 
     public boolean has(K key) {
+        if (key == null) {
+            return false;
+        }
+
         return this.registryMap.containsKey(key);
     }
 
     public V remove(K key) {
+        if (key == null) {
+            return null;
+        }
+
         return this.registryMap.remove(key);
     }
 
