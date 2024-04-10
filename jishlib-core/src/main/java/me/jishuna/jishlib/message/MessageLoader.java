@@ -84,7 +84,7 @@ public class MessageLoader {
 
         if (file.exists()) {
             try (InputStream stream = new FileInputStream(file);
-                    Reader reader = new InputStreamReader(stream)) {
+                    Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
                 Node node = YAML.compose(reader);
                 if (node instanceof MappingNode mapping) {
                     CONSTRUCTOR.flattenMapping(mapping);
@@ -100,7 +100,7 @@ public class MessageLoader {
 
     private MappingNode readInternal() {
         try (InputStream stream = JishLib.getPlugin().getResource(this.fileName);
-                Reader reader = new InputStreamReader(stream)) {
+                Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
             Node node = YAML.compose(reader);
             if (node instanceof MappingNode mapping) {
                 CONSTRUCTOR.flattenMapping(mapping);
