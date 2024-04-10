@@ -1,19 +1,20 @@
 package me.jishuna.jishlib.inventory;
 
+import java.util.List;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import me.jishuna.jishlib.util.NumberUtils;
 
 public abstract class PagedInventory<T, B extends Inventory> extends CustomInventory<B> {
-    protected final int itemsPerPage;
+    protected final List<Integer> itemSlots;
 
     protected int maxPage;
     protected int page = 0;
 
-    protected PagedInventory(B inventory, int maxIndex, int maxPage) {
+    protected PagedInventory(B inventory, List<Integer> itemSlots, int maxPage) {
         super(inventory);
-        this.itemsPerPage = maxIndex;
+        this.itemSlots = itemSlots;
         this.maxPage = maxPage;
     }
 
@@ -36,5 +37,9 @@ public abstract class PagedInventory<T, B extends Inventory> extends CustomInven
 
     protected int getPage() {
         return this.page;
+    }
+
+    protected int getMaxPage() {
+        return this.maxPage;
     }
 }

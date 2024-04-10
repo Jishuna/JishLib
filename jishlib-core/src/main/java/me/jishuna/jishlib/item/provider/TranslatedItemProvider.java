@@ -3,7 +3,7 @@ package me.jishuna.jishlib.item.provider;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import me.jishuna.jishlib.item.ItemBuilder;
-import me.jishuna.jishlib.message.MessageAPI;
+import me.jishuna.jishlib.message.MessageSystem;
 
 public class TranslatedItemProvider implements ItemProvider {
     private final ItemBuilder builder;
@@ -27,8 +27,8 @@ public class TranslatedItemProvider implements ItemProvider {
     @Override
     public ItemStack get() {
         ItemBuilder copy = this.builder.clone();
-        copy.name(MessageAPI.get(this.nameKey));
-        copy.lore(MessageAPI.getList(this.loreKey));
+        copy.name(MessageSystem.get(this.nameKey));
+        copy.lore(MessageSystem.getList(this.loreKey));
         return copy.build();
     }
 }

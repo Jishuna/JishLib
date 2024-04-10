@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.IntStream;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -17,7 +18,7 @@ public abstract class PagedArrayCustomInventory<T, B extends Inventory> extends 
     }
 
     protected PagedArrayCustomInventory(B inventory, List<T[]> items, int maxIndex) {
-        super(inventory, maxIndex, items.size() - 1);
+        super(inventory, IntStream.range(0, maxIndex).boxed().toList(), items.size() - 1);
         this.items = items;
     }
 
@@ -32,13 +33,16 @@ public abstract class PagedArrayCustomInventory<T, B extends Inventory> extends 
         T[] entry = this.items.get(this.page);
         ItemStack[] stackArray = Arrays.stream(entry).map(this::asItemStack).toArray(ItemStack[]::new);
 
-        for (int i = 0; i < this.itemsPerPage; i++) {
-            if (i >= stackArray.length) {
+        int index = 0;
+        for (int i : this.itemSlots) {
+            if (index >= stackArray.length) {
                 clearItem(i);
                 removeButton(i);
             } else {
-                setButton(i, stackArray[i], this::onClick);
+                setButton(i, stackArray[index], this::onClick);
             }
+
+            index++;
         }
     }
 
@@ -57,6 +61,6 @@ public abstract class PagedArrayCustomInventory<T, B extends Inventory> extends 
     @Override
     protected void onClick(InventoryClickEvent event, InventorySession session) {
         T[] entry = this.items.get(this.page);
-        onItemClicked(event, session, entry[event.getSlot()]);
+        onItemClicked(event, session, entry[this.itemSlots.indexOf(event.getSlot())]);
     }
 }

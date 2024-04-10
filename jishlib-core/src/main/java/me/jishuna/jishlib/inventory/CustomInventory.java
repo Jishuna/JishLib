@@ -1,29 +1,29 @@
 package me.jishuna.jishlib.inventory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import me.jishuna.jishlib.JishLib;
 import me.jishuna.jishlib.inventory.button.Button;
 import me.jishuna.jishlib.item.ItemstackRepresentable;
 
 public class CustomInventory<T extends Inventory> {
     private final Map<Integer, BiConsumer<InventoryClickEvent, InventorySession>> buttons = new HashMap<>();
-    private final Map<Integer, ItemstackRepresentable> providers = new HashMap<>();
 
     private final List<BiConsumer<InventoryClickEvent, InventorySession>> clickActions = new ArrayList<>();
     private final List<BiConsumer<InventoryCloseEvent, InventorySession>> closeActions = new ArrayList<>();
-    private final List<BiConsumer<HumanEntity, InventorySession>> openActions = new ArrayList<>();
+    private final List<BiConsumer<InventoryOpenEvent, InventorySession>> openActions = new ArrayList<>();
 
     private final T inventory;
 
@@ -39,7 +39,7 @@ public class CustomInventory<T extends Inventory> {
         this.closeActions.add(action);
     }
 
-    public void addOpenConsumer(BiConsumer<HumanEntity, InventorySession> action) {
+    public void addOpenConsumer(BiConsumer<InventoryOpenEvent, InventorySession> action) {
         this.openActions.add(action);
     }
 
@@ -48,7 +48,7 @@ public class CustomInventory<T extends Inventory> {
     }
 
     public void setItem(int slot, ItemstackRepresentable provider) {
-        this.providers.put(slot, provider);
+        this.inventory.setItem(slot, provider.asItemStack());
     }
 
     public void setItem(int slot, ItemStack item) {
@@ -61,19 +61,8 @@ public class CustomInventory<T extends Inventory> {
         }
     }
 
-    public void replaceItem(int slot, ItemstackRepresentable provider, int ticks) {
-        replaceItem(slot, provider.asItemStack(), ticks);
-    }
-
-    public void replaceItem(int slot, ItemStack item, int ticks) {
-        ItemStack previous = this.inventory.getItem(slot);
-        this.inventory.setItem(slot, item);
-        JishLib.runLater(() -> {
-            ItemStack current = this.inventory.getItem(slot);
-            if (current != null && current.isSimilar(item)) {
-                this.inventory.setItem(slot, previous);
-            }
-        }, ticks);
+    public void setItem(ItemStack item, Collection<Integer> slots) {
+        slots.forEach(i -> setItem(i, item));
     }
 
     public void addItem(ItemStack item) {
@@ -88,12 +77,8 @@ public class CustomInventory<T extends Inventory> {
         return this.inventory.getItem(slot);
     }
 
-    public ItemstackRepresentable getProvider(int slot) {
-        return this.providers.get(slot);
-    }
-
     public boolean hasItem(int slot) {
-        return this.inventory.getItem(slot) != null || this.providers.get(slot) != null;
+        return this.inventory.getItem(slot) != null;
     }
 
     public void fillEmpty(ItemStack filler) {
@@ -102,6 +87,19 @@ public class CustomInventory<T extends Inventory> {
                 setItem(slot, filler);
             }
         }
+    }
+
+    public Collection<Integer> getEdgeSlots() {
+        Set<Integer> slots = new HashSet<>();
+        int size = getSize();
+
+        for (int slot = 0; slot < size; slot++) {
+            if (slot < 9 || slot >= size - 9 || slot % 9 == 0 || slot % 9 == 8) {
+                slots.add(slot);
+            }
+        }
+
+        return slots;
     }
 
     public void removeButton(int slot) {
@@ -114,12 +112,12 @@ public class CustomInventory<T extends Inventory> {
 
     public void setButton(int slot, Button button) {
         this.buttons.put(slot, button.getAction());
-        this.providers.put(slot, button.getProvider());
+        this.inventory.setItem(slot, button.getProvider().asItemStack());
     }
 
     public void setButton(int slot, ItemstackRepresentable provider, BiConsumer<InventoryClickEvent, InventorySession> action) {
         this.buttons.put(slot, action);
-        this.providers.put(slot, provider);
+        this.inventory.setItem(slot, provider.asItemStack());
     }
 
     public void setButton(int slot, ItemStack item, BiConsumer<InventoryClickEvent, InventorySession> action) {
@@ -131,23 +129,8 @@ public class CustomInventory<T extends Inventory> {
         return this.inventory.getSize();
     }
 
-    public void open(HumanEntity target) {
-        InventoryAPI.openInventory(target, this, true);
-    }
-
-    protected void openDirect(HumanEntity target) {
+    protected void open(HumanEntity target) {
         target.openInventory(this.inventory);
-    }
-
-    protected void onDiscard(InventorySession session) {
-        // For children to override
-    }
-
-    @SafeVarargs
-    public final void apply(Consumer<T>... consumers) {
-        for (Consumer<T> consumer : consumers) {
-            consumer.accept(this.inventory);
-        }
     }
 
     public T getBukkitInventory() {
@@ -170,15 +153,8 @@ public class CustomInventory<T extends Inventory> {
         this.closeActions.forEach(consumer -> consumer.accept(event, session));
     }
 
-    public final void consumeOpen(HumanEntity entity, InventorySession session) {
-        processProviders();
-        this.openActions.forEach(consumer -> consumer.accept(entity, session));
-    }
-
-    private void processProviders() {
-        for (Entry<Integer, ItemstackRepresentable> entry : this.providers.entrySet()) {
-            this.inventory.setItem(entry.getKey(), entry.getValue().asItemStack());
-        }
+    public final void consumeOpenEvent(InventoryOpenEvent event, InventorySession session) {
+        this.openActions.forEach(consumer -> consumer.accept(event, session));
     }
 
     @Override

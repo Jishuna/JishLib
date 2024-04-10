@@ -1,10 +1,11 @@
-package me.jishuna.jishlib.command.argument;
+package me.jishuna.jishlib.command.argument.parser;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
+import me.jishuna.jishlib.command.argument.ArgumentParser;
 
 public class PlayerParser implements ArgumentParser<Player> {
 

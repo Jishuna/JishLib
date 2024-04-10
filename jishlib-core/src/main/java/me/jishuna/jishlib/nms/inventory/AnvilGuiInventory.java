@@ -64,7 +64,7 @@ public class AnvilGuiInventory extends CustomInventory<AnvilInventory> {
     }
 
     @Override
-    public void openDirect(HumanEntity target) {
+    public void open(HumanEntity target) {
         target.openInventory(this.menu.getView());
     }
 

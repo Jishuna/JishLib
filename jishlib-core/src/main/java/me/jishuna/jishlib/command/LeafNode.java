@@ -12,9 +12,6 @@ public abstract class LeafNode extends CommandNode {
     }
 
     @Override
-    protected abstract void handleCommand(CommandSender sender, ArgumentQueue arguments);
-
-    @Override
     protected List<String> handleTabComplete(CommandSender sender, ArgumentQueue arguments) {
         return Collections.emptyList();
     }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.IntStream;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -16,7 +17,15 @@ public abstract class PagedCustomInventory<T, B extends Inventory> extends Paged
     }
 
     protected PagedCustomInventory(B inventory, List<T> items, int maxIndex) {
-        super(inventory, maxIndex, Math.max(0, (int) Math.ceil(items.size() / (double) maxIndex) - 1));
+        this(inventory, items, IntStream.range(0, maxIndex).boxed().toList());
+    }
+
+    protected PagedCustomInventory(B inventory, Collection<T> items, List<Integer> itemSlots) {
+        this(inventory, new ArrayList<>(items), itemSlots);
+    }
+
+    protected PagedCustomInventory(B inventory, List<T> items, List<Integer> itemSlots) {
+        super(inventory, itemSlots, Math.max(0, (int) Math.ceil(items.size() / (double) itemSlots.size()) - 1));
         this.items = items;
     }
 
@@ -28,10 +37,8 @@ public abstract class PagedCustomInventory<T, B extends Inventory> extends Paged
 
     @Override
     protected void refreshOptions() {
-        int startIndex = this.page * this.itemsPerPage;
-        for (int i = 0; i < this.itemsPerPage; i++) {
-            int index = startIndex + i;
-
+        int index = this.page * this.itemSlots.size();
+        for (int i : this.itemSlots) {
             if (index >= this.items.size()) {
                 clearItem(i);
                 removeButton(i);
@@ -41,6 +48,8 @@ public abstract class PagedCustomInventory<T, B extends Inventory> extends Paged
                 ItemStack item = asItemStack(entry);
                 setButton(i, item, this::onClick);
             }
+
+            index++;
         }
     }
 
@@ -48,9 +57,13 @@ public abstract class PagedCustomInventory<T, B extends Inventory> extends Paged
         return Collections.unmodifiableList(this.items);
     }
 
+    protected void replaceContents(Collection<T> items) {
+        replaceContents(new ArrayList<>(items));
+    }
+
     protected void replaceContents(List<T> items) {
         this.items = items;
-        this.maxPage = Math.max(0, (int) Math.ceil(items.size() / (double) this.itemsPerPage) - 1);
+        this.maxPage = Math.max(0, (int) Math.ceil(items.size() / (double) this.itemSlots.size()) - 1);
         this.page = 0;
 
         refreshOptions();
@@ -58,8 +71,8 @@ public abstract class PagedCustomInventory<T, B extends Inventory> extends Paged
 
     @Override
     protected void onClick(InventoryClickEvent event, InventorySession session) {
-        int startIndex = this.page * this.itemsPerPage;
-        T entry = this.items.get(startIndex + event.getSlot());
+        int startIndex = this.page * this.itemSlots.size();
+        T entry = this.items.get(startIndex + this.itemSlots.indexOf(event.getSlot()));
 
         onItemClicked(event, session, entry);
     }

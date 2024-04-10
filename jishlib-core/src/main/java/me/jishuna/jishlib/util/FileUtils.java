@@ -4,13 +4,16 @@ import com.google.common.base.Preconditions;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.CopyOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 import org.bukkit.plugin.Plugin;
 
 /**
@@ -94,11 +97,11 @@ public class FileUtils {
         }
     }
 
-    public static void copyFolder(File source, File target) throws IOException {
-        copyFolder(source.toPath(), target.toPath());
+    public static void copyFolder(File source, File target, CopyOption... options) throws IOException {
+        copyFolder(source.toPath(), target.toPath(), options);
     }
 
-    public static void copyFolder(Path source, Path target) throws IOException {
+    public static void copyFolder(Path source, Path target, CopyOption... options) throws IOException {
         Files.walkFileTree(source, new SimpleFileVisitor<Path>() {
 
             @Override
@@ -111,10 +114,25 @@ public class FileUtils {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                     throws IOException {
-                Files.copy(file, target.resolve(source.relativize(file).toString()));
+                Files.copy(file, target.resolve(source.relativize(file).toString()), options);
                 return FileVisitResult.CONTINUE;
             }
         });
+    }
+
+    public static void deleteFolder(File folder) {
+        deleteFolder(folder.toPath());
+    }
+
+    public static void deleteFolder(Path path) {
+        try (Stream<Path> walk = Files.walk(path)) {
+            walk
+                    .sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

@@ -16,12 +16,12 @@ public class EnumAdapter<R extends Enum> implements GenericStringAdapter<R> {
 
     @Override
     public String toString(R value) {
-        return value.name();
+        return value.toString();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public R fromString(String value) {
-        return (R) Enum.valueOf(this.clazz, value);
+        return (R) Enum.valueOf(this.clazz, value.toUpperCase());
     }
 }

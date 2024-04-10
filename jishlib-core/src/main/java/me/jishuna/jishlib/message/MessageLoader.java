@@ -5,85 +5,28 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.bukkit.configuration.file.YamlConstructor;
 import org.bukkit.configuration.file.YamlRepresenter;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.nodes.MappingNode;
+import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeTuple;
 import me.jishuna.jishlib.JishLib;
 
 public class MessageLoader {
-    private static final Yaml YAML = createYaml();
-    private final String fileName;
+    public static YamlConstructor CONSTRUCTOR;
+    public static final Yaml YAML;
 
-    public MessageLoader(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public Map<String, Object> load() {
-        Map<String, Object> saved = new LinkedHashMap<>(readSaved());
-        Map<String, Object> internal = new LinkedHashMap<>(readInternal());
-
-        boolean needsSaving = merge(internal, saved);
-        if (needsSaving) {
-            save(saved);
-        }
-
-        return saved;
-    }
-
-    private boolean merge(Map<String, Object> from, Map<String, Object> to) {
-        boolean modified = false;
-
-        for (Entry<String, Object> entry : from.entrySet()) {
-            if (to.putIfAbsent(entry.getKey(), entry.getValue()) == null) {
-                modified = true;
-            }
-        }
-
-        return modified;
-    }
-
-    private Map<String, Object> readSaved() {
-        File file = new File(JishLib.getPlugin().getDataFolder(), this.fileName);
-
-        if (file.exists()) {
-            try (InputStream stream = new FileInputStream(file)) {
-                return YAML.load(stream);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return Collections.emptyMap();
-    }
-
-    private Map<String, Object> readInternal() {
-        try (InputStream stream = JishLib.getPlugin().getResource(this.fileName)) {
-            return YAML.load(stream);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return Collections.emptyMap();
-    }
-
-    private void save(Map<String, Object> map) {
-        File file = new File(JishLib.getPlugin().getDataFolder(), this.fileName);
-
-        try (FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8)) {
-            YAML.dump(map, writer);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static Yaml createYaml() {
+    static {
         DumperOptions dumperOptions = new DumperOptions();
         dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         dumperOptions.setSplitLines(false);
@@ -94,11 +37,89 @@ public class MessageLoader {
         loaderOptions.setMaxAliasesForCollections(Integer.MAX_VALUE); // SPIGOT-5881: Not ideal, but was default pre SnakeYAML 1.26
         loaderOptions.setCodePointLimit(Integer.MAX_VALUE); // SPIGOT-7161: Not ideal, but was default pre SnakeYAML 1.32
 
-        YamlConstructor constructor = new YamlConstructor(loaderOptions);
+        CONSTRUCTOR = new YamlConstructor(loaderOptions);
         YamlRepresenter representer = new YamlRepresenter(dumperOptions);
 
         representer.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
 
-        return new Yaml(constructor, representer, dumperOptions, loaderOptions);
+        YAML = new Yaml(CONSTRUCTOR, representer, dumperOptions, loaderOptions);
+    }
+
+    private final String fileName;
+
+    public MessageLoader(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public MappingNode load() {
+        MappingNode node = merge(readSaved(), readInternal());
+        save(node);
+
+        return node;
+    }
+
+    private MappingNode merge(MappingNode saved, MappingNode internal) {
+        if (saved == null) {
+            return internal;
+        }
+
+        Set<String> paths = new HashSet<>();
+        saved.getValue().forEach(tuple -> paths.add(String.valueOf(CONSTRUCTOR.construct(tuple.getKeyNode()))));
+
+        List<NodeTuple> nodes = new ArrayList<>(saved.getValue());
+
+        for (NodeTuple tuple : internal.getValue()) {
+            String path = String.valueOf(CONSTRUCTOR.construct(tuple.getKeyNode()));
+            if (!paths.contains(path)) {
+                nodes.add(tuple);
+            }
+        }
+
+        saved.setValue(nodes);
+        return saved;
+    }
+
+    private MappingNode readSaved() {
+        File file = new File(JishLib.getPlugin().getDataFolder(), this.fileName);
+
+        if (file.exists()) {
+            try (InputStream stream = new FileInputStream(file);
+                    Reader reader = new InputStreamReader(stream)) {
+                Node node = YAML.compose(reader);
+                if (node instanceof MappingNode mapping) {
+                    CONSTRUCTOR.flattenMapping(mapping);
+                    return mapping;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
+    }
+
+    private MappingNode readInternal() {
+        try (InputStream stream = JishLib.getPlugin().getResource(this.fileName);
+                Reader reader = new InputStreamReader(stream)) {
+            Node node = YAML.compose(reader);
+            if (node instanceof MappingNode mapping) {
+                CONSTRUCTOR.flattenMapping(mapping);
+                return mapping;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    private void save(Node node) {
+        File file = new File(JishLib.getPlugin().getDataFolder(), this.fileName);
+
+        try (FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8)) {
+            YAML.serialize(node, writer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

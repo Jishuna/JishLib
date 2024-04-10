@@ -1,28 +1,31 @@
 package me.jishuna.jishlib.inventory;
 
-import org.bukkit.entity.HumanEntity;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import org.bukkit.entity.Player;
 import me.jishuna.jishlib.JishLib;
-import me.jishuna.jishlib.datastructure.History;
 
 public final class InventorySession {
     public enum State {
         NORMAL, SWITCHING, WAITING;
     }
 
-    private final HumanEntity player;
-    private final History<CustomInventory<?>> history;
+    private final Player player;
+    private final Deque<CustomInventory<?>> history = new ArrayDeque<>();
 
+    private CustomInventory<?> active;
     private State state = State.SWITCHING;
 
-    public InventorySession(HumanEntity player, CustomInventory<?> first) {
+    public InventorySession(Player player, CustomInventory<?> inventory) {
         this.player = player;
-        this.history = new History<>(first);
+        this.active = inventory;
     }
 
     public void changeTo(CustomInventory<?> inventory, boolean recordHistory) {
         JishLib.run(() -> {
             this.state = State.SWITCHING;
             open(inventory, recordHistory);
+            this.state = State.NORMAL;
         });
     }
 
@@ -38,7 +41,7 @@ public final class InventorySession {
     }
 
     public CustomInventory<?> getActive() {
-        return this.history.getActive();
+        return this.active;
     }
 
     public State getState() {
@@ -46,7 +49,7 @@ public final class InventorySession {
     }
 
     public boolean hasHistory() {
-        return this.history.hasPrevious();
+        return !this.history.isEmpty();
     }
 
     public void openPrevious() {
@@ -54,43 +57,27 @@ public final class InventorySession {
             return;
         }
 
-        if (this.history.getActive() != null) {
-            this.history.getActive().onDiscard(this);
-        }
-        changeTo(this.history.pollPrevious(), false);
+        changeTo(this.history.pollFirst(), false);
     }
 
     public void reopen() {
-        if (this.history.getActive() != null) {
-            open(this.history.getActive(), false);
-        }
+        open(this.active, false);
     }
 
-    protected final void onDiscard() {
-        if (this.history.getActive() != null) {
-            this.history.getActive().onDiscard(this);
-        }
-
-        while (this.history.hasPrevious()) {
-            this.history.pollPrevious().onDiscard(this);
-        }
+    public Player getPlayer() {
+        return this.player;
     }
 
-    public void open(CustomInventory<?> inventory, boolean recordHistory) {
-        if (this.history.getActive() != null) {
-            this.history.getActive().onDiscard(this);
+    private void open(CustomInventory<?> inventory, boolean recordHistory) {
+        if (recordHistory) {
+            this.history.addFirst(this.active);
         }
 
-        inventory.openDirect(this.player);
-        this.history.setActive(inventory, recordHistory);
-        inventory.consumeOpen(this.player, this);
+        this.active = inventory;
+        inventory.open(this.player);
 
-        if (this.state != State.NORMAL) {
+        if (this.state == State.WAITING) {
             this.state = State.NORMAL;
         }
-    }
-
-    public HumanEntity getPlayer() {
-        return this.player;
     }
 }

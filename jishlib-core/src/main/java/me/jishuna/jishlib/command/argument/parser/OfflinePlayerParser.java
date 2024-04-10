@@ -1,4 +1,4 @@
-package me.jishuna.jishlib.command.argument;
+package me.jishuna.jishlib.command.argument.parser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,6 +7,7 @@ import java.util.Objects;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.util.StringUtil;
+import me.jishuna.jishlib.command.argument.ArgumentParser;
 
 public class OfflinePlayerParser implements ArgumentParser<OfflinePlayer> {
     private final List<String> cache = Arrays

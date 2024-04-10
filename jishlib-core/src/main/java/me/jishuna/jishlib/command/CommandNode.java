@@ -8,10 +8,11 @@ import java.util.Map.Entry;
 import org.bukkit.command.CommandSender;
 import org.bukkit.util.StringUtil;
 import me.jishuna.jishlib.command.argument.ArgumentQueue;
-import me.jishuna.jishlib.message.MessageAPI;
+import me.jishuna.jishlib.message.MessageSystem;
 
 public abstract class CommandNode {
     private final Map<String, CommandNode> children = new HashMap<>();
+    private CommandNode defaultNode;
     protected final String permission;
 
     protected CommandNode(String permission) {
@@ -22,11 +23,15 @@ public abstract class CommandNode {
         String subCommand = arguments.peek();
         CommandNode childNode = this.children.get(subCommand);
         if (childNode == null) {
+            if (this.defaultNode != null) {
+                this.defaultNode.handleCommand(sender, arguments);
+                return true;
+            }
             return false;
         }
 
         if (!sender.hasPermission(childNode.permission)) {
-            throw new CommandException(MessageAPI.get("command.no-permission"));
+            throw new CommandException(MessageSystem.get("command.no-permission"));
         }
 
         arguments.poll();
@@ -34,11 +39,15 @@ public abstract class CommandNode {
         return true;
     }
 
-    protected void addChildNode(String name, CommandNode node) {
+    public void addChildNode(String name, CommandNode node) {
         this.children.put(name, node);
     }
 
-    protected List<String> getApplicableSubcommands(CommandSender sender) {
+    public void setDefaultNode(CommandNode node) {
+        this.defaultNode = node;
+    }
+
+    public List<String> getApplicableSubcommands(CommandSender sender) {
         List<String> commands = new ArrayList<>();
 
         for (Entry<String, CommandNode> entry : this.children.entrySet()) {
