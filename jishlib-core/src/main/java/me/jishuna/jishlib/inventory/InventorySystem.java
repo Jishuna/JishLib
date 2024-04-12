@@ -18,6 +18,11 @@ public class InventorySystem {
         return INSTANCE;
     }
 
+    public static void cleanup() {
+        getInstance().closeAll();
+        INSTANCE = null;
+    }
+
     private final HashMap<UUID, InventorySession> inventoryMap = new HashMap<>();
 
     public InventorySystem() {
@@ -47,5 +52,13 @@ public class InventorySystem {
 
     public void discardSession(UUID id) {
         this.inventoryMap.remove(id);
+    }
+
+    public void closeAll() {
+        for (InventorySession session : this.inventoryMap.values()) {
+            session.getPlayer().closeInventory();
+        }
+
+        this.inventoryMap.clear();
     }
 }

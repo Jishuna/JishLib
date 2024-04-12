@@ -13,7 +13,7 @@ public class PromptListener implements Listener {
         this.system = system;
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onChat(AsyncPlayerChatEvent event) {
         Prompt prompt = this.system.getPrompt(event.getPlayer());
 

@@ -157,6 +157,10 @@ public class CustomInventory<T extends Inventory> {
         this.openActions.forEach(consumer -> consumer.accept(event, session));
     }
 
+    public void refresh() {
+        // Designed for overriding
+    }
+
     @Override
     public int hashCode() {
         return this.inventory.hashCode();

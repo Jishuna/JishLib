@@ -1,5 +1,6 @@
 package me.jishuna.jishlib.inventory;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -50,6 +51,12 @@ public class CustomInventoryListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onLeave(PlayerQuitEvent event) {
-        this.system.discardSession(event.getPlayer());
+        Player player = event.getPlayer();
+        InventorySession session = this.system.getSession(player);
+
+        if (session != null) {
+            player.closeInventory();
+            this.system.discardSession(player);
+        }
     }
 }
