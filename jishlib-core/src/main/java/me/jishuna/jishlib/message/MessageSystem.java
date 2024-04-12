@@ -5,15 +5,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.bukkit.Bukkit;
-import org.yaml.snakeyaml.nodes.AnchorNode;
-import org.yaml.snakeyaml.nodes.MappingNode;
-import org.yaml.snakeyaml.nodes.Node;
-import org.yaml.snakeyaml.nodes.NodeTuple;
 import me.jishuna.jishlib.JishLib;
 import me.jishuna.jishlib.util.StringUtils;
 
@@ -92,21 +89,19 @@ public final class MessageSystem {
         read(loader.load(), this.strings, this.lists);
     }
 
-    private void read(MappingNode data, Map<String, String> strings, Map<String, List<String>> lists) {
-        for (NodeTuple tuple : data.getValue()) {
-            Node key = tuple.getKeyNode();
-            String keyString = String.valueOf(MessageLoader.CONSTRUCTOR.construct(key));
-            Node value = tuple.getValueNode();
+    private void read(Map<String, Object> data, Map<String, String> strings, Map<String, List<String>> lists) {
+        for (Entry<String, Object> entry : data.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
 
-            while (value instanceof AnchorNode anchor) {
-                value = anchor.getRealNode();
+            if (key.startsWith(".")) {
+                key = key.substring(1);
             }
 
-            Object object = MessageLoader.CONSTRUCTOR.construct(value);
-            if (object instanceof List<?> list) {
-                lists.put(keyString, list.stream().map(this::convertObject).toList());
-            } else {
-                strings.put(keyString, convertObject(object));
+            if (value instanceof List<?> list) {
+                lists.put(key, list.stream().map(this::convertObject).toList());
+            } else if (value instanceof String) {
+                strings.put(key, convertObject(value));
             }
         }
     }

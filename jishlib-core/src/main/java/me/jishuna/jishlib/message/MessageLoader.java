@@ -1,123 +1,69 @@
 package me.jishuna.jishlib.message;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import org.bukkit.configuration.file.YamlConstructor;
-import org.bukkit.configuration.file.YamlRepresenter;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.LoaderOptions;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.nodes.MappingNode;
-import org.yaml.snakeyaml.nodes.Node;
-import org.yaml.snakeyaml.nodes.NodeTuple;
+import java.util.Map;
+import org.bukkit.configuration.file.YamlConfiguration;
 import me.jishuna.jishlib.JishLib;
 
 public class MessageLoader {
-    public static YamlConstructor CONSTRUCTOR;
-    public static final Yaml YAML;
-
-    static {
-        DumperOptions dumperOptions = new DumperOptions();
-        dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        dumperOptions.setSplitLines(false);
-        dumperOptions.setProcessComments(true);
-
-        LoaderOptions loaderOptions = new LoaderOptions();
-        loaderOptions.setProcessComments(true);
-        loaderOptions.setMaxAliasesForCollections(Integer.MAX_VALUE); // SPIGOT-5881: Not ideal, but was default pre SnakeYAML 1.26
-        loaderOptions.setCodePointLimit(Integer.MAX_VALUE); // SPIGOT-7161: Not ideal, but was default pre SnakeYAML 1.32
-
-        CONSTRUCTOR = new YamlConstructor(loaderOptions);
-        YamlRepresenter representer = new YamlRepresenter(dumperOptions);
-
-        representer.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-
-        YAML = new Yaml(CONSTRUCTOR, representer, dumperOptions, loaderOptions);
-    }
-
     private final String fileName;
 
     public MessageLoader(String fileName) {
         this.fileName = fileName;
     }
 
-    public MappingNode load() {
-        MappingNode node = merge(readSaved(), readInternal());
-        save(node);
+    public Map<String, Object> load() {
+        YamlConfiguration saved = readSaved();
+        YamlConfiguration internal = readInternal();
 
-        return node;
+        merge(internal, saved);
+        save(saved);
+
+        return saved.getValues(true);
     }
 
-    private MappingNode merge(MappingNode saved, MappingNode internal) {
-        if (saved == null) {
-            return internal;
-        }
+    private void merge(YamlConfiguration from, YamlConfiguration to) {
+        from.getValues(true).forEach((k, v) -> {
+            if (!to.isSet(k)) {
+                to.set(k, v);
 
-        Set<String> paths = new HashSet<>();
-        saved.getValue().forEach(tuple -> paths.add(String.valueOf(CONSTRUCTOR.construct(tuple.getKeyNode()))));
-
-        List<NodeTuple> nodes = new ArrayList<>(saved.getValue());
-
-        for (NodeTuple tuple : internal.getValue()) {
-            String path = String.valueOf(CONSTRUCTOR.construct(tuple.getKeyNode()));
-            if (!paths.contains(path)) {
-                nodes.add(tuple);
+                to.setComments(k, from.getComments(k));
+                to.setInlineComments(k, from.getInlineComments(k));
             }
-        }
-
-        saved.setValue(nodes);
-        return saved;
+        });
     }
 
-    private MappingNode readSaved() {
+    private YamlConfiguration readSaved() {
         File file = new File(JishLib.getPlugin().getDataFolder(), this.fileName);
 
         if (file.exists()) {
-            try (InputStream stream = new FileInputStream(file);
-                    Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-                Node node = YAML.compose(reader);
-                if (node instanceof MappingNode mapping) {
-                    CONSTRUCTOR.flattenMapping(mapping);
-                    return mapping;
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            return YamlConfiguration.loadConfiguration(file);
         }
 
-        return null;
+        return new YamlConfiguration();
     }
 
-    private MappingNode readInternal() {
+    private YamlConfiguration readInternal() {
         try (InputStream stream = JishLib.getPlugin().getResource(this.fileName);
                 Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-            Node node = YAML.compose(reader);
-            if (node instanceof MappingNode mapping) {
-                CONSTRUCTOR.flattenMapping(mapping);
-                return mapping;
-            }
-        } catch (Exception e) {
+            return YamlConfiguration.loadConfiguration(reader);
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return null;
+        return new YamlConfiguration();
     }
 
-    private void save(Node node) {
+    private void save(YamlConfiguration config) {
         File file = new File(JishLib.getPlugin().getDataFolder(), this.fileName);
 
-        try (FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8)) {
-            YAML.serialize(node, writer);
+        try {
+            config.save(file);
         } catch (IOException e) {
             e.printStackTrace();
         }

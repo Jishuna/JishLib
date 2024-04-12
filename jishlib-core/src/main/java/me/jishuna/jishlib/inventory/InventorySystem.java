@@ -19,8 +19,10 @@ public class InventorySystem {
     }
 
     public static void cleanup() {
-        getInstance().closeAll();
-        INSTANCE = null;
+        if (INSTANCE != null) {
+            getInstance().closeAll();
+            INSTANCE = null;
+        }
     }
 
     private final HashMap<UUID, InventorySession> inventoryMap = new HashMap<>();
