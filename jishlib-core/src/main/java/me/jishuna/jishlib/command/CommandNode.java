@@ -20,22 +20,25 @@ public abstract class CommandNode {
     }
 
     protected final boolean checkSubcommands(CommandSender sender, ArgumentQueue arguments) {
-        String subCommand = arguments.peek();
-        CommandNode childNode = this.children.get(subCommand);
-        if (childNode == null) {
-            if (this.defaultNode != null) {
-                this.defaultNode.handleCommand(sender, arguments);
-                return true;
-            }
+        CommandNode node;
+        if (arguments.isEmpty()) {
+            node = this.defaultNode;
+        } else {
+            node = this.children.get(arguments.peek());
+        }
+
+        if (node == null) {
             return false;
         }
 
-        if (!sender.hasPermission(childNode.permission)) {
-            throw new CommandException(MessageSystem.get("command.no-permission"));
+        if (!sender.hasPermission(node.permission)) {
+            throw new CommandException(MessageSystem
+                    .get("command.invalid-arg",
+                            Map.of("input", arguments::poll, "args", () -> String.join(", ", getApplicableSubcommands(sender)))));
         }
 
         arguments.poll();
-        childNode.handleCommand(sender, arguments);
+        node.handleCommand(sender, arguments);
         return true;
     }
 

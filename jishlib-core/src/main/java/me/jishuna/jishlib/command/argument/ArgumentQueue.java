@@ -2,7 +2,9 @@ package me.jishuna.jishlib.command.argument;
 
 import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Map;
 import me.jishuna.jishlib.command.CommandException;
+import me.jishuna.jishlib.message.MessageSystem;
 
 public class ArgumentQueue extends ArrayDeque<String> {
     private static final long serialVersionUID = 1L;
@@ -14,13 +16,17 @@ public class ArgumentQueue extends ArrayDeque<String> {
     public <T> T pollAs(Class<T> clazz) {
         ArgumentParser<T> parser = ArgumentParsers.getParser(clazz);
         if (isEmpty()) {
-            throw new CommandException("TODO");
+            throw new CommandException(MessageSystem
+                    .get("command.invalid-arg",
+                            Map.of("input", () -> "none", "args", parser::getValidArguments)));
         }
 
         String raw = poll();
         T value = parser.parse(raw);
         if (value == null) {
-            throw new CommandException("TODO");
+            throw new CommandException(MessageSystem
+                    .get("command.invalid-arg",
+                            Map.of("input", () -> raw, "args", parser::getValidArguments)));
         }
 
         return value;
