@@ -8,7 +8,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import org.bukkit.configuration.file.YamlConfiguration;
-import me.jishuna.jishlib.JishLib;
+import me.jishuna.jishlib.SpigotPlugin;
 
 public class MessageLoader {
     private final String fileName;
@@ -39,7 +39,7 @@ public class MessageLoader {
     }
 
     private YamlConfiguration readSaved() {
-        File file = new File(JishLib.getPlugin().getDataFolder(), this.fileName);
+        File file = new File(SpigotPlugin.getInstance().getDataFolder(), this.fileName);
 
         if (file.exists()) {
             return YamlConfiguration.loadConfiguration(file);
@@ -49,7 +49,7 @@ public class MessageLoader {
     }
 
     private YamlConfiguration readInternal() {
-        try (InputStream stream = JishLib.getPlugin().getResource(this.fileName);
+        try (InputStream stream = SpigotPlugin.getInstance().getResource(this.fileName);
                 Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
             return YamlConfiguration.loadConfiguration(reader);
         } catch (IOException e) {
@@ -60,7 +60,7 @@ public class MessageLoader {
     }
 
     private void save(YamlConfiguration config) {
-        File file = new File(JishLib.getPlugin().getDataFolder(), this.fileName);
+        File file = new File(SpigotPlugin.getInstance().getDataFolder(), this.fileName);
 
         try {
             config.save(file);

@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.bukkit.Bukkit;
-import me.jishuna.jishlib.JishLib;
+import me.jishuna.jishlib.SpigotPlugin;
 import me.jishuna.jishlib.util.StringUtils;
 
 public final class MessageSystem {
@@ -30,10 +30,10 @@ public final class MessageSystem {
     }
 
     public static void reload() {
-        File folder = JishLib.getPlugin().getDataFolder();
+        File folder = SpigotPlugin.getInstance().getDataFolder();
 
         if (!folder.exists() && !folder.mkdirs()) {
-            JishLib.getLogger().severe("Failed to load messages: Failed to create message file");
+            SpigotPlugin.logger().severe("Failed to load messages: Failed to create message file");
             return;
         }
 
@@ -69,7 +69,7 @@ public final class MessageSystem {
             key = key.substring(1, key.length() - 1);
             Supplier<Object> replacement = placeholders.get(key);
 
-            return replacement == null ? "[Invalid Placeholder: " + key + "]" : Objects.toString(replacement.get());
+            return replacement == null ? "[Invalid Placeholder: " + key + "]" : Matcher.quoteReplacement(Objects.toString(replacement.get()));
         });
     }
 

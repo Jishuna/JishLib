@@ -5,7 +5,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
-import me.jishuna.jishlib.JishLib;
+import me.jishuna.jishlib.SpigotPlugin;
 
 public class PromptSystem {
     private static PromptSystem INSTANCE;
@@ -22,7 +22,7 @@ public class PromptSystem {
 
     public PromptSystem() {
         PromptListener listener = new PromptListener(this);
-        Bukkit.getPluginManager().registerEvents(listener, JishLib.getPlugin());
+        Bukkit.getPluginManager().registerEvents(listener, SpigotPlugin.getInstance());
     }
 
     public void startPrompt(HumanEntity entity, Prompt prompt) {

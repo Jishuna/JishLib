@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import org.bukkit.configuration.ConfigurationSection;
-import me.jishuna.jishlib.JishLib;
+import me.jishuna.jishlib.SpigotPlugin;
 import me.jishuna.jishlib.config.ConfigAPI;
 import me.jishuna.jishlib.config.ConfigField;
 import me.jishuna.jishlib.config.ConfigType;
-import me.jishuna.jishlib.config.ReflectionHelper;
 import me.jishuna.jishlib.config.CustomConfig;
+import me.jishuna.jishlib.config.ReflectionHelper;
 import me.jishuna.jishlib.config.annotation.ConfigEntry;
 
 public class NativeAdapter<T> implements TypeAdapter<ConfigurationSection, T> {
@@ -42,7 +42,7 @@ public class NativeAdapter<T> implements TypeAdapter<ConfigurationSection, T> {
             Constructor<T> constructor = this.clazz.getDeclaredConstructor();
             object = constructor.newInstance();
         } catch (ReflectiveOperationException e) {
-            JishLib.getLogger().log(Level.WARNING, "Failed to create instance");
+            SpigotPlugin.logger().log(Level.WARNING, "Failed to create instance");
             return null;
         }
 
@@ -50,35 +50,35 @@ public class NativeAdapter<T> implements TypeAdapter<ConfigurationSection, T> {
             String path = field.getPath();
 
             if (!value.isSet(path)) {
-                JishLib.getLogger().log(Level.WARNING, "No configuration entry found for {0}", path);
+                SpigotPlugin.logger().log(Level.WARNING, "No configuration entry found for {0}", path);
                 continue;
             }
 
             ConfigType<?> type = ConfigType.get(field.getField());
             TypeAdapter<Object, Object> adapter = (TypeAdapter<Object, Object>) ConfigAPI.getAdapter(type);
             if (adapter == null) {
-                JishLib.getLogger().log(Level.WARNING, "No configuration adapter found for {0}", type.getClass());
+                SpigotPlugin.logger().log(Level.WARNING, "No configuration adapter found for {0}", type.getClass());
                 continue;
             }
 
             Class<Object> saved = adapter.getSavedType();
             Object savedValue = getSavedValue(value, path, saved);
             if (!saved.isInstance(savedValue)) {
-                JishLib.getLogger().log(Level.WARNING, "Wrong saved type for {0}, {1} != {2}", new Object[] { path, savedValue.getClass(), saved });
+                SpigotPlugin.logger().log(Level.WARNING, "Wrong saved type for {0}, {1} != {2}", new Object[] { path, savedValue.getClass(), saved });
                 continue;
             }
 
             Object readValue = adapter.read(saved.cast(savedValue));
 
             if (readValue == null) {
-                JishLib.getLogger().log(Level.WARNING, "Failed to read value for {0} of type {1}", new Object[] { path, type.getType() });
+                SpigotPlugin.logger().log(Level.WARNING, "Failed to read value for {0} of type {1}", new Object[] { path, type.getType() });
                 continue;
             }
 
             try {
                 ReflectionHelper.setField(field, readValue, object);
             } catch (ReflectiveOperationException ex) {
-                JishLib.getLogger().log(Level.WARNING, "Failed to read value for {0} of type {1}", new Object[] { path, type.getType() });
+                SpigotPlugin.logger().log(Level.WARNING, "Failed to read value for {0} of type {1}", new Object[] { path, type.getType() });
                 ex.printStackTrace();
             }
         }
@@ -99,26 +99,26 @@ public class NativeAdapter<T> implements TypeAdapter<ConfigurationSection, T> {
             ConfigType<?> type = ConfigType.get(field.getField());
             TypeAdapter<Object, Object> adapter = (TypeAdapter<Object, Object>) ConfigAPI.getAdapter(type);
             if (adapter == null) {
-                JishLib.getLogger().log(Level.WARNING, "No configuration adapter found for {0}", type.getType());
+                SpigotPlugin.logger().log(Level.WARNING, "No configuration adapter found for {0}", type.getType());
                 continue;
             }
 
             Object writeValue = ReflectionHelper.getField(field, value);
             if (writeValue == null) {
-                JishLib.getLogger().log(Level.WARNING, "null");
+                SpigotPlugin.logger().log(Level.WARNING, "null");
                 continue;
             }
 
             Class<Object> saved = adapter.getSavedType();
             Class<Object> runtime = adapter.getRuntimeType();
             if (!runtime.isInstance(writeValue)) {
-                JishLib.getLogger().log(Level.WARNING, "Wrong runtime type for {0}, {1} != {2}", new Object[] { path, writeValue.getClass(), runtime });
+                SpigotPlugin.logger().log(Level.WARNING, "Wrong runtime type for {0}, {1} != {2}", new Object[] { path, writeValue.getClass(), runtime });
                 continue;
             }
 
             Object existing = getSavedValue(section, path, saved);
             if (existing != null && !saved.isInstance(existing)) {
-                JishLib.getLogger().log(Level.WARNING, "Wrong saved type for {0}, {1} != {2}", new Object[] { path, existing.getClass(), saved });
+                SpigotPlugin.logger().log(Level.WARNING, "Wrong saved type for {0}, {1} != {2}", new Object[] { path, existing.getClass(), saved });
                 existing = null;
             }
 

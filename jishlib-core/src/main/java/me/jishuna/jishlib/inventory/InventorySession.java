@@ -3,7 +3,7 @@ package me.jishuna.jishlib.inventory;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import org.bukkit.entity.Player;
-import me.jishuna.jishlib.JishLib;
+import me.jishuna.jishlib.util.Tasks;
 
 public final class InventorySession {
     public enum State {
@@ -22,7 +22,7 @@ public final class InventorySession {
     }
 
     public void changeTo(CustomInventory<?> inventory, boolean recordHistory) {
-        JishLib.run(() -> {
+        Tasks.run(() -> {
             this.state = State.SWITCHING;
             open(inventory, recordHistory);
             this.state = State.NORMAL;
@@ -30,11 +30,11 @@ public final class InventorySession {
     }
 
     public void close() {
-        JishLib.run(this.player::closeInventory);
+        Tasks.run(this.player::closeInventory);
     }
 
     public void closeAndWait() {
-        JishLib.run(() -> {
+        Tasks.run(() -> {
             this.state = State.WAITING;
             this.player.closeInventory();
         });
@@ -42,6 +42,14 @@ public final class InventorySession {
 
     public CustomInventory<?> getActive() {
         return this.active;
+    }
+
+    public CustomInventory<?> getPrevious() {
+        if (!hasHistory()) {
+            return null;
+        }
+
+        return this.history.peekFirst();
     }
 
     public State getState() {

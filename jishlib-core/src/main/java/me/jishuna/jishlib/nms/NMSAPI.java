@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
-import me.jishuna.jishlib.JishLib;
+import me.jishuna.jishlib.SpigotPlugin;
 
 public class NMSAPI {
     private static final String PACKAGE = "me.jishuna.jishlib.nms.";
@@ -22,16 +22,15 @@ public class NMSAPI {
 
     public static void initialize() {
         Preconditions.checkArgument(adapter == null, "NMS already initialized!");
-        Preconditions.checkArgument(JishLib.isInitialized(), "JishLib must be initialized first!");
 
-        String version = getAdapterVersion(getServerVersion(), JishLib.getLogger());
+        String version = getAdapterVersion(getServerVersion(), SpigotPlugin.logger());
 
         try {
             adapter = (NMSAdapter) Class.forName(PACKAGE + version + ".NMSAdapterImpl").getDeclaredConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
-            JishLib.getLogger().log(Level.SEVERE, "Failed to load adapter! Please check for updates.");
+            SpigotPlugin.logger().log(Level.SEVERE, "Failed to load adapter! Please check for updates.");
             e.printStackTrace();
-            Bukkit.getPluginManager().disablePlugin(JishLib.getPlugin());
+            Bukkit.getPluginManager().disablePlugin(SpigotPlugin.getInstance());
         }
     }
 

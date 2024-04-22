@@ -1,4 +1,4 @@
-package me.jishuna.jishlib;
+package me.jishuna.jishlib.util;
 
 public final class PixelSizes {
     public static final float ONE_PIXEL = 1 / 16f;

@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import me.jishuna.jishlib.JishLib;
+import me.jishuna.jishlib.SpigotPlugin;
 import me.jishuna.jishlib.config.ConfigAPI;
 import me.jishuna.jishlib.config.ConfigField;
 import me.jishuna.jishlib.config.ConfigType;
@@ -53,32 +53,32 @@ public abstract class ConfigReloadable<T> {
             ConfigType<?> type = ConfigType.get(field.getField());
             TypeAdapter<Object, Object> adapter = (TypeAdapter<Object, Object>) ConfigAPI.getAdapter(type);
             if (adapter == null) {
-                JishLib.getLogger().log(Level.WARNING, "No configuration adapter found for {0}", type.getClass());
+                SpigotPlugin.logger().log(Level.WARNING, "No configuration adapter found for {0}", type.getClass());
                 continue;
             }
 
             Class<Object> saved = adapter.getSavedType();
             Object savedValue = config.get(path);
             if (savedValue == null) {
-                JishLib.getLogger().log(Level.WARNING, "No configuration entry found for {0}", path);
+                SpigotPlugin.logger().log(Level.WARNING, "No configuration entry found for {0}", path);
                 continue;
             }
 
             if (!saved.isInstance(savedValue)) {
-                JishLib.getLogger().log(Level.WARNING, "Wrong saved type for {0}, {1} != {2}", new Object[] { path, savedValue.getClass(), saved });
+                SpigotPlugin.logger().log(Level.WARNING, "Wrong saved type for {0}, {1} != {2}", new Object[] { path, savedValue.getClass(), saved });
                 continue;
             }
 
             Object readValue = adapter.read(saved.cast(savedValue));
             if (readValue == null) {
-                JishLib.getLogger().log(Level.WARNING, "Failed to read value for {0} of type {1}", new Object[] { path, type.getType() });
+                SpigotPlugin.logger().log(Level.WARNING, "Failed to read value for {0} of type {1}", new Object[] { path, type.getType() });
                 continue;
             }
 
             try {
                 setField(field, readValue);
             } catch (ReflectiveOperationException ex) {
-                JishLib.getLogger().log(Level.WARNING, "Failed to read value for {0} of type {1}", new Object[] { path, type.getType() });
+                SpigotPlugin.logger().log(Level.WARNING, "Failed to read value for {0} of type {1}", new Object[] { path, type.getType() });
                 ex.printStackTrace();
             }
         }
@@ -120,26 +120,26 @@ public abstract class ConfigReloadable<T> {
             ConfigType<?> type = ConfigType.get(field.getField());
             TypeAdapter<Object, Object> adapter = (TypeAdapter<Object, Object>) ConfigAPI.getAdapter(type);
             if (adapter == null) {
-                JishLib.getLogger().log(Level.WARNING, "No configuration adapter found for {0}", type.getType());
+                SpigotPlugin.logger().log(Level.WARNING, "No configuration adapter found for {0}", type.getType());
                 continue;
             }
 
             Object writeValue = getField(field);
             if (writeValue == null) {
-                JishLib.getLogger().log(Level.WARNING, "null");
+                SpigotPlugin.logger().log(Level.WARNING, "null");
                 continue;
             }
 
             Class<Object> saved = adapter.getSavedType();
             Class<Object> runtime = adapter.getRuntimeType();
             if (!runtime.isInstance(writeValue)) {
-                JishLib.getLogger().log(Level.WARNING, "Wrong runtime type for {0}, {1} != {2}", new Object[] { path, writeValue.getClass(), runtime });
+                SpigotPlugin.logger().log(Level.WARNING, "Wrong runtime type for {0}, {1} != {2}", new Object[] { path, writeValue.getClass(), runtime });
                 continue;
             }
 
             Object existing = config.get(path);
             if (existing != null && !saved.isInstance(existing)) {
-                JishLib.getLogger().log(Level.WARNING, "Wrong saved type for {0}, {1} != {2}", new Object[] { path, existing.getClass(), saved });
+                SpigotPlugin.logger().log(Level.WARNING, "Wrong saved type for {0}, {1} != {2}", new Object[] { path, existing.getClass(), saved });
                 existing = null;
             }
 
@@ -153,7 +153,7 @@ public abstract class ConfigReloadable<T> {
         try {
             config.save(this.file);
         } catch (IOException ex) {
-            JishLib.getLogger().log(Level.WARNING, "Failed to save configuration file {0}", this.file.getName());
+            SpigotPlugin.logger().log(Level.WARNING, "Failed to save configuration file {0}", this.file.getName());
             ex.printStackTrace();
         }
         return this;
@@ -168,7 +168,7 @@ public abstract class ConfigReloadable<T> {
     private boolean prepareFile() {
         try {
             if (!this.file.getParentFile().exists() && !this.file.getParentFile().mkdirs()) {
-                JishLib.getLogger().log(Level.WARNING, "Error creating file {0}", this.file.getName());
+                SpigotPlugin.logger().log(Level.WARNING, "Error creating file {0}", this.file.getName());
                 return false;
             }
 
@@ -178,7 +178,7 @@ public abstract class ConfigReloadable<T> {
 
             return true;
         } catch (IOException ex) {
-            JishLib.getLogger().log(Level.WARNING, "Error creating file {0}", this.file.getName());
+            SpigotPlugin.logger().log(Level.WARNING, "Error creating file {0}", this.file.getName());
             return false;
         }
     }

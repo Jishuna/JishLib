@@ -1,10 +1,7 @@
 package me.jishuna.jishlib.pdc;
 
-import java.util.function.BiFunction;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataAdapterContext;
-import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -37,10 +34,6 @@ public final class PDCUtils {
             return;
         }
         item.getItemMeta().getPersistentDataContainer().set(key, type, value);
-    }
-
-    public static <T extends PDCSerializable> PDCSerializableType<T> createType(Class<T> clazz, BiFunction<PersistentDataContainer, PersistentDataAdapterContext, T> creator) {
-        return new PDCSerializableType<>(clazz, creator);
     }
 
     private PDCUtils() {

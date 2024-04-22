@@ -1,37 +1,24 @@
-package me.jishuna.jishlib;
+package me.jishuna.jishlib.util;
 
 import java.util.Objects;
 
-/**
- * Represents a SemanticVersion <br>
- * See <a href=https://semver.org/>https://semver.org/</a>
- */
-public class SemanticVersion {
+public class SemanticVersion implements Comparable<SemanticVersion> {
 
     private final int major;
     private final int minor;
     private final int patch;
 
-    /**
-     * Create a new semantic version.
-     *
-     * @param major the major version
-     * @param minor the minor version
-     * @param patch the patch version
-     */
+    private final long packed;
+
     public SemanticVersion(int major, int minor, int patch) {
         this.major = major;
         this.minor = minor;
         this.patch = patch;
+
+        this.packed = packValues();
+        System.out.println(Long.toBinaryString(this.packed));
     }
 
-    /**
-     * Creates a SemanticVersion from the provided string.
-     *
-     * @param version the version string, must be in the format major.minor.patch
-     * @return a SemanticVersion for the provided string
-     * @throws IllegalArgumentException if the string is in an invalid format
-     */
     public static SemanticVersion fromString(String version) {
         version = version.replaceAll("[^\\d.]", "");
         String[] parts = version.split("\\.");
@@ -49,23 +36,17 @@ public class SemanticVersion {
         return semVersion;
     }
 
-    /**
-     * Checks if this SemanticVersion is newer than the provided version.
-     *
-     * @param other the version to compare with
-     * @return true if newer, false otherwise
-     */
     public boolean isNewerThan(SemanticVersion other) {
-        if (this.major != other.major) {
-            return this.major > other.major;
-        }
-        if (this.minor != other.minor) {
-            return this.minor > other.minor;
-        }
-        if (this.patch != other.patch) {
-            return this.patch > other.patch;
-        }
-        return false;
+        return this.packed > other.packed;
+    }
+
+    public boolean isNewerThanOrEqual(SemanticVersion other) {
+        return this.packed >= other.packed;
+    }
+
+    @Override
+    public int compareTo(SemanticVersion o) {
+        return Long.compare(this.packed, o.packed);
     }
 
     @Override
@@ -87,5 +68,9 @@ public class SemanticVersion {
     @Override
     public String toString() {
         return this.major + "." + this.minor + "." + this.patch;
+    }
+
+    private long packValues() {
+        return ((long) this.major << 42) | ((long) this.minor << 21) | (this.patch);
     }
 }

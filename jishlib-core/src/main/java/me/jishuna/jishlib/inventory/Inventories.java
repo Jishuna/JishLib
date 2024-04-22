@@ -5,31 +5,26 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import me.jishuna.jishlib.JishLib;
+import me.jishuna.jishlib.Feature;
+import me.jishuna.jishlib.SpigotPlugin;
 
-public class InventorySystem {
-    private static InventorySystem INSTANCE;
+public class Inventories implements Feature {
+    private static Inventories INSTANCE;
 
-    public static InventorySystem getInstance() {
+    public static Inventories getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new InventorySystem();
+            INSTANCE = new Inventories();
+            SpigotPlugin.getInstance().getActiveFeatures().add(INSTANCE);
         }
 
         return INSTANCE;
     }
 
-    public static void cleanup() {
-        if (INSTANCE != null) {
-            getInstance().closeAll();
-            INSTANCE = null;
-        }
-    }
-
     private final HashMap<UUID, InventorySession> inventoryMap = new HashMap<>();
 
-    public InventorySystem() {
+    public Inventories() {
         CustomInventoryListener listener = new CustomInventoryListener(this);
-        Bukkit.getPluginManager().registerEvents(listener, JishLib.getPlugin());
+        Bukkit.getPluginManager().registerEvents(listener, SpigotPlugin.getInstance());
     }
 
     public InventorySession getSession(HumanEntity entity) {
@@ -62,5 +57,11 @@ public class InventorySystem {
         }
 
         this.inventoryMap.clear();
+    }
+
+    @Override
+    public void cleanup() {
+        closeAll();
+        INSTANCE = null;
     }
 }

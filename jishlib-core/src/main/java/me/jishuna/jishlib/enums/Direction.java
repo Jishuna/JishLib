@@ -6,9 +6,8 @@ import org.bukkit.Axis;
 import org.bukkit.block.BlockFace;
 
 public enum Direction {
-    NONE(0, null, null), UP(2, BlockFace.UP, Axis.Y), DOWN(1, BlockFace.DOWN, Axis.Y), NORTH(4, BlockFace.NORTH, Axis.Z), SOUTH(3, BlockFace.SOUTH, Axis.Z), EAST(6, BlockFace.EAST, Axis.X), WEST(5, BlockFace.WEST, Axis.X);
+    NONE(null, null), UP(BlockFace.UP, Axis.Y), DOWN(BlockFace.DOWN, Axis.Y), NORTH(BlockFace.NORTH, Axis.Z), SOUTH(BlockFace.SOUTH, Axis.Z), EAST(BlockFace.EAST, Axis.X), WEST(BlockFace.WEST, Axis.X);
 
-    private final Direction[] opposites = new Direction[7];
     private static final Map<BlockFace, Direction> bukkitMap = new EnumMap<>(BlockFace.class);
 
     static {
@@ -19,12 +18,10 @@ public enum Direction {
         }
     }
 
-    private final int oppositeIndex;
     private final BlockFace blockFace;
     private final Axis axis;
 
-    private Direction(int oppositeIndex, BlockFace blockface, Axis axis) {
-        this.oppositeIndex = oppositeIndex;
+    private Direction(BlockFace blockface, Axis axis) {
         this.blockFace = blockface;
         this.axis = axis;
     }
@@ -50,13 +47,15 @@ public enum Direction {
     }
 
     public Direction getOpposite() {
-        Direction direction = this.opposites[ordinal()];
-        if (direction == null) {
-            direction = Direction.values()[this.oppositeIndex];
-            this.opposites[ordinal()] = direction;
-        }
-
-        return direction;
+        return switch (this) {
+        case UP -> DOWN;
+        case DOWN -> UP;
+        case NORTH -> SOUTH;
+        case SOUTH -> NORTH;
+        case EAST -> WEST;
+        case WEST -> EAST;
+        default -> this;
+        };
     }
 
     public Direction rotateClockwise(Axis axis) {

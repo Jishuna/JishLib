@@ -12,9 +12,9 @@ import me.jishuna.jishlib.inventory.InventorySession.State;
 
 public class CustomInventoryListener implements Listener {
 
-    private final InventorySystem system;
+    private final Inventories system;
 
-    public CustomInventoryListener(InventorySystem system) {
+    public CustomInventoryListener(Inventories system) {
         this.system = system;
     }
 

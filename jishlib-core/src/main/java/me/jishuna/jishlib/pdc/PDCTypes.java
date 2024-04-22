@@ -2,8 +2,8 @@ package me.jishuna.jishlib.pdc;
 
 import java.util.UUID;
 import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.util.Vector;
 
 public class PDCTypes {
     public static final PersistentDataType<Byte, Byte> BYTE = PersistentDataType.BYTE;
@@ -24,7 +24,11 @@ public class PDCTypes {
 
     public static final PersistentDataType<long[], UUID> UUID = new UUIDType();
     public static final PersistentDataType<String, NamespacedKey> NAMESPACE = new NamespacedKeyType();
-    public static final PersistentDataType<Integer, Vector> VECTOR = new VectorType();
+    public static final PersistentDataType<byte[], ItemStack> ITEM_STACK = new ItemStackType();
+
+    public static <P, C> ListType<P, C> list(PersistentDataType<P, C> type) {
+        return new ListType<>(type);
+    }
 
     private PDCTypes() {
     }
