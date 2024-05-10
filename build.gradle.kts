@@ -1,5 +1,5 @@
 plugins {
-    id("java-library")
+    id("java")
     id("maven-publish")
 	id("io.github.goooler.shadow") version "8.1.7"
 }
@@ -10,6 +10,7 @@ tasks.withType<JavaCompile> {
 
 dependencies {
 	implementation(project(":core"))
+	implementation(project(path = ":nms", configuration = "shadow"))	
 }
 
 tasks.shadowJar {

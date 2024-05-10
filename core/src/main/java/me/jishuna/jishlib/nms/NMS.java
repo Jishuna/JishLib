@@ -13,8 +13,8 @@ public class NMS {
     private static NMSAdapter ADAPTER;
 
     static {
-        ADAPTER_MAP.put(MinecraftVersion.MC1_20_6, "v1_20_3");
-        ADAPTER_MAP.put(MinecraftVersion.MC1_20_5, "v1_20_3");
+        ADAPTER_MAP.put(MinecraftVersion.MC1_20_6, "v1_20_R4");
+        ADAPTER_MAP.put(MinecraftVersion.MC1_20_5, "v1_20_R4");
     }
 
     public static boolean isAvailable() {

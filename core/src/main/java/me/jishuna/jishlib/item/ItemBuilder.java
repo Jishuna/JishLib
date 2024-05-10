@@ -12,9 +12,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemRarity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ArmorMeta;
 import org.bukkit.inventory.meta.ColorableArmorMeta;
@@ -118,10 +119,8 @@ public class ItemBuilder implements ItemSupplier {
         return this;
     }
 
-    public ItemBuilder rarity(ItemRarity rarity) {
-        if (ITEM_COMPONENTS) {
-            this.meta.setRarity(rarity);
-        }
+    public ItemBuilder attribute(Attribute attribute, AttributeModifier modifier) {
+        this.meta.addAttributeModifier(attribute, modifier);
         return this;
     }
 

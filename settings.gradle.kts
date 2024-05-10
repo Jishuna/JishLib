@@ -15,3 +15,6 @@ dependencyResolutionManagement {
 }
 
 include("core")
+include("nms")
+include("nms:v1_20_R4")
+findProject(":nms:v1_20_R4")?.name = "v1_20_R4"
