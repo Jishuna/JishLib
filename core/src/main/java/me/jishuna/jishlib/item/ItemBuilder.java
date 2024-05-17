@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -30,6 +31,9 @@ import org.bukkit.inventory.meta.trim.TrimPattern;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.profile.PlayerProfile;
+import me.jishuna.jishlib.Constants;
+import me.jishuna.jishlib.nms.NMS;
+import me.jishuna.jishlib.util.Components;
 import me.jishuna.jishlib.util.EffectBuilder;
 import me.jishuna.jishlib.util.Utils;
 
@@ -87,6 +91,11 @@ public class ItemBuilder implements ItemSupplier {
         return this;
     }
 
+    public ItemBuilder name(Component component) {
+        Components.setItemName(this.meta, component);
+        return this;
+    }
+
     public List<String> lore() {
         return this.meta.hasLore() ? this.meta.getLore() : new ArrayList<>();
     }
@@ -104,6 +113,19 @@ public class ItemBuilder implements ItemSupplier {
         Collections.addAll(itemLore, lore);
 
         this.meta.setLore(itemLore);
+        return this;
+    }
+
+    public ItemBuilder lore(Component... lore) {
+        if (NMS.isInitialized()) {
+            NMS.get().addItemLoreComponents(this.meta, lore);
+        } else {
+            List<String> itemLore = lore();
+            for (Component component : lore) {
+                itemLore.add(Constants.LEGACY_SERIALIZER.serialize(component));
+            }
+            this.meta.setLore(itemLore);
+        }
         return this;
     }
 

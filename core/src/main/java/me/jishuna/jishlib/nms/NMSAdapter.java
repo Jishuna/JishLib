@@ -1,11 +1,17 @@
 package me.jishuna.jishlib.nms;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
-import org.bukkit.entity.EntityType;
-import me.jishuna.jishlib.nms.entity.CustomEntity;
+import org.bukkit.Particle;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public interface NMSAdapter {
+    public <T> void spawnParticle(Player player, Particle particle, Location location, int count, double offsetX, double offsetY, double offsetZ, double extra, boolean force, T data);
 
-    public CustomEntity spawnCustomEntity(Location location, EntityType type);
+    public <T> void spawnParticle(Player player, Particle particle, double x, double y, double z, int count, double offsetX, double offsetY, double offsetZ, double extra, boolean force, T data);
 
+    public void setItemNameComponent(ItemMeta meta, Component component);
+
+    public void addItemLoreComponents(ItemMeta meta, Component... lore);
 }

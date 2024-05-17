@@ -13,6 +13,24 @@ public final class ReflectionHelper {
         }
     }
 
+    public static Class<?> getClass(String name) {
+        try {
+            return Class.forName(name);
+        } catch (ReflectiveOperationException e) {
+            return null;
+        }
+    }
+
+    public static Field getField(Class<?> clazz, String name) {
+        try {
+            Field field = clazz.getDeclaredField(name);
+            field.setAccessible(true);
+            return field;
+        } catch (ReflectiveOperationException e) {
+            return null;
+        }
+    }
+
     public static Field getField(Class<?> clazz, Class<?> type, int index) {
         int i = 0;
         for (Field field : clazz.getDeclaredFields()) {

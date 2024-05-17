@@ -26,6 +26,10 @@ public class NMS {
         return ReflectionHelper.hasClass(PACKAGE + adapterVersion + ".NMSAdapterImpl");
     }
 
+    public static boolean isInitialized() {
+        return ADAPTER != null;
+    }
+
     public static boolean initialize() {
         if (ADAPTER != null) {
             throw new IllegalStateException("NMS already initialized");

@@ -21,7 +21,7 @@ public class Utils {
     }
 
     public static PlayerProfile createProfile(String url) {
-        PlayerProfile profile = Bukkit.createPlayerProfile(UUID.nameUUIDFromBytes(url.getBytes()), "Custom");
+        PlayerProfile profile = Bukkit.createPlayerProfile(UUID.nameUUIDFromBytes(url.getBytes()), "custom");
         PlayerTextures textures = profile.getTextures();
         try {
             textures.setSkin(new URI(TEXTURE_URL + url).toURL());
@@ -31,6 +31,12 @@ public class Utils {
 
         profile.setTextures(textures);
         return profile;
+    }
+
+    public static void validate(boolean expression, String message) throws ValidationException {
+        if (!expression) {
+            throw new ValidationException(message);
+        }
     }
 
     private Utils() {
