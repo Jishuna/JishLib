@@ -6,10 +6,10 @@ import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.server.level.ServerPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.craftbukkit.CraftParticle;
-import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.entity.Player;
@@ -20,7 +20,7 @@ import me.jishuna.jishlib.nms.NMSAdapter;
 import me.jishuna.jishlib.util.ReflectionHelper;
 
 public class NMSAdapterImpl implements NMSAdapter {
-    public static final String CRAFTBUKKIT_PACKAGE = CraftServer.class.getPackageName();
+    public static final String CRAFTBUKKIT_PACKAGE = Bukkit.getServer().getClass().getPackageName();
 
     private static final Field DISPLAY_NAME_FIELD;
     private static final Field LORE_FIELD;
