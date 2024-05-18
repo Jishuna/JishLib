@@ -11,7 +11,6 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.craftbukkit.CraftParticle;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
-import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.ItemMeta;
 import me.jishuna.jishlib.Constants;
@@ -46,13 +45,11 @@ public class NMSAdapterImpl implements NMSAdapter {
 
     @Override
     public void setItemNameComponent(ItemMeta meta, Component component) {
-        net.minecraft.network.chat.Component nmsComponent = CraftChatMessage.fromJSONOrNull(Constants.GSON_SERIALIZER.serialize(component));
-        if (nmsComponent != null) {
-            try {
-                DISPLAY_NAME_FIELD.set(meta, nmsComponent);
-            } catch (Exception e) {
-                Logger.error("An unexpected error occured while modifying item name: {0}", e);
-            }
+        Object nmsComponent = Constants.MOJANG_SERIALIZER.serialize(component);
+        try {
+            DISPLAY_NAME_FIELD.set(meta, nmsComponent);
+        } catch (Exception e) {
+            Logger.error("An unexpected error occured while modifying item name: {0}", e);
         }
     }
 
@@ -66,7 +63,7 @@ public class NMSAdapterImpl implements NMSAdapter {
             }
 
             for (Component component : lore) {
-                net.minecraft.network.chat.Component nmsComponent = CraftChatMessage.fromJSONOrNull(Constants.GSON_SERIALIZER.serialize(component));
+                net.minecraft.network.chat.Component nmsComponent = (net.minecraft.network.chat.Component) Constants.MOJANG_SERIALIZER.serialize(component);
                 if (nmsComponent != null) {
                     nmsLore.add(nmsComponent);
                 }

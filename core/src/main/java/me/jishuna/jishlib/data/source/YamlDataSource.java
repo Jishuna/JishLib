@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.YamlConfiguration;
 import me.jishuna.jishlib.data.object.BooleanDataObject;
 import me.jishuna.jishlib.data.object.DataObject;
 import me.jishuna.jishlib.data.object.ListDataObject;
@@ -16,39 +15,43 @@ import me.jishuna.jishlib.data.object.StringDataObject;
 
 public class YamlDataSource {
 
-    public static MapDataObject parse(YamlConfiguration configuration) {
-        return parseMap(configuration.getValues(false));
+    public static MapDataObject read(ConfigurationSection configuration) {
+        return readMap(configuration.getValues(false));
     }
 
-    private static MapDataObject parseMap(Map<?, ?> map) {
+    public static void write(MapDataObject data, ConfigurationSection configuration) {
+        data.forEach((k, v) -> configuration.set(k, v.asObject()));
+    }
+
+    private static MapDataObject readMap(Map<?, ?> map) {
         Map<String, DataObject<?>> dataMap = new LinkedHashMap<>();
         map.forEach((k, v) -> {
-            dataMap.put(String.valueOf(k), parseValue(v));
+            dataMap.put(String.valueOf(k), readValue(v));
         });
 
         return MapDataObject.of(dataMap);
     }
 
-    private static ListDataObject parseList(Collection<?> list) {
+    private static ListDataObject readList(Collection<?> list) {
         List<DataObject<?>> dataList = new ArrayList<>();
         for (Object obj : list) {
-            dataList.add(parseValue(obj));
+            dataList.add(readValue(obj));
         }
 
         return ListDataObject.of(dataList);
     }
 
-    private static DataObject<?> parseValue(Object value) {
+    private static DataObject<?> readValue(Object value) {
         if (Map.class.isInstance(value)) {
-            return parseMap((Map<?, ?>) value);
+            return readMap((Map<?, ?>) value);
         }
 
         if (ConfigurationSection.class.isInstance(value)) {
-            return parseMap(((ConfigurationSection) value).getValues(false));
+            return readMap(((ConfigurationSection) value).getValues(false));
         }
 
         if (Collection.class.isInstance(value)) {
-            return parseList((Collection<?>) value);
+            return readList((Collection<?>) value);
         }
 
         if (Boolean.class.isInstance(value)) {

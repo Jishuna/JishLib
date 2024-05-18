@@ -10,7 +10,7 @@ public final class Capabilities {
     public static final boolean MULTIPLE_RESOURCE_PACKS = MinecraftVersion.CURRENT_VERSION.newerThanOrEqual(MinecraftVersion.MC1_20_3);
     public static final boolean ITEM_COMPONENTS = MinecraftVersion.CURRENT_VERSION.newerThanOrEqual(MinecraftVersion.MC1_20_5);
     public static final boolean NEW_ATTRIBUTES = MinecraftVersion.CURRENT_VERSION.newerThanOrEqual(MinecraftVersion.MC1_20_5);
-    public static final boolean NMS = me.jishuna.jishlib.nms.NMS.isAvailable();
+    public static final boolean NMS = me.jishuna.jishlib.nms.NMS.initialize();
     public static final boolean PAPER = ReflectionHelper.hasClass("com.destroystokyo.paper.PaperConfig") || ReflectionHelper.hasClass("io.papermc.paper.configuration.Configuration");
 
     public static List<String> getStatus() {
@@ -27,6 +27,10 @@ public final class Capabilities {
         }
 
         return status;
+    }
+
+    public static void init() {
+        // Force the class to load
     }
 
     private Capabilities() {

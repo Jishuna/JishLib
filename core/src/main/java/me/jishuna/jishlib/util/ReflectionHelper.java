@@ -45,6 +45,25 @@ public final class ReflectionHelper {
         return null;
     }
 
+    public static Object getField(Field field, Object instance) {
+        try {
+            field.setAccessible(true);
+            return field.get(instance);
+        } catch (ReflectiveOperationException e) {
+            return null;
+        }
+    }
+
+    public static boolean setField(Field field, Object value, Object instance) {
+        try {
+            field.setAccessible(true);
+            field.set(instance, value);
+            return true;
+        } catch (ReflectiveOperationException e) {
+            return false;
+        }
+    }
+
     private ReflectionHelper() {
     }
 }

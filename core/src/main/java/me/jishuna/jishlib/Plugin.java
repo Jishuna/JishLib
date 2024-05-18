@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventPriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import me.jishuna.jishlib.event.EventBus;
+import me.jishuna.jishlib.util.Capabilities;
 
 public class Plugin extends JavaPlugin {
     private static Plugin INSTANCE;
@@ -24,6 +25,7 @@ public class Plugin extends JavaPlugin {
     @Override
     public void onEnable() {
         INSTANCE = this;
+        Capabilities.init();
     }
 
     @Override

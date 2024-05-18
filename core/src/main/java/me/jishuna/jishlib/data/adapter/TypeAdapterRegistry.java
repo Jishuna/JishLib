@@ -1,7 +1,9 @@
 package me.jishuna.jishlib.data.adapter;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import me.jishuna.jishlib.data.DataType;
 import me.jishuna.jishlib.data.object.DataObject;
@@ -45,6 +47,10 @@ public class TypeAdapterRegistry {
             return new MapAdapter<>(type);
         }
 
+        if (Collection.class.isAssignableFrom(type.getType())) {
+            return new CollectionAdapter<>(type);
+        }
+
         return null;
     }
 
@@ -80,6 +86,7 @@ public class TypeAdapterRegistry {
         registerTypeAdapter(String.class, new StringAdapter());
 
         registerTypeAdapter(Material.class, new MaterialAdapter());
+        registerTypeAdapter(Component.class, new ComponentAdapter());
     }
 
     private <T> void registerTypeAdapter(Class<T> clazz, TypeAdapter<?, ?> adapter) {

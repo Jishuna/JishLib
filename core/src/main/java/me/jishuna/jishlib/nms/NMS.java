@@ -3,7 +3,6 @@ package me.jishuna.jishlib.nms;
 import java.util.HashMap;
 import java.util.Map;
 import me.jishuna.jishlib.util.MinecraftVersion;
-import me.jishuna.jishlib.util.ReflectionHelper;
 import me.jishuna.jishlib.util.SemanticVersion;
 
 public class NMS {
@@ -15,15 +14,6 @@ public class NMS {
     static {
         ADAPTER_MAP.put(MinecraftVersion.MC1_20_6, "v1_20_R4");
         ADAPTER_MAP.put(MinecraftVersion.MC1_20_5, "v1_20_R4");
-    }
-
-    public static boolean isAvailable() {
-        String adapterVersion = ADAPTER_MAP.get(MinecraftVersion.CURRENT_VERSION);
-        if (adapterVersion == null) {
-            return false;
-        }
-
-        return ReflectionHelper.hasClass(PACKAGE + adapterVersion + ".NMSAdapterImpl");
     }
 
     public static boolean isInitialized() {
