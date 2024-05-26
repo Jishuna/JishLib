@@ -1,13 +1,22 @@
 package me.jishuna.jishlib.data.adapter;
 
+import static me.jishuna.jishlib.data.adapter.TypeAdapters.COMPONENT;
+import static me.jishuna.jishlib.data.adapter.TypeAdapters.DOUBLE;
+import static me.jishuna.jishlib.data.adapter.TypeAdapters.FLOAT;
+import static me.jishuna.jishlib.data.adapter.TypeAdapters.INT;
+import static me.jishuna.jishlib.data.adapter.TypeAdapters.ITEM_STACK;
+import static me.jishuna.jishlib.data.adapter.TypeAdapters.LONG;
+import static me.jishuna.jishlib.data.adapter.TypeAdapters.MATERIAL;
+import static me.jishuna.jishlib.data.adapter.TypeAdapters.NAMESPACE;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemStack;
 import me.jishuna.jishlib.data.DataType;
 import me.jishuna.jishlib.data.object.DataObject;
-import me.jishuna.jishlib.data.object.NumericDataObject;
 
 public class TypeAdapterRegistry {
     private static TypeAdapterRegistry INSTANCE;
@@ -65,17 +74,17 @@ public class TypeAdapterRegistry {
     private final Map<DataType<?>, TypeAdapter<?, ?>> adapters = new HashMap<>();
 
     private TypeAdapterRegistry() {
-        registerTypeAdapter(int.class, new NumericAdapter<>(NumericDataObject::asInt));
-        registerTypeAdapter(Integer.class, new NumericAdapter<>(NumericDataObject::asInt));
+        registerTypeAdapter(int.class, INT);
+        registerTypeAdapter(Integer.class, INT);
 
-        registerTypeAdapter(long.class, new NumericAdapter<>(NumericDataObject::asLong));
-        registerTypeAdapter(Long.class, new NumericAdapter<>(NumericDataObject::asLong));
+        registerTypeAdapter(long.class, LONG);
+        registerTypeAdapter(Long.class, LONG);
 
-        registerTypeAdapter(float.class, new NumericAdapter<>(NumericDataObject::asFloat));
-        registerTypeAdapter(Float.class, new NumericAdapter<>(NumericDataObject::asFloat));
+        registerTypeAdapter(float.class, FLOAT);
+        registerTypeAdapter(Float.class, FLOAT);
 
-        registerTypeAdapter(double.class, new NumericAdapter<>(NumericDataObject::asDouble));
-        registerTypeAdapter(Double.class, new NumericAdapter<>(NumericDataObject::asDouble));
+        registerTypeAdapter(double.class, DOUBLE);
+        registerTypeAdapter(Double.class, DOUBLE);
 
         registerTypeAdapter(boolean.class, new BooleanAdapter());
         registerTypeAdapter(Boolean.class, new BooleanAdapter());
@@ -85,8 +94,11 @@ public class TypeAdapterRegistry {
 
         registerTypeAdapter(String.class, new StringAdapter());
 
-        registerTypeAdapter(Material.class, new MaterialAdapter());
-        registerTypeAdapter(Component.class, new ComponentAdapter());
+        registerTypeAdapter(Material.class, MATERIAL);
+        registerTypeAdapter(NamespacedKey.class, NAMESPACE);
+        registerTypeAdapter(Component.class, COMPONENT);
+
+        registerTypeAdapter(ItemStack.class, ITEM_STACK);
     }
 
     private <T> void registerTypeAdapter(Class<T> clazz, TypeAdapter<?, ?> adapter) {

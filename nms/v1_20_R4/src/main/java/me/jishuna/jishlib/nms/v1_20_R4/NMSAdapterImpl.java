@@ -6,7 +6,6 @@ import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.server.level.ServerPlayer;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.craftbukkit.CraftParticle;
@@ -19,15 +18,13 @@ import me.jishuna.jishlib.nms.NMSAdapter;
 import me.jishuna.jishlib.util.ReflectionHelper;
 
 public class NMSAdapterImpl implements NMSAdapter {
-    public static final String CRAFTBUKKIT_PACKAGE = Bukkit.getServer().getClass().getPackageName();
-
     private static final Field DISPLAY_NAME_FIELD;
     private static final Field LORE_FIELD;
 
     static {
-        Class<?> craftMetaItemClass = ReflectionHelper.getClass(CRAFTBUKKIT_PACKAGE + ".inventory.CraftMetaItem");
-        DISPLAY_NAME_FIELD = ReflectionHelper.getField(craftMetaItemClass, "displayName");
-        LORE_FIELD = ReflectionHelper.getField(craftMetaItemClass, "lore");
+        Class<?> craftMetaItemClass = ReflectionHelper.getCraftClass(".inventory.CraftMetaItem");
+        DISPLAY_NAME_FIELD = ReflectionHelper.getNamedField(craftMetaItemClass, "displayName");
+        LORE_FIELD = ReflectionHelper.getNamedField(craftMetaItemClass, "lore");
     }
 
     @Override

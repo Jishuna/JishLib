@@ -11,5 +11,4 @@ public class CharacterAdapter implements TypeAdapterString<Character> {
     public String toString(Character value) {
         return Character.toString(value);
     }
-
 }

@@ -1,0 +1,36 @@
+package me.jishuna.jishlib;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
+import me.jishuna.jishlib.util.Capabilities;
+import me.jishuna.jishlib.util.MinecraftVersion;
+
+public class Debug {
+
+    public static void writeDebugLog(File file) {
+        List<String> lines = new ArrayList<>();
+        lines.add("%s: %s".formatted("Version", MinecraftVersion.CURRENT_VERSION));
+        lines.add("%s: %s version %s (Implementing API version %s)".formatted("Software Version", Bukkit.getName(), Bukkit.getVersion(), Bukkit.getBukkitVersion()));
+        lines.add("%s: %s".formatted("Online Players", Bukkit.getOnlinePlayers().size()));
+        lines.add("");
+        lines.add("%s: %s".formatted("NMS", Capabilities.NMS));
+        lines.add("");
+        lines.add("Plugins:");
+
+        for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+            lines.add(" - %s v%s".formatted(plugin.getName(), plugin.getDescription().getVersion()));
+        }
+
+        try {
+            Logger.info("Writing debug log to {0}", file.getPath());
+            Files.write(file.toPath(), lines);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}

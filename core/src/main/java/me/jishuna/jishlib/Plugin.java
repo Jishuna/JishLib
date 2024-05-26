@@ -23,13 +23,18 @@ public class Plugin extends JavaPlugin {
     private EventBus eventBus;
 
     @Override
-    public void onEnable() {
+    public final void onEnable() {
         INSTANCE = this;
         Capabilities.init();
+
+        onEnable(false);
+    }
+
+    protected void onEnable(boolean reload) {
     }
 
     @Override
-    public void onDisable() {
+    public final void onDisable() {
         this.activeFeatures.forEach(Feature::cleanup);
         this.activeFeatures.clear();
 
@@ -38,6 +43,10 @@ public class Plugin extends JavaPlugin {
         }
 
         INSTANCE = null;
+        onDisable(false);
+    }
+
+    protected void onDisable(boolean reload) {
     }
 
     public void run(Runnable task) {

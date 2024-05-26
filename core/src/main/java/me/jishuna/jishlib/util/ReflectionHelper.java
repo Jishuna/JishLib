@@ -1,17 +1,10 @@
 package me.jishuna.jishlib.util;
 
 import java.lang.reflect.Field;
+import org.bukkit.Bukkit;
 
 public final class ReflectionHelper {
-
-    public static boolean hasClass(String className) {
-        try {
-            Class.forName(className);
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-    }
+    public static final String CRAFTBUKKIT_PACKAGE = Bukkit.getServer().getClass().getPackageName();
 
     public static Class<?> getClass(String name) {
         try {
@@ -21,7 +14,15 @@ public final class ReflectionHelper {
         }
     }
 
-    public static Field getField(Class<?> clazz, String name) {
+    public static Class<?> getCraftClass(String name) {
+        try {
+            return Class.forName(CRAFTBUKKIT_PACKAGE + name);
+        } catch (ReflectiveOperationException e) {
+            return null;
+        }
+    }
+
+    public static Field getNamedField(Class<?> clazz, String name) {
         try {
             Field field = clazz.getDeclaredField(name);
             field.setAccessible(true);
@@ -45,7 +46,7 @@ public final class ReflectionHelper {
         return null;
     }
 
-    public static Object getField(Field field, Object instance) {
+    public static Object readField(Field field, Object instance) {
         try {
             field.setAccessible(true);
             return field.get(instance);

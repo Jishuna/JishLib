@@ -71,14 +71,18 @@ public class MapDataObject extends DataObject<Map<String, DataObject<?>>> {
         return null;
     }
 
+    public PrimitiveDataObject getPrimitive(String key) {
+        return get(key, PrimitiveDataObject.class);
+    }
+
     public void forEach(BiConsumer<String, DataObject<?>> consumer) {
         this.value.forEach(consumer);
     }
 
     @Override
-    public Object asObject() {
+    public Object serialize() {
         Map<String, Object> map = new HashMap<>();
-        this.value.forEach((k, v) -> map.put(k, v.asObject()));
+        this.value.forEach((k, v) -> map.put(k, v.serialize()));
 
         return map;
     }

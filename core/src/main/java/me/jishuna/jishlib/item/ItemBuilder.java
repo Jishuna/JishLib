@@ -54,6 +54,10 @@ public class ItemBuilder implements ItemSupplier {
         return new ItemBuilder(new ItemStack(material, amount));
     }
 
+    public static ItemBuilder of(ItemStack item) {
+        return new ItemBuilder(item);
+    }
+
     public <T extends ItemMeta> ItemBuilder modify(Class<T> metaType, Consumer<T> action) {
         if (!metaType.isAssignableFrom(this.meta.getClass())) {
             return this;

@@ -1,9 +1,9 @@
 package me.jishuna.jishlib.config;
 
+import static me.jishuna.jishlib.data.source.DataSources.YAML;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -13,16 +13,15 @@ import me.jishuna.jishlib.data.adapter.TypeAdapter;
 import me.jishuna.jishlib.data.adapter.TypeAdapterRegistry;
 import me.jishuna.jishlib.data.object.DataObject;
 import me.jishuna.jishlib.data.object.MapDataObject;
-import me.jishuna.jishlib.data.source.YamlDataSource;
 
 public abstract class ReloadableDataHolder<T> {
     protected final File file;
     protected final List<ConfigField> fields = new ArrayList<>();
-    private final Method postLoadMethod;
+    // private final Method postLoadMethod;
 
     protected ReloadableDataHolder(File file, Class<T> clazz) {
         this.file = file;
-        this.postLoadMethod = findPostLoadMethod(clazz);
+        // this.postLoadMethod = findPostLoadMethod(clazz);
 
         cacheFields(clazz);
     }
@@ -40,7 +39,7 @@ public abstract class ReloadableDataHolder<T> {
         }
 
         YamlConfiguration configuration = YamlConfiguration.loadConfiguration(this.file);
-        MapDataObject data = YamlDataSource.read(configuration);
+        MapDataObject data = YAML.read(configuration);
 
         for (ConfigField field : this.fields) {
             if (field.isStatic() && !includeStatic) {
@@ -87,7 +86,7 @@ public abstract class ReloadableDataHolder<T> {
         }
 
         YamlConfiguration configuration = YamlConfiguration.loadConfiguration(this.file);
-        MapDataObject data = YamlDataSource.read(configuration);
+        MapDataObject data = YAML.read(configuration);
 
         for (ConfigField field : this.fields) {
             String path = field.getPath();
@@ -116,10 +115,10 @@ public abstract class ReloadableDataHolder<T> {
         }
 
         try {
-            YamlDataSource.write(data, configuration);
+            YAML.write(data, configuration);
             configuration.save(this.file);
         } catch (IOException ex) {
-            Logger.error("Failed to save file {0}: {1}", this.file.getPath());
+            Logger.error("Failed to save file {0}: {1}", this.file.getPath(), ex);
         }
         return this;
     }
@@ -163,18 +162,14 @@ public abstract class ReloadableDataHolder<T> {
         }
     }
 
-    private Method findPostLoadMethod(Class<? super T> clazz) {
-        for (Method method : clazz.getDeclaredMethods()) {
-            if (method.isAnnotationPresent(PostLoad.class)) {
-                return method;
-            }
-        }
-
-        Class<? super T> superClass = clazz.getSuperclass();
-        if (superClass != null && superClass != Object.class) {
-            return findPostLoadMethod(superClass);
-        }
-
-        return null;
-    }
+    /*
+     * private Method findPostLoadMethod(Class<? super T> clazz) { for (Method
+     * method : clazz.getDeclaredMethods()) { if
+     * (method.isAnnotationPresent(PostLoad.class)) { return method; } }
+     *
+     * Class<? super T> superClass = clazz.getSuperclass(); if (superClass != null
+     * && superClass != Object.class) { return findPostLoadMethod(superClass); }
+     *
+     * return null; }
+     */
 }

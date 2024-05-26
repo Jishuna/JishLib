@@ -16,6 +16,6 @@ public class ReloadableStaticDataHolder<T> extends ReloadableDataHolder<T> {
 
     @Override
     protected Object getField(ConfigField field) {
-        return ReflectionHelper.getField(field.getField(), null);
+        return ReflectionHelper.readField(field.getField(), null);
     }
 }

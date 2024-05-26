@@ -1,22 +1,22 @@
 package me.jishuna.jishlib.data.adapter;
 
-import me.jishuna.jishlib.data.object.StringDataObject;
+import me.jishuna.jishlib.data.object.PrimitiveDataObject;
 
-public interface TypeAdapterString<R> extends TypeAdapter<StringDataObject, R> {
+public interface TypeAdapterString<R> extends TypeAdapter<PrimitiveDataObject, R> {
 
     @Override
-    default Class<StringDataObject> getObjectType() {
-        return StringDataObject.class;
+    default Class<PrimitiveDataObject> getObjectType() {
+        return PrimitiveDataObject.class;
     }
 
     @Override
-    default R deserialize(StringDataObject data) {
-        return fromString(data.get());
+    default R deserialize(PrimitiveDataObject data) {
+        return fromString(data.asString());
     }
 
     @Override
-    default StringDataObject serialize(R value) {
-        return StringDataObject.of(toString(value));
+    default PrimitiveDataObject serialize(R value) {
+        return PrimitiveDataObject.of(toString(value));
     }
 
     public R fromString(String value);

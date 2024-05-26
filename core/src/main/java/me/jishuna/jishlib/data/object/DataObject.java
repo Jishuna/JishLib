@@ -11,7 +11,7 @@ public abstract class DataObject<T> {
         return this.value;
     }
 
-    public Object asObject() {
+    public Object serialize() {
         return this.value;
     }
 

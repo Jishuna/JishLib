@@ -20,6 +20,6 @@ public class ReloadableInstanceDataHolder<T> extends ReloadableDataHolder<T> {
 
     @Override
     protected Object getField(ConfigField field) {
-        return ReflectionHelper.getField(field.getField(), this.wrapped);
+        return ReflectionHelper.readField(field.getField(), this.wrapped);
     }
 }

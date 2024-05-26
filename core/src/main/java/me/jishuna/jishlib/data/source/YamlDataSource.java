@@ -1,29 +1,39 @@
 package me.jishuna.jishlib.data.source;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.bukkit.configuration.ConfigurationSection;
-import me.jishuna.jishlib.data.object.BooleanDataObject;
+import org.bukkit.configuration.file.YamlConfiguration;
 import me.jishuna.jishlib.data.object.DataObject;
 import me.jishuna.jishlib.data.object.ListDataObject;
 import me.jishuna.jishlib.data.object.MapDataObject;
-import me.jishuna.jishlib.data.object.NumericDataObject;
-import me.jishuna.jishlib.data.object.StringDataObject;
+import me.jishuna.jishlib.data.object.PrimitiveDataObject;
 
-public class YamlDataSource {
+public class YamlDataSource implements DataSource {
 
-    public static MapDataObject read(ConfigurationSection configuration) {
+    @Override
+    public MapDataObject read(File file) {
+        return read(YamlConfiguration.loadConfiguration(file));
+    }
+
+    @Override
+    public void write(MapDataObject data, File file) {
+        write(data, YamlConfiguration.loadConfiguration(file));
+    }
+
+    public MapDataObject read(ConfigurationSection configuration) {
         return readMap(configuration.getValues(false));
     }
 
-    public static void write(MapDataObject data, ConfigurationSection configuration) {
-        data.forEach((k, v) -> configuration.set(k, v.asObject()));
+    public void write(MapDataObject data, ConfigurationSection configuration) {
+        data.forEach((k, v) -> configuration.set(k, v.serialize()));
     }
 
-    private static MapDataObject readMap(Map<?, ?> map) {
+    private MapDataObject readMap(Map<?, ?> map) {
         Map<String, DataObject<?>> dataMap = new LinkedHashMap<>();
         map.forEach((k, v) -> {
             dataMap.put(String.valueOf(k), readValue(v));
@@ -32,7 +42,7 @@ public class YamlDataSource {
         return MapDataObject.of(dataMap);
     }
 
-    private static ListDataObject readList(Collection<?> list) {
+    private ListDataObject readList(Collection<?> list) {
         List<DataObject<?>> dataList = new ArrayList<>();
         for (Object obj : list) {
             dataList.add(readValue(obj));
@@ -41,7 +51,7 @@ public class YamlDataSource {
         return ListDataObject.of(dataList);
     }
 
-    private static DataObject<?> readValue(Object value) {
+    private DataObject<?> readValue(Object value) {
         if (Map.class.isInstance(value)) {
             return readMap((Map<?, ?>) value);
         }
@@ -55,13 +65,13 @@ public class YamlDataSource {
         }
 
         if (Boolean.class.isInstance(value)) {
-            return BooleanDataObject.of((boolean) value);
+            return PrimitiveDataObject.of((boolean) value);
         }
 
         if (Number.class.isInstance(value)) {
-            return NumericDataObject.of((Number) value);
+            return PrimitiveDataObject.of((Number) value);
         }
 
-        return StringDataObject.of(String.valueOf(value));
+        return PrimitiveDataObject.of(String.valueOf(value));
     }
 }

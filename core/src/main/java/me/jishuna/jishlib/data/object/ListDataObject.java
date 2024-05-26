@@ -19,9 +19,9 @@ public class ListDataObject extends DataObject<List<DataObject<?>>> implements I
     }
 
     @Override
-    public Object asObject() {
+    public Object serialize() {
         List<Object> list = new ArrayList<>();
-        this.value.forEach(o -> list.add(o.asObject()));
+        this.value.forEach(o -> list.add(o.serialize()));
 
         return list;
     }
