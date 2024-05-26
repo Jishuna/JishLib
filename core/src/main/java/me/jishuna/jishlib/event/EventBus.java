@@ -1,5 +1,6 @@
 package me.jishuna.jishlib.event;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -14,8 +15,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 public class EventBus implements Listener {
-    private final Map<PriorityEvent, List<EventListener>> handlers = new ConcurrentHashMap<>();
-    private final Set<PriorityEvent> subscribed = ConcurrentHashMap.newKeySet();
+    private final Map<ListenerData, List<EventListener>> handlers = new ConcurrentHashMap<>();
+    private final Set<ListenerData> subscribed = ConcurrentHashMap.newKeySet();
 
     private final Plugin plugin;
     private final EventPriority defaultPriority;
@@ -26,12 +27,16 @@ public class EventBus implements Listener {
     }
 
     public <T extends Event> EventListener subscribe(Class<T> eventClass, Consumer<T> action) {
-        return subscribe(eventClass, action, this.defaultPriority);
+        return subscribe(eventClass, this.defaultPriority, true, action);
+    }
+
+    public <T extends Event> EventListener subscribe(Class<T> eventClass, EventPriority priority, Consumer<T> action) {
+        return subscribe(eventClass, priority, true, action);
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Event> EventListener subscribe(Class<T> eventClass, Consumer<T> action, EventPriority priority) {
-        PriorityEvent priorityEvent = new PriorityEvent(eventClass, priority);
+    public <T extends Event> EventListener subscribe(Class<T> eventClass, EventPriority priority, boolean ignoreCancelled, Consumer<T> action) {
+        ListenerData priorityEvent = new ListenerData(eventClass, priority, ignoreCancelled);
         EventListener listener = new EventListener(this, priorityEvent, (Consumer<Event>) action);
         this.handlers.computeIfAbsent(priorityEvent, k -> new LinkedList<>()).add(listener);
 
@@ -46,13 +51,30 @@ public class EventBus implements Listener {
         }
     }
 
-    private void subscribeEvent(PriorityEvent priorityEvent) {
-        if (this.subscribed.contains(priorityEvent)) {
+    public void discard() {
+        this.handlers.clear();
+        this.subscribed.clear();
+        HandlerList.unregisterAll(this);
+    }
+
+    public List<String> getDebugData() {
+        List<String> list = new ArrayList<>();
+
+        this.handlers.forEach((k, v) -> {
+            list.add("  " + k.getDebugString());
+            v.forEach(l -> list.add("   - " + l.getDebugString()));
+        });
+
+        return list;
+    }
+
+    private void subscribeEvent(ListenerData data) {
+        if (this.subscribed.contains(data)) {
             return;
         }
 
-        Bukkit.getPluginManager().registerEvent(priorityEvent.eventClass(), this, priorityEvent.priority(), (ignored, event) -> {
-            List<EventListener> listeners = this.handlers.get(priorityEvent);
+        Bukkit.getPluginManager().registerEvent(data.eventClass(), this, data.priority(), (ignored, event) -> {
+            List<EventListener> listeners = this.handlers.get(data);
             for (EventListener listener : listeners) {
                 if (!listener.getEvent().eventClass().isInstance(event)) {
                     continue;
@@ -64,12 +86,6 @@ public class EventBus implements Listener {
                     e.printStackTrace();
                 }
             }
-        }, this.plugin, true);
-    }
-
-    public void discard() {
-        this.handlers.clear();
-        this.subscribed.clear();
-        HandlerList.unregisterAll(this);
+        }, this.plugin, data.ignoreCancelled());
     }
 }

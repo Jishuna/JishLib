@@ -26,6 +26,10 @@ public class Debug {
             lines.add(" - %s v%s".formatted(plugin.getName(), plugin.getDescription().getVersion()));
         }
 
+        lines.add("");
+        lines.add("Events:");
+        lines.addAll(me.jishuna.jishlib.Plugin.getInstance().getEventBus().getDebugData());
+
         try {
             Logger.info("Writing debug log to {0}", file.getPath());
             Files.write(file.toPath(), lines);

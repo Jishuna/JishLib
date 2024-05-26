@@ -5,10 +5,10 @@ import org.bukkit.event.Event;
 
 public class EventListener {
     private final EventBus bus;
-    private final PriorityEvent priorityEvent;
+    private final ListenerData priorityEvent;
     private final Consumer<Event> consumer;
 
-    public EventListener(EventBus bus, PriorityEvent priorityEvent, Consumer<Event> consumer) {
+    public EventListener(EventBus bus, ListenerData priorityEvent, Consumer<Event> consumer) {
         this.bus = bus;
         this.priorityEvent = priorityEvent;
         this.consumer = consumer;
@@ -18,11 +18,15 @@ public class EventListener {
         this.consumer.accept(event);
     }
 
-    public PriorityEvent getEvent() {
+    public ListenerData getEvent() {
         return this.priorityEvent;
     }
 
     public void discard() {
         this.bus.unsubscribe(this);
+    }
+
+    protected String getDebugString() {
+        return this.consumer.toString();
     }
 }
