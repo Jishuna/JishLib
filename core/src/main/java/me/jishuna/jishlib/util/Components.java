@@ -22,4 +22,8 @@ public class Components {
     public static void sendMessage(CommandSender sender, Component component) {
         ADVENTURE.sender(sender).sendMessage(component);
     }
+
+    public static String toString(Component component) {
+        return Constants.LEGACY_SERIALIZER.serialize(component);
+    }
 }

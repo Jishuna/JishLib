@@ -9,24 +9,34 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import me.jishuna.jishlib.Constants;
 import me.jishuna.jishlib.item.ItemSupplier;
+import me.jishuna.jishlib.nms.NMS;
 
-public class CustomInventory<T extends Inventory> {
+public class CustomInventory {
     private final Map<Integer, Consumer<ClickContext>> buttons = new HashMap<>();
 
     private final List<Consumer<ClickContext>> clickActions = new ArrayList<>();
     private final List<Consumer<InventorySession>> openActions = new ArrayList<>();
     private final List<Consumer<InventorySession>> closeActions = new ArrayList<>();
 
-    private final T inventory;
+    private final Inventory inventory;
+    private final Component title;
     private final Set<Integer> edgeSlots = new HashSet<>();
     private final Set<Integer> innerSlots = new HashSet<>();
 
-    public CustomInventory(T inventory) {
-        this.inventory = inventory;
+    public CustomInventory(int size, String title) {
+        this(size, Constants.LEGACY_SERIALIZER.deserialize(title));
+    }
+
+    public CustomInventory(int size, Component title) {
+        this.inventory = Bukkit.createInventory(null, size);
+        this.title = title;
 
         calculateSlots();
     }
@@ -121,12 +131,16 @@ public class CustomInventory<T extends Inventory> {
         return this.inventory.getSize();
     }
 
-    public T getBukkitInventory() {
+    public Inventory getBukkitInventory() {
         return this.inventory;
     }
 
-    protected void open(HumanEntity target) {
-        target.openInventory(this.inventory);
+    protected final void open(HumanEntity target) {
+        if (NMS.isInitialized()) {
+            NMS.get().openInventory(target, this.inventory, this.title);
+        } else {
+            target.openInventory(this.inventory);
+        }
     }
 
     final void consumeClickEvent(ClickContext context) {
@@ -160,7 +174,7 @@ public class CustomInventory<T extends Inventory> {
             return true;
         }
 
-        if (!(obj instanceof CustomInventory<?> other)) {
+        if (!(obj instanceof CustomInventory other)) {
             return false;
         }
 

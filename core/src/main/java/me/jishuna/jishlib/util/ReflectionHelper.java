@@ -22,7 +22,7 @@ public final class ReflectionHelper {
         }
     }
 
-    public static Field getNamedField(Class<?> clazz, String name) {
+    public static Field getField(Class<?> clazz, String name) {
         try {
             Field field = clazz.getDeclaredField(name);
             field.setAccessible(true);

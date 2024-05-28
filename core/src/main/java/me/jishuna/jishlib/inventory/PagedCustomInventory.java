@@ -5,26 +5,26 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
-import org.bukkit.inventory.Inventory;
+import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
 
-public abstract class PagedCustomInventory<T, B extends Inventory> extends PagedInventory<T, B> {
+public abstract class PagedCustomInventory<T> extends PagedInventory<T> {
     private List<T> items;
 
-    protected PagedCustomInventory(B inventory, Collection<T> items, int maxIndex) {
-        this(inventory, new ArrayList<>(items), maxIndex);
+    protected PagedCustomInventory(int size, Component title, Collection<T> items, int maxIndex) {
+        this(size, title, new ArrayList<>(items), maxIndex);
     }
 
-    protected PagedCustomInventory(B inventory, List<T> items, int maxIndex) {
-        this(inventory, items, IntStream.range(0, maxIndex).boxed().toList());
+    protected PagedCustomInventory(int size, Component title, List<T> items, int maxIndex) {
+        this(size, title, items, IntStream.range(0, maxIndex).boxed().toList());
     }
 
-    protected PagedCustomInventory(B inventory, Collection<T> items, List<Integer> itemSlots) {
-        this(inventory, new ArrayList<>(items), itemSlots);
+    protected PagedCustomInventory(int size, Component title, Collection<T> items, List<Integer> itemSlots) {
+        this(size, title, new ArrayList<>(items), itemSlots);
     }
 
-    protected PagedCustomInventory(B inventory, List<T> items, List<Integer> itemSlots) {
-        super(inventory, itemSlots, Math.max(0, (int) Math.ceil(items.size() / (double) itemSlots.size()) - 1));
+    protected PagedCustomInventory(int size, Component title, List<T> items, List<Integer> itemSlots) {
+        super(size, title, itemSlots, Math.max(0, (int) Math.ceil(items.size() / (double) itemSlots.size()) - 1));
         this.items = items;
     }
 

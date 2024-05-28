@@ -19,7 +19,7 @@ public final class Inventories implements Feature {
         return getInstance().inventoryMap.get(id);
     }
 
-    public static InventorySession openInventory(HumanEntity entity, CustomInventory<?> inventory) {
+    public static InventorySession openInventory(HumanEntity entity, CustomInventory inventory) {
         InventorySession session = new InventorySession((Player) entity, inventory);
         inventory.open(entity);
         inventory.consumeOpenEvent(session);

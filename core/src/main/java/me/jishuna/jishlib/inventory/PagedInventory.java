@@ -1,18 +1,18 @@
 package me.jishuna.jishlib.inventory;
 
 import java.util.List;
-import org.bukkit.inventory.Inventory;
+import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
 import me.jishuna.jishlib.util.NumberUtils;
 
-public abstract class PagedInventory<T, B extends Inventory> extends CustomInventory<B> {
+public abstract class PagedInventory<T> extends CustomInventory {
     protected final List<Integer> itemSlots;
 
     protected int maxPage;
     protected int page = 0;
 
-    protected PagedInventory(B inventory, List<Integer> itemSlots, int maxPage) {
-        super(inventory);
+    protected PagedInventory(int size, Component title, List<Integer> itemSlots, int maxPage) {
+        super(size, title);
         this.itemSlots = itemSlots;
         this.maxPage = maxPage;
     }

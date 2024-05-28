@@ -11,17 +11,17 @@ public final class InventorySession {
     }
 
     private final Player player;
-    private final Deque<CustomInventory<?>> history = new ArrayDeque<>();
+    private final Deque<CustomInventory> history = new ArrayDeque<>();
 
-    private CustomInventory<?> active;
+    private CustomInventory active;
     private State state = State.NORMAL;
 
-    public InventorySession(Player player, CustomInventory<?> inventory) {
+    public InventorySession(Player player, CustomInventory inventory) {
         this.player = player;
         this.active = inventory;
     }
 
-    public void changeTo(CustomInventory<?> inventory, boolean recordHistory) {
+    public void changeTo(CustomInventory inventory, boolean recordHistory) {
         Tasks.run(() -> {
             this.state = State.SWITCHING;
             open(inventory, recordHistory);
@@ -40,11 +40,11 @@ public final class InventorySession {
         });
     }
 
-    public CustomInventory<?> getActive() {
+    public CustomInventory getActive() {
         return this.active;
     }
 
-    public CustomInventory<?> getPrevious() {
+    public CustomInventory getPrevious() {
         if (!hasHistory()) {
             return null;
         }
@@ -76,7 +76,7 @@ public final class InventorySession {
         return this.player;
     }
 
-    private void open(CustomInventory<?> inventory, boolean recordHistory) {
+    private void open(CustomInventory inventory, boolean recordHistory) {
         if (recordHistory) {
             this.history.addFirst(this.active);
         }
