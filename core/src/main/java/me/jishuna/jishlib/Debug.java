@@ -14,11 +14,11 @@ public class Debug {
 
     public static void writeDebugLog(File file) {
         List<String> lines = new ArrayList<>();
-        lines.add("%s: %s".formatted("Version", MinecraftVersion.CURRENT_VERSION));
-        lines.add("%s: %s version %s (Implementing API version %s)".formatted("Software Version", Bukkit.getName(), Bukkit.getVersion(), Bukkit.getBukkitVersion()));
+        lines.add("%s: %s".formatted("Server Version", MinecraftVersion.CURRENT_VERSION));
+        lines.add("%s: %s version %s (Implementing API version %s)".formatted("Server Software", Bukkit.getName(), Bukkit.getVersion(), Bukkit.getBukkitVersion()));
         lines.add("%s: %s".formatted("Online Players", Bukkit.getOnlinePlayers().size()));
         lines.add("");
-        lines.add("%s: %s".formatted("NMS", Capabilities.NMS));
+        lines.add("%s: %s".formatted("NMS Adapter", Capabilities.NMS));
         lines.add("");
         lines.add("Plugins:");
 

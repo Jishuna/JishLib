@@ -91,8 +91,6 @@ public abstract class ReloadableDataHolder<T> {
         for (ConfigField field : this.fields) {
             String path = field.getPath();
 
-            configuration.setComments(path, field.getComments());
-
             DataType<?> type = DataType.get(field.getField());
             TypeAdapter<DataObject<?>, Object> adapter = (TypeAdapter<DataObject<?>, Object>) TypeAdapterRegistry.getAdapter(type);
             if (adapter == null) {
@@ -116,6 +114,7 @@ public abstract class ReloadableDataHolder<T> {
 
         try {
             YAML.write(data, configuration);
+            this.fields.forEach(f -> configuration.setComments(f.getPath(), f.getComments()));
             configuration.save(this.file);
         } catch (IOException ex) {
             Logger.error("Failed to save file {0}: {1}", this.file.getPath(), ex);
