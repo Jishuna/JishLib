@@ -1,10 +1,14 @@
 package me.jishuna.jishlib.util;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import org.bukkit.Bukkit;
 
 public final class ReflectionHelper {
     public static final String CRAFTBUKKIT_PACKAGE = Bukkit.getServer().getClass().getPackageName();
+    private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
 
     public static Class<?> getClass(String name) {
         try {
@@ -44,6 +48,17 @@ public final class ReflectionHelper {
             }
         }
         return null;
+    }
+
+    public static MethodHandle getConstructor(Class<?> clazz, Class<?>... parameters) {
+        try {
+            final Constructor<?> constructor = clazz.getDeclaredConstructor(parameters);
+            constructor.setAccessible(true);
+            return LOOKUP.unreflectConstructor(constructor);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static Object readField(Field field, Object instance) {
