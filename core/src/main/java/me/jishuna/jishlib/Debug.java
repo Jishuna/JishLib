@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import me.jishuna.jishlib.util.Capabilities;
@@ -28,7 +30,13 @@ public class Debug {
 
         lines.add("");
         lines.add("Events:");
-        lines.addAll(me.jishuna.jishlib.Plugin.getInstance().getEventBus().getDebugData());
+
+        Map<String, List<String>> eventData = new HashMap<>();
+        me.jishuna.jishlib.Plugin.getInstance().getEventBus().writeDebugData(eventData);
+        eventData.forEach((k, v) -> {
+            lines.add("  " + k);
+            v.forEach(s -> lines.add("   - " + s));
+        });
 
         try {
             Logger.info("Writing debug log to {0}", file.getPath());

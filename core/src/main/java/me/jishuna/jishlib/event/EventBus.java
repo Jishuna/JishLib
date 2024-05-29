@@ -57,15 +57,11 @@ public class EventBus implements Listener {
         HandlerList.unregisterAll(this);
     }
 
-    public List<String> getDebugData() {
-        List<String> list = new ArrayList<>();
-
+    public void writeDebugData(Map<String, List<String>> map) {
         this.handlers.forEach((k, v) -> {
-            list.add("  " + k.getDebugString());
-            v.forEach(l -> list.add("   - " + l.getDebugString()));
+            List<String> list = map.computeIfAbsent(k.getDebugString(), key -> new ArrayList<>());
+            v.forEach(l -> list.add(l.getDebugString()));
         });
-
-        return list;
     }
 
     private void subscribeEvent(ListenerData data) {
