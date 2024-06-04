@@ -1,6 +1,8 @@
 package me.jishuna.jishlib.data.source;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -14,6 +16,11 @@ import me.jishuna.jishlib.data.object.MapDataObject;
 import me.jishuna.jishlib.data.object.PrimitiveDataObject;
 
 public class YamlDataSource implements DataSource {
+    private final String pathSeperator;
+
+    public YamlDataSource(String pathSeperator) {
+        this.pathSeperator = pathSeperator;
+    }
 
     @Override
     public MapDataObject read(File file) {
@@ -21,8 +28,25 @@ public class YamlDataSource implements DataSource {
     }
 
     @Override
+    public MapDataObject read(Reader reader) {
+        try (reader) {
+            return read(YamlConfiguration.loadConfiguration(reader));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return MapDataObject.empty();
+    }
+
+    @Override
     public void write(MapDataObject data, File file) {
-        write(data, YamlConfiguration.loadConfiguration(file));
+        YamlConfiguration config = new YamlConfiguration();
+        write(data, config);
+        try {
+            config.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public MapDataObject read(ConfigurationSection configuration) {
@@ -39,7 +63,7 @@ public class YamlDataSource implements DataSource {
             dataMap.put(String.valueOf(k), readValue(v));
         });
 
-        return MapDataObject.of(dataMap);
+        return MapDataObject.of(this.pathSeperator, dataMap);
     }
 
     private ListDataObject readList(Collection<?> list) {

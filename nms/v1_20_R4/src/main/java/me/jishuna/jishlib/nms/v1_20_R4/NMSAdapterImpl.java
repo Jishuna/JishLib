@@ -4,19 +4,15 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.text.Component;
-import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.craftbukkit.CraftParticle;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.craftbukkit.inventory.CraftContainer;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import me.jishuna.jishlib.Constants;
@@ -32,19 +28,6 @@ public class NMSAdapterImpl implements NMSAdapter {
         Class<?> craftMetaItemClass = ReflectionHelper.getCraftClass(".inventory.CraftMetaItem");
         DISPLAY_NAME_FIELD = ReflectionHelper.getField(craftMetaItemClass, "displayName");
         LORE_FIELD = ReflectionHelper.getField(craftMetaItemClass, "lore");
-    }
-
-    @Override
-    public <T> void spawnParticle(Player player, Particle particle, Location location, int count, double offsetX, double offsetY, double offsetZ, double extra, boolean force, T data) {
-        spawnParticle(player, particle, location.getX(), location.getY(), location.getZ(), count, offsetX, offsetY, offsetZ, extra, force, data);
-    }
-
-    @Override
-    public <T> void spawnParticle(Player player, Particle particle, double x, double y, double z, int count, double offsetX, double offsetY, double offsetZ, double extra, boolean force, T data) {
-        ClientboundLevelParticlesPacket packetplayoutworldparticles = new ClientboundLevelParticlesPacket(CraftParticle.createParticleParam(particle, data), force, x, y, z, (float) offsetX, (float) offsetY, (float) offsetZ, (float) extra, count);
-        ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-
-        serverPlayer.connection.send(packetplayoutworldparticles);
     }
 
     @Override
@@ -96,5 +79,10 @@ public class NMSAdapterImpl implements NMSAdapter {
         } catch (Exception e) {
             Logger.error("An unexpected error occured while modifying item lore: {0}", e);
         }
+    }
+
+    @Override
+    public int getCurrentTick() {
+        return MinecraftServer.currentTick;
     }
 }

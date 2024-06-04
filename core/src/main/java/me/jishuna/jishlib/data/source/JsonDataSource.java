@@ -1,5 +1,6 @@
 package me.jishuna.jishlib.data.source;
 
+import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,23 +27,51 @@ import me.jishuna.jishlib.data.object.MapDataObject;
 import me.jishuna.jishlib.data.object.PrimitiveDataObject;
 
 public class JsonDataSource implements DataSource {
-    private static final Gson GSON = new GsonBuilder().setLenient().setPrettyPrinting().create();
+    private static final Gson GSON = new GsonBuilder()
+            .setLenient()
+            .setPrettyPrinting()
+            .disableHtmlEscaping()
+            .create();
     private static final Type TYPE = new TypeToken<Map<String, Object>>() {
     }.getType();
 
+    private final String pathSeperator;
+
+    public JsonDataSource(String pathSeperator) {
+        this.pathSeperator = pathSeperator;
+    }
+
     @Override
     public MapDataObject read(File file) {
-        try (Reader reader = new FileReader(file)) {
+        try (FileReader reader = new FileReader(file, StandardCharsets.UTF_8)) {
+            return read(reader);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return MapDataObject.empty();
+    }
+
+    @Override
+    public MapDataObject read(Reader reader) {
+        try (reader) {
             return readObject(JsonParser.parseReader(reader).getAsJsonObject());
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
         }
+
+        return MapDataObject.empty();
     }
 
     @Override
     public void write(MapDataObject data, File file) {
-        try (Writer writer = new FileWriter(file)) {
+        try {
+            Files.createParentDirs(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try (Writer writer = new FileWriter(file, StandardCharsets.UTF_8)) {
             GSON.toJson(data.serialize(), TYPE, writer);
         } catch (IOException e) {
             e.printStackTrace();
@@ -54,7 +84,7 @@ public class JsonDataSource implements DataSource {
             dataMap.put(k, readValue(v));
         });
 
-        return MapDataObject.of(dataMap);
+        return MapDataObject.of(this.pathSeperator, dataMap);
     }
 
     private ListDataObject readArray(JsonArray array) {

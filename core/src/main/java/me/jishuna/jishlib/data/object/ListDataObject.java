@@ -10,12 +10,20 @@ public class ListDataObject extends DataObject<List<DataObject<?>>> implements I
         super(value);
     }
 
+    public static ListDataObject empty() {
+        return new ListDataObject(new ArrayList<>());
+    }
+
     public static ListDataObject of(List<DataObject<?>> value) {
         return new ListDataObject(value);
     }
 
     public void add(DataObject<?> value) {
         this.value.add(value);
+    }
+
+    public void merge(ListDataObject other) {
+        other.forEach(this::add);
     }
 
     @Override

@@ -23,6 +23,10 @@ public class Components {
         ADVENTURE.sender(sender).sendMessage(component);
     }
 
+    public static void sendActionBar(CommandSender sender, Component component) {
+        ADVENTURE.sender(sender).sendActionBar(component);
+    }
+
     public static String toString(Component component) {
         return Constants.LEGACY_SERIALIZER.serialize(component);
     }

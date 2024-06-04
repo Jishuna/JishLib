@@ -8,7 +8,7 @@ gradle.rootProject {
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
-        mavenLocal()
+		maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
         maven("https://oss.sonatype.org/content/repositories/central")
         maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
@@ -16,6 +16,7 @@ dependencyResolutionManagement {
 }
 
 include("core")
+include("paper")
 include("nms")
 include("nms:v1_20_R4")
 findProject(":nms:v1_20_R4")?.name = "v1_20_R4"

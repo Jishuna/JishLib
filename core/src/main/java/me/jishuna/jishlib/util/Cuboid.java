@@ -7,7 +7,6 @@ import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-import me.jishuna.jishlib.nms.NMS;
 
 public class Cuboid implements Iterable<BlockPos> {
     public final double minX;
@@ -103,11 +102,7 @@ public class Cuboid implements Iterable<BlockPos> {
             for (double distance = 0; distance <= path.length(); distance += spacing) {
                 Vector position = origin.clone().add(path.clone().normalize().multiply(distance));
 
-                if (NMS.isInitialized()) {
-                    NMS.get().spawnParticle(player, Particle.DUST, position.toLocation(player.getWorld()), 1, 0, 0, 0, 0, false, new DustOptions(color, 1));
-                } else {
-                    player.spawnParticle(Particle.DUST, position.toLocation(player.getWorld()), 1, new DustOptions(color, 1));
-                }
+                player.spawnParticle(Particle.DUST, position.toLocation(player.getWorld()), 1, new DustOptions(color, 1));
             }
         }
     }

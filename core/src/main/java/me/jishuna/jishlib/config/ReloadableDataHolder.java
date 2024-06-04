@@ -1,6 +1,5 @@
 package me.jishuna.jishlib.config;
 
-import static me.jishuna.jishlib.data.source.DataSources.YAML;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -13,6 +12,7 @@ import me.jishuna.jishlib.data.adapter.TypeAdapter;
 import me.jishuna.jishlib.data.adapter.TypeAdapterRegistry;
 import me.jishuna.jishlib.data.object.DataObject;
 import me.jishuna.jishlib.data.object.MapDataObject;
+import me.jishuna.jishlib.data.source.YamlDataSource;
 
 public abstract class ReloadableDataHolder<T> {
     protected final File file;
@@ -38,8 +38,8 @@ public abstract class ReloadableDataHolder<T> {
             return this;
         }
 
-        YamlConfiguration configuration = YamlConfiguration.loadConfiguration(this.file);
-        MapDataObject data = YAML.read(configuration);
+        YamlDataSource source = new YamlDataSource(".");
+        MapDataObject data = source.read(this.file);
 
         for (ConfigField field : this.fields) {
             if (field.isStatic() && !includeStatic) {
@@ -86,7 +86,8 @@ public abstract class ReloadableDataHolder<T> {
         }
 
         YamlConfiguration configuration = YamlConfiguration.loadConfiguration(this.file);
-        MapDataObject data = YAML.read(configuration);
+        YamlDataSource source = new YamlDataSource(".");
+        MapDataObject data = source.read(configuration);
 
         for (ConfigField field : this.fields) {
             String path = field.getPath();
@@ -113,7 +114,7 @@ public abstract class ReloadableDataHolder<T> {
         }
 
         try {
-            YAML.write(data, configuration);
+            source.write(data, configuration);
             this.fields.forEach(f -> configuration.setComments(f.getPath(), f.getComments()));
             configuration.save(this.file);
         } catch (IOException ex) {
