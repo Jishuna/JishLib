@@ -40,9 +40,9 @@ public class Cuboid implements Iterable<BlockPos> {
         int minX = Math.min(corner1.x, corner2.x);
         int minY = Math.min(corner1.y, corner2.y);
         int minZ = Math.min(corner1.z, corner2.z);
-        int maxX = Math.max(corner1.x, corner2.x) + 1;
-        int maxY = Math.max(corner1.y, corner2.y) + 1;
-        int maxZ = Math.max(corner1.z, corner2.z) + 1;
+        int maxX = Math.max(corner1.x, corner2.x);
+        int maxY = Math.max(corner1.y, corner2.y);
+        int maxZ = Math.max(corner1.z, corner2.z);
 
         return new Cuboid(minX, minY, minZ, maxX, maxY, maxZ);
     }

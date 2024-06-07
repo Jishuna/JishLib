@@ -3,7 +3,6 @@ package me.jishuna.jishlib.util;
 import java.util.Objects;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 
 public class BlockPos {
@@ -18,6 +17,14 @@ public class BlockPos {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    public static BlockPos of(Location location) {
+        return new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+    }
+
+    public static BlockPos of(Vector vector) {
+        return new BlockPos(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
     }
 
     public BlockPos add(int x, int y, int z) {
@@ -40,19 +47,13 @@ public class BlockPos {
         return subtract(other.x, other.y, other.z);
     }
 
-    public BlockPos rotate(Rotation rotation, double xOrigin, double zOrigin) {
-        double radians = rotation.getRadians();
-
-        double angleCos = Math.cos(radians);
-        double angleSin = Math.sin(radians);
-
-        double x = this.x + xOrigin;
-        double z = this.z + zOrigin;
-
-        double x2 = angleCos * x + angleSin * z;
-        double z2 = -angleSin * x + angleCos * z;
-
-        return new BlockPos(NumberConversions.round(x2 - xOrigin), this.y, NumberConversions.round(z2 - zOrigin));
+    public BlockPos rotate(Rotation rotation) {
+        return switch (rotation) {
+        case NONE -> this;
+        case CW_90 -> new BlockPos(-this.z, this.y, this.x);
+        case CW_180 -> new BlockPos(-this.x, this.y, -this.z);
+        case CW_270 -> new BlockPos(this.z, this.y, -this.x);
+        };
     }
 
     public BlockPos inverse() {

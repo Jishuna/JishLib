@@ -36,17 +36,29 @@ public class EffectBuilder {
     }
 
     public EffectBuilder ambient() {
-        this.ambient = true;
+        return ambient(true);
+    }
+
+    public EffectBuilder ambient(boolean ambient) {
+        this.ambient = ambient;
         return this;
     }
 
     public EffectBuilder hideParticles() {
-        this.showParticles = false;
+        return hideParticles(true);
+    }
+
+    public EffectBuilder hideParticles(boolean hide) {
+        this.showParticles = !hide;
         return this;
     }
 
     public EffectBuilder hideIcon() {
-        this.showIcon = false;
+        return hideIcon(true);
+    }
+
+    public EffectBuilder hideIcon(boolean hide) {
+        this.showIcon = !hide;
         return this;
     }
 

@@ -3,12 +3,13 @@ package me.jishuna.jishlib.command.node;
 import java.util.Collections;
 import java.util.List;
 import org.bukkit.command.CommandSender;
+import me.jishuna.jishlib.command.CommandInfo;
 import me.jishuna.jishlib.command.argument.ArgumentQueue;
 
 public abstract class LeafNode extends CommandNode {
 
-    protected LeafNode(String permission) {
-        super(permission);
+    protected LeafNode(CommandInfo info) {
+        super(info);
     }
 
     @Override

@@ -5,12 +5,14 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import me.jishuna.jishlib.command.CommandException;
+import me.jishuna.jishlib.command.CommandInfo;
 import me.jishuna.jishlib.command.argument.ArgumentQueue;
+import me.jishuna.jishlib.util.Components;
 
 public class RootNode extends BranchNode implements TabExecutor {
 
-    public RootNode(String permission) {
-        super(permission);
+    public RootNode(CommandInfo info) {
+        super(info);
     }
 
     @Override
@@ -20,7 +22,7 @@ public class RootNode extends BranchNode implements TabExecutor {
         try {
             handleCommand(sender, queue);
         } catch (CommandException e) {
-            sender.sendMessage(e.getMessage());
+            Components.sendMessage(sender, e.getComponent());
         }
 
         return true;

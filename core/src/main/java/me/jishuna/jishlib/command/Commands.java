@@ -18,13 +18,15 @@ public class Commands {
         COMMAND_MAP = (CommandMap) ReflectionHelper.readField(field, Bukkit.getPluginManager());
     }
 
-    public static void register(String name, RootNode root) {
+    public static void register(RootNode root) {
         try {
-            PluginCommand command = (PluginCommand) CONSTRUCTOR.invoke(name, Plugin.getInstance());
-            command.setName(name);
-            command.setUsage("/" + name);
+            CommandInfo info = root.getCommandInfo();
+            PluginCommand command = (PluginCommand) CONSTRUCTOR.invoke(info.name(), Plugin.getInstance());
+            command.setName(info.name());
+            command.setPermission(info.permission());
+            command.setAliases(info.aliases());
+            command.setUsage("/" + info.name());
             command.setExecutor(root);
-            command.setPermission(root.getPermission());
             command.setTabCompleter(root);
 
             COMMAND_MAP.register(Plugin.getInstance().getName(), command);

@@ -17,6 +17,7 @@ public final class PDCTypes {
     public static final PersistentDataType<long[], long[]> LONG_ARRAY = PersistentDataType.LONG_ARRAY;
     public static final PersistentDataType<Float, Float> FLOAT = PersistentDataType.FLOAT;
     public static final PersistentDataType<Double, Double> DOUBLE = PersistentDataType.DOUBLE;
+    public static final PersistentDataType<Byte, Boolean> BOOLEAN = PersistentDataType.BOOLEAN;
 
     public static final PersistentDataType<String, String> STRING = PersistentDataType.STRING;
     public static final PersistentDataType<PersistentDataContainer, PersistentDataContainer> CONTAINER = PersistentDataType.TAG_CONTAINER;

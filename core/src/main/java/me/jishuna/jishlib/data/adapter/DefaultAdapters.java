@@ -6,7 +6,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import me.jishuna.jishlib.data.object.PrimitiveDataObject;
 
-public final class TypeAdapters {
+public final class DefaultAdapters {
 
     public static final NumericAdapter<Integer> INT = new NumericAdapter<>(PrimitiveDataObject::asInt, Ints::tryParse);
     public static final NumericAdapter<Long> LONG = new NumericAdapter<>(PrimitiveDataObject::asLong, Longs::tryParse);
@@ -18,6 +18,6 @@ public final class TypeAdapters {
     public static final ComponentAdapter COMPONENT = new ComponentAdapter();
     public static final ItemStackAdapter ITEM_STACK = new ItemStackAdapter();
 
-    private TypeAdapters() {
+    private DefaultAdapters() {
     }
 }

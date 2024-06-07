@@ -1,7 +1,7 @@
 package me.jishuna.jishlib.data.adapter;
 
-import static me.jishuna.jishlib.data.adapter.TypeAdapters.COMPONENT;
-import static me.jishuna.jishlib.data.adapter.TypeAdapters.MATERIAL;
+import static me.jishuna.jishlib.data.adapter.DefaultAdapters.COMPONENT;
+import static me.jishuna.jishlib.data.adapter.DefaultAdapters.MATERIAL;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.bukkit.inventory.ItemStack;

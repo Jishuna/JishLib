@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
-import me.jishuna.jishlib.util.Capabilities;
+import me.jishuna.jishlib.event.EventBus;
 import me.jishuna.jishlib.util.MinecraftVersion;
 
 public class Debug {
@@ -32,7 +32,12 @@ public class Debug {
         lines.add("Events:");
 
         Map<String, List<String>> eventData = new HashMap<>();
-        me.jishuna.jishlib.Plugin.getInstance().getEventBus().writeDebugData(eventData);
+        for (Cleanable cleanable : me.jishuna.jishlib.Plugin.getInstance().cleanables) {
+            if (cleanable instanceof EventBus bus) {
+                bus.writeDebugData(eventData);
+            }
+        }
+
         eventData.forEach((k, v) -> {
             lines.add("  " + k);
             v.forEach(s -> lines.add("   - " + s));

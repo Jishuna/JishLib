@@ -1,13 +1,13 @@
 package me.jishuna.jishlib.data.adapter;
 
-import static me.jishuna.jishlib.data.adapter.TypeAdapters.COMPONENT;
-import static me.jishuna.jishlib.data.adapter.TypeAdapters.DOUBLE;
-import static me.jishuna.jishlib.data.adapter.TypeAdapters.FLOAT;
-import static me.jishuna.jishlib.data.adapter.TypeAdapters.INT;
-import static me.jishuna.jishlib.data.adapter.TypeAdapters.ITEM_STACK;
-import static me.jishuna.jishlib.data.adapter.TypeAdapters.LONG;
-import static me.jishuna.jishlib.data.adapter.TypeAdapters.MATERIAL;
-import static me.jishuna.jishlib.data.adapter.TypeAdapters.NAMESPACE;
+import static me.jishuna.jishlib.data.adapter.DefaultAdapters.COMPONENT;
+import static me.jishuna.jishlib.data.adapter.DefaultAdapters.DOUBLE;
+import static me.jishuna.jishlib.data.adapter.DefaultAdapters.FLOAT;
+import static me.jishuna.jishlib.data.adapter.DefaultAdapters.INT;
+import static me.jishuna.jishlib.data.adapter.DefaultAdapters.ITEM_STACK;
+import static me.jishuna.jishlib.data.adapter.DefaultAdapters.LONG;
+import static me.jishuna.jishlib.data.adapter.DefaultAdapters.MATERIAL;
+import static me.jishuna.jishlib.data.adapter.DefaultAdapters.NAMESPACE;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;

@@ -11,6 +11,7 @@ import me.jishuna.jishlib.command.argument.parser.IntParser;
 import me.jishuna.jishlib.command.argument.parser.NamespacedKeyParser;
 import me.jishuna.jishlib.command.argument.parser.OfflinePlayerParser;
 import me.jishuna.jishlib.command.argument.parser.PlayerParser;
+import me.jishuna.jishlib.command.argument.parser.StringParser;
 
 public final class ArgumentParsers {
     private static final Map<Class<?>, ArgumentParser<?>> parsers = new HashMap<>();
@@ -20,6 +21,7 @@ public final class ArgumentParsers {
     public static final ArgumentParser<NamespacedKey> NAMESPACED_KEY = register(NamespacedKey.class, new NamespacedKeyParser());
     public static final ArgumentParser<Integer> INTEGER = register(int.class, new IntParser());
     public static final ArgumentParser<Double> DOUBLE = register(double.class, new DoubleParser());
+    public static final ArgumentParser<String> STRING = register(String.class, new StringParser());
 
     @SuppressWarnings("unchecked")
     public static <T> ArgumentParser<T> getParser(Class<T> clazz) {

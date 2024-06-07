@@ -1,4 +1,4 @@
-package me.jishuna.jishlib.config;
+package me.jishuna.jishlib.config.annotation;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.ElementType;

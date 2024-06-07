@@ -1,5 +1,5 @@
 package me.jishuna.jishlib;
 
-public interface Feature {
+public interface Cleanable {
     public void cleanup();
 }

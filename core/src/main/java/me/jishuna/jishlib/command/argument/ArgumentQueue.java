@@ -2,41 +2,43 @@ package me.jishuna.jishlib.command.argument;
 
 import java.util.ArrayDeque;
 import java.util.Arrays;
-import org.bukkit.command.CommandException;
+import java.util.Deque;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import me.jishuna.jishlib.command.CommandException;
 import me.jishuna.jishlib.message.Messages;
-import me.jishuna.jishlib.util.Components;
 
-public class ArgumentQueue extends ArrayDeque<String> {
-    private static final long serialVersionUID = 1L;
+public class ArgumentQueue {
+    private Deque<String> internalQueue;
 
     public ArgumentQueue(String[] args) {
-        super(Arrays.asList(args));
+        this.internalQueue = new ArrayDeque<>(Arrays.asList(args));
     }
 
-    public <T> T pollAs(Class<T> clazz) {
+    public <T> T poll(Class<T> clazz) {
         ArgumentParser<T> parser = ArgumentParsers.getParser(clazz);
-        if (isEmpty()) {
-            throw new CommandException(Components.toString(Messages.get("command.invalid-arg")));
+        if (this.internalQueue.isEmpty()) {
+            throw new CommandException(Messages.get("command.invalid-arg", Placeholder.unparsed("arg", "None")));
         }
 
-        String raw = poll();
+        String raw = this.internalQueue.poll();
         T value = parser.parse(raw);
         if (value == null) {
-            throw new CommandException(Components.toString(Messages.get("command.invalid-arg")));
+            throw new CommandException(Messages.get("command.invalid-arg", Placeholder.unparsed("arg", raw)));
         }
 
         return value;
     }
 
-    @Override
-    public String peekFirst() {
-        String s = super.peekFirst();
-        return s == null ? "none" : s;
+    public String peek() {
+        String s = this.internalQueue.peekFirst();
+        return s == null ? "None" : s;
     }
 
-    @Override
-    public String pollFirst() {
-        String s = super.pollFirst();
-        return s == null ? "none" : s;
+    public boolean isEmpty() {
+        return this.internalQueue.isEmpty();
+    }
+
+    public int size() {
+        return this.internalQueue.size();
     }
 }

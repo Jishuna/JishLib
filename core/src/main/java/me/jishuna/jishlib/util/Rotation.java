@@ -3,14 +3,18 @@ package me.jishuna.jishlib.util;
 import org.joml.Math;
 
 public enum Rotation {
-    NONE(0), CW_90(270), CW_180(180), CW_270(90);
+    NONE(0, 0, 0), CW_90(270, 1, 0), CW_180(180, 1, 1), CW_270(90, 0, 1);
 
     private final int degrees;
     private final float radians;
+    private final int xOffset;
+    private final int zOffset;
 
-    private Rotation(int degrees) {
+    private Rotation(int degrees, int xOffset, int zOffset) {
         this.degrees = degrees;
         this.radians = Math.toRadians(degrees);
+        this.xOffset = xOffset;
+        this.zOffset = zOffset;
     }
 
     public int getDegrees() {
@@ -19,6 +23,14 @@ public enum Rotation {
 
     public float getRadians() {
         return this.radians;
+    }
+
+    public int getXOffset() {
+        return this.xOffset;
+    }
+
+    public int getZOffset() {
+        return this.zOffset;
     }
 
     public Direction apply(Direction direction) {

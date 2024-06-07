@@ -1,6 +1,5 @@
 package me.jishuna.jishlib.item;
 
-import static me.jishuna.jishlib.util.Capabilities.ITEM_COMPONENTS;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -35,9 +34,12 @@ import me.jishuna.jishlib.Constants;
 import me.jishuna.jishlib.nms.NMS;
 import me.jishuna.jishlib.util.Components;
 import me.jishuna.jishlib.util.EffectBuilder;
+import me.jishuna.jishlib.util.MinecraftVersion;
 import me.jishuna.jishlib.util.Utils;
 
 public class ItemBuilder implements ItemSupplier {
+    private static final boolean ITEM_COMPONENTS = MinecraftVersion.CURRENT_VERSION.newerThanOrEqual(MinecraftVersion.MC1_20_5);
+
     private ItemStack item;
     private ItemMeta meta;
 

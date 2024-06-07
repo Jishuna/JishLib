@@ -36,7 +36,7 @@ public class DataType<T> {
                     .collect(Collectors.toList());
             return new DataType<>(clazz, componentTypes);
         } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException("All parameter types for config must be known at compiletime", e);
+            throw new IllegalArgumentException("All parameter types for data must be known at compiletime", e);
         }
     }
 

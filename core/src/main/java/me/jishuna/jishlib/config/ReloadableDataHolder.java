@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.configuration.file.YamlConfiguration;
 import me.jishuna.jishlib.Logger;
+import me.jishuna.jishlib.config.annotation.Path;
 import me.jishuna.jishlib.data.DataType;
 import me.jishuna.jishlib.data.adapter.TypeAdapter;
 import me.jishuna.jishlib.data.adapter.TypeAdapterRegistry;

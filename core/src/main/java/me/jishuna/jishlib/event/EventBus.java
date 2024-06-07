@@ -13,8 +13,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
+import me.jishuna.jishlib.Cleanable;
 
-public class EventBus implements Listener {
+public class EventBus implements Listener, Cleanable {
     private final Map<ListenerData, List<EventListener>> handlers = new ConcurrentHashMap<>();
     private final Set<ListenerData> subscribed = ConcurrentHashMap.newKeySet();
 
@@ -24,6 +25,8 @@ public class EventBus implements Listener {
     public EventBus(Plugin plugin, EventPriority defaultPriority) {
         this.plugin = plugin;
         this.defaultPriority = defaultPriority;
+
+        me.jishuna.jishlib.Plugin.getInstance().registerCleanup(this);
     }
 
     public <T extends Event> EventListener subscribe(Class<T> eventClass, Consumer<T> action) {
@@ -51,7 +54,8 @@ public class EventBus implements Listener {
         }
     }
 
-    public void discard() {
+    @Override
+    public void cleanup() {
         this.handlers.clear();
         this.subscribed.clear();
         HandlerList.unregisterAll(this);

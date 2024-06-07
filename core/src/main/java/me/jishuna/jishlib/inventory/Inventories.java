@@ -5,10 +5,10 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import me.jishuna.jishlib.Feature;
+import me.jishuna.jishlib.Cleanable;
 import me.jishuna.jishlib.Plugin;
 
-public final class Inventories implements Feature {
+public final class Inventories implements Cleanable {
     private static Inventories INSTANCE;
 
     public static InventorySession getSession(HumanEntity entity) {
@@ -47,7 +47,7 @@ public final class Inventories implements Feature {
     private static Inventories getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new Inventories();
-            Plugin.getInstance().registerFeature(INSTANCE);
+            Plugin.getInstance().registerCleanup(INSTANCE);
         }
 
         return INSTANCE;
