@@ -30,6 +30,7 @@ public class Plugin extends JavaPlugin {
     public final void onEnable() {
         INSTANCE = this;
         Capabilities.init();
+        Constants.init();
 
         onEnable(false);
     }

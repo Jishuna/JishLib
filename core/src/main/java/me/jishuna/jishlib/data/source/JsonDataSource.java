@@ -21,10 +21,12 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import me.jishuna.jishlib.data.object.BooleanDataObject;
 import me.jishuna.jishlib.data.object.DataObject;
 import me.jishuna.jishlib.data.object.ListDataObject;
 import me.jishuna.jishlib.data.object.MapDataObject;
-import me.jishuna.jishlib.data.object.PrimitiveDataObject;
+import me.jishuna.jishlib.data.object.NumericDataObject;
+import me.jishuna.jishlib.data.object.StringDataObject;
 
 public class JsonDataSource implements DataSource {
     private static final Gson GSON = new GsonBuilder()
@@ -49,7 +51,7 @@ public class JsonDataSource implements DataSource {
             e.printStackTrace();
         }
 
-        return MapDataObject.empty();
+        return MapDataObject.empty("");
     }
 
     @Override
@@ -60,7 +62,7 @@ public class JsonDataSource implements DataSource {
             e.printStackTrace();
         }
 
-        return MapDataObject.empty();
+        return MapDataObject.empty("");
     }
 
     @Override
@@ -84,7 +86,7 @@ public class JsonDataSource implements DataSource {
             dataMap.put(k, readValue(v));
         });
 
-        return MapDataObject.of(this.pathSeperator, dataMap);
+        return MapDataObject.of("", this.pathSeperator, dataMap);
     }
 
     private ListDataObject readArray(JsonArray array) {
@@ -106,14 +108,14 @@ public class JsonDataSource implements DataSource {
         if (value.isJsonPrimitive()) {
             JsonPrimitive primitive = value.getAsJsonPrimitive();
             if (primitive.isBoolean()) {
-                return PrimitiveDataObject.of(primitive.getAsBoolean());
+                return BooleanDataObject.of(primitive.getAsBoolean());
             }
 
             if (primitive.isNumber()) {
-                return PrimitiveDataObject.of(primitive.getAsNumber());
+                return NumericDataObject.of(primitive.getAsNumber());
             }
         }
 
-        return PrimitiveDataObject.of(value.getAsString());
+        return StringDataObject.of(value.getAsString());
     }
 }

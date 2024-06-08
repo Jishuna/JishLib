@@ -7,12 +7,12 @@ import me.jishuna.jishlib.data.object.DataObject;
 import me.jishuna.jishlib.data.object.MapDataObject;
 
 public class MapAdapter<K, V> implements TypeAdapter<MapDataObject, Map<K, V>> {
-    private final TypeAdapterString<K> keyAdapter;
+    private final TypeAdapter<DataObject<?>, K> keyAdapter;
     private final TypeAdapter<DataObject<?>, V> valueAdapter;
 
     @SuppressWarnings("unchecked")
     public MapAdapter(DataType<?> type) {
-        this.keyAdapter = (TypeAdapterString<K>) TypeAdapterRegistry.getStringAdapter(type.getComponentTypes().get(0));
+        this.keyAdapter = (TypeAdapter<DataObject<?>, K>) TypeAdapterRegistry.getAdapter(type.getComponentTypes().get(0));
         this.valueAdapter = (TypeAdapter<DataObject<?>, V>) TypeAdapterRegistry.getAdapter(type.getComponentTypes().get(1));
     }
 
@@ -44,5 +44,15 @@ public class MapAdapter<K, V> implements TypeAdapter<MapDataObject, Map<K, V>> {
         });
 
         return MapDataObject.of(dataMap);
+    }
+
+    @Override
+    public Map<K, V> fromString(String value) {
+        return null;
+    }
+
+    @Override
+    public String toString(Map<K, V> value) {
+        return null;
     }
 }

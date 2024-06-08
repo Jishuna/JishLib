@@ -13,6 +13,10 @@ public final class Constants {
             .useUnusualXRepeatedCharacterHexFormat()
             .build();
 
+    public static void init() {
+        // Force the class to load
+    }
+
     private Constants() {
     }
 }

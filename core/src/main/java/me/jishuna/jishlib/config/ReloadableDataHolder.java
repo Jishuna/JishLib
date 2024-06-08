@@ -27,6 +27,14 @@ public abstract class ReloadableDataHolder<T> {
         cacheFields(clazz);
     }
 
+    public static <T> ReloadableInstanceDataHolder<T> create(File file, T object) {
+        return new ReloadableInstanceDataHolder<>(file, object);
+    }
+
+    public static <T> ReloadableStaticDataHolder<T> create(File file, Class<T> clazz) {
+        return new ReloadableStaticDataHolder<>(file, clazz);
+    }
+
     public ReloadableDataHolder<T> load() {
         load(true);
 

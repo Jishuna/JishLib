@@ -14,16 +14,26 @@ public class ArgumentQueue {
         this.internalQueue = new ArrayDeque<>(Arrays.asList(args));
     }
 
+    public void dropFirst() {
+        this.internalQueue.poll();
+    }
+
     public <T> T poll(Class<T> clazz) {
         ArgumentParser<T> parser = ArgumentParsers.getParser(clazz);
         if (this.internalQueue.isEmpty()) {
-            throw new CommandException(Messages.get("command.invalid-arg", Placeholder.unparsed("arg", "None")));
+            throw new CommandException(Messages
+                    .get("command.invalid-arg",
+                            Placeholder.unparsed("input", "None"),
+                            Placeholder.unparsed("args", parser.getValidArguments())));
         }
 
         String raw = this.internalQueue.poll();
         T value = parser.parse(raw);
         if (value == null) {
-            throw new CommandException(Messages.get("command.invalid-arg", Placeholder.unparsed("arg", raw)));
+            throw new CommandException(Messages
+                    .get("command.invalid-arg",
+                            Placeholder.unparsed("input", raw),
+                            Placeholder.unparsed("args", parser.getValidArguments())));
         }
 
         return value;

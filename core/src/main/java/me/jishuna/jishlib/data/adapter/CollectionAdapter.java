@@ -54,4 +54,14 @@ public class CollectionAdapter<T> implements TypeAdapter<ListDataObject, Collect
         value.forEach(v -> dataList.add(this.adapter.serialize(v)));
         return ListDataObject.of(dataList);
     }
+
+    @Override
+    public Collection<T> fromString(String value) {
+        return null;
+    }
+
+    @Override
+    public String toString(Collection<T> value) {
+        return null;
+    }
 }

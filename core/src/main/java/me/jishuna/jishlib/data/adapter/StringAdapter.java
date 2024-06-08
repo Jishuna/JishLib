@@ -1,6 +1,23 @@
 package me.jishuna.jishlib.data.adapter;
 
-public class StringAdapter implements TypeAdapterString<String> {
+import me.jishuna.jishlib.data.object.StringDataObject;
+
+public class StringAdapter implements TypeAdapter<StringDataObject, String> {
+
+    @Override
+    public Class<StringDataObject> getObjectType() {
+        return StringDataObject.class;
+    }
+
+    @Override
+    public String deserialize(StringDataObject data) {
+        return data.get();
+    }
+
+    @Override
+    public StringDataObject serialize(String value) {
+        return StringDataObject.of(value);
+    }
 
     @Override
     public String fromString(String value) {
@@ -11,5 +28,4 @@ public class StringAdapter implements TypeAdapterString<String> {
     public String toString(String value) {
         return value;
     }
-
 }

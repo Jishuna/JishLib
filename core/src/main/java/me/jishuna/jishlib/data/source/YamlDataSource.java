@@ -10,10 +10,12 @@ import java.util.List;
 import java.util.Map;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import me.jishuna.jishlib.data.object.BooleanDataObject;
 import me.jishuna.jishlib.data.object.DataObject;
 import me.jishuna.jishlib.data.object.ListDataObject;
 import me.jishuna.jishlib.data.object.MapDataObject;
-import me.jishuna.jishlib.data.object.PrimitiveDataObject;
+import me.jishuna.jishlib.data.object.NumericDataObject;
+import me.jishuna.jishlib.data.object.StringDataObject;
 
 public class YamlDataSource implements DataSource {
     private final String pathSeperator;
@@ -35,7 +37,7 @@ public class YamlDataSource implements DataSource {
             e.printStackTrace();
         }
 
-        return MapDataObject.empty();
+        return MapDataObject.empty("");
     }
 
     @Override
@@ -60,10 +62,12 @@ public class YamlDataSource implements DataSource {
     private MapDataObject readMap(Map<?, ?> map) {
         Map<String, DataObject<?>> dataMap = new LinkedHashMap<>();
         map.forEach((k, v) -> {
-            dataMap.put(String.valueOf(k), readValue(v));
+            DataObject<?> value = readValue(v);
+            value.setName(String.valueOf(k));
+            dataMap.put(value.getName(), value);
         });
 
-        return MapDataObject.of(this.pathSeperator, dataMap);
+        return MapDataObject.of("", this.pathSeperator, dataMap);
     }
 
     private ListDataObject readList(Collection<?> list) {
@@ -89,13 +93,13 @@ public class YamlDataSource implements DataSource {
         }
 
         if (Boolean.class.isInstance(value)) {
-            return PrimitiveDataObject.of((boolean) value);
+            return BooleanDataObject.of((boolean) value);
         }
 
         if (Number.class.isInstance(value)) {
-            return PrimitiveDataObject.of((Number) value);
+            return NumericDataObject.of((Number) value);
         }
 
-        return PrimitiveDataObject.of(String.valueOf(value));
+        return StringDataObject.of(String.valueOf(value));
     }
 }

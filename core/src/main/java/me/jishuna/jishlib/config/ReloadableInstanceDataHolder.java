@@ -7,7 +7,7 @@ public class ReloadableInstanceDataHolder<T> extends ReloadableDataHolder<T> {
     private final T wrapped;
 
     @SuppressWarnings("unchecked")
-    public ReloadableInstanceDataHolder(File file, T object) {
+    protected ReloadableInstanceDataHolder(File file, T object) {
         super(file, (Class<T>) object.getClass());
 
         this.wrapped = object;

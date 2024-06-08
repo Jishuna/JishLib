@@ -7,29 +7,30 @@ import java.util.Iterator;
 import java.util.List;
 import me.jishuna.jishlib.data.source.nbt.TagType;
 
-public class ListDataObject extends DataObject<List<DataObject<?>>> implements Iterable<DataObject<?>> {
+public class ArrayDataObject extends ListDataObject {
 
-    protected ListDataObject(String name, List<DataObject<?>> value) {
+    private ArrayDataObject(String name, List<DataObject<?>> value) {
         super(name, value);
     }
 
-    public static ListDataObject empty(String name) {
-        return new ListDataObject(name, new ArrayList<>());
+    public static ArrayDataObject empty(String name) {
+        return new ArrayDataObject(name, new ArrayList<>());
     }
 
-    public static ListDataObject of(List<DataObject<?>> value) {
+    public static ArrayDataObject of(List<DataObject<?>> value) {
         return of("", value);
     }
 
-    public static ListDataObject of(String name, List<DataObject<?>> value) {
-        return new ListDataObject(name, value);
+    public static ArrayDataObject of(String name, List<DataObject<?>> value) {
+        return new ArrayDataObject(name, value);
     }
 
+    @Override
     public void add(DataObject<?> value) {
         this.value.add(value);
     }
 
-    public void merge(ListDataObject other) {
+    public void merge(ArrayDataObject other) {
         other.forEach(this::add);
     }
 
@@ -48,16 +49,24 @@ public class ListDataObject extends DataObject<List<DataObject<?>>> implements I
 
     @Override
     public byte getTagType() {
-        return TagType.LIST.id();
+        if (this.value.isEmpty()) {
+            return TagType.BYTE_ARRAY.id();
+        }
+
+        byte entryType = this.value.get(0).getTagType();
+        if (entryType == TagType.INT.id()) {
+            return TagType.INT_ARRAY.id();
+        }
+
+        if (entryType == TagType.LONG.id()) {
+            return TagType.LONG_ARRAY.id();
+        }
+
+        return TagType.BYTE_ARRAY.id();
     }
 
     @Override
     public void write(DataOutput output) throws IOException {
-        if (this.value.isEmpty()) {
-            output.writeByte(0);
-        } else {
-            output.writeByte(this.value.get(0).getTagType());
-        }
         output.writeInt(this.value.size());
 
         for (DataObject<?> object : this) {

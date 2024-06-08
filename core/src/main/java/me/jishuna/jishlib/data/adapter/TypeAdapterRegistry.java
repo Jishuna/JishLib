@@ -30,17 +30,6 @@ public class TypeAdapterRegistry {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends DataObject<?>, R> TypeAdapterString<R> getStringAdapter(DataType<R> type) {
-        TypeAdapter<?, R> adapter = getAdapter(type);
-
-        if (adapter instanceof TypeAdapterString<?> stringAdapter) {
-            return (TypeAdapterString<R>) stringAdapter;
-        }
-
-        return null;
-    }
-
-    @SuppressWarnings("unchecked")
     public static <T extends DataObject<?>, R> TypeAdapter<T, R> getAdapter(DataType<R> type) {
         TypeAdapter<?, ?> adapter = getInstance().adapters.get(type);
         if (adapter == null) {

@@ -19,6 +19,9 @@ public class BranchNode extends CommandNode {
             return;
         }
 
-        throw new CommandException(Messages.get("command.invalid-arg", Placeholder.unparsed("arg", arguments.peek())));
+        throw new CommandException(Messages
+                .get("command.invalid-arg",
+                        Placeholder.unparsed("input", arguments.peek()),
+                        Placeholder.unparsed("args", String.join(", ", getApplicableSubcommands(sender)))));
     }
 }

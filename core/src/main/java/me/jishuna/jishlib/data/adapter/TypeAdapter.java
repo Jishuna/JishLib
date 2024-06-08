@@ -9,4 +9,8 @@ public interface TypeAdapter<T extends DataObject<?>, R> {
     public R deserialize(T data);
 
     public T serialize(R value);
+
+    public R fromString(String value);
+
+    public String toString(R value);
 }

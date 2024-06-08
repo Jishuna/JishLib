@@ -17,7 +17,7 @@ import me.jishuna.jishlib.Constants;
 import me.jishuna.jishlib.Plugin;
 import me.jishuna.jishlib.data.object.ListDataObject;
 import me.jishuna.jishlib.data.object.MapDataObject;
-import me.jishuna.jishlib.data.object.PrimitiveDataObject;
+import me.jishuna.jishlib.data.object.StringDataObject;
 import me.jishuna.jishlib.data.source.JsonDataSource;
 
 public class Messages {
@@ -93,14 +93,14 @@ public class Messages {
                 List<String> list = new ArrayList<>();
 
                 listObject.forEach(entry -> {
-                    if (entry instanceof PrimitiveDataObject primitive) {
-                        list.add(primitive.asString());
+                    if (entry instanceof StringDataObject primitive) {
+                        list.add(primitive.get());
                     }
                 });
 
                 this.stringLists.put(k, list);
-            } else if (v instanceof PrimitiveDataObject primitive) {
-                this.strings.put(k, primitive.asString());
+            } else if (v instanceof StringDataObject primitive) {
+                this.strings.put(k, primitive.get());
             }
         });
     }
@@ -110,7 +110,7 @@ public class Messages {
             return source.read(this.file);
         }
 
-        return MapDataObject.empty();
+        return MapDataObject.empty("");
     }
 
     private MapDataObject readInternal(JsonDataSource source) {
@@ -121,6 +121,6 @@ public class Messages {
             e.printStackTrace();
         }
 
-        return MapDataObject.empty();
+        return MapDataObject.empty("");
     }
 }

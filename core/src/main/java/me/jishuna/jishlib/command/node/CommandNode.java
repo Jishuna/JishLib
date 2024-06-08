@@ -35,10 +35,13 @@ public abstract class CommandNode {
         }
 
         if (!sender.hasPermission(node.info.permission())) {
-            throw new CommandException(Messages.get("command.invalid-arg", Placeholder.unparsed("arg", arguments.peek())));
+            throw new CommandException(Messages
+                    .get("command.invalid-arg",
+                            Placeholder.unparsed("input", arguments.peek()),
+                            Placeholder.unparsed("args", String.join(", ", getApplicableSubcommands(sender)))));
         }
 
-        arguments.poll(String.class);
+        arguments.dropFirst();
         node.handleCommand(sender, arguments);
         return true;
     }
@@ -77,7 +80,7 @@ public abstract class CommandNode {
             return StringUtil.copyPartialMatches(subCommand, subCommands, new ArrayList<>());
         }
 
-        arguments.poll(String.class);
+        arguments.dropFirst();
         return childNode.handleTabComplete(sender, arguments);
     }
 

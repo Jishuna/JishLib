@@ -5,7 +5,7 @@ import me.jishuna.jishlib.util.ReflectionHelper;
 
 public class ReloadableStaticDataHolder<T> extends ReloadableDataHolder<T> {
 
-    public ReloadableStaticDataHolder(File file, Class<T> clazz) {
+    protected ReloadableStaticDataHolder(File file, Class<T> clazz) {
         super(file, clazz);
     }
 
