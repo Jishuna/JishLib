@@ -49,13 +49,7 @@ public abstract class ReloadableDataHolder<T> {
         }
 
         YamlReader source = YamlReader.create(".");
-        MapDataObject data;
-        try {
-            data = source.readFile(this.file);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return this;
-        }
+        MapDataObject data = source.read(YamlConfiguration.loadConfiguration(this.file));
 
         for (ConfigField field : this.fields) {
             if (field.isStatic() && !includeStatic) {
@@ -129,9 +123,11 @@ public abstract class ReloadableDataHolder<T> {
             data.set(path, obj, replace);
         }
 
-        try (YamlWriter writer = YamlWriter.create(this.file, configuration)) {
+        try {
+            YamlWriter writer = YamlWriter.create(configuration);
             writer.writeMap("", data);
             this.fields.forEach(f -> configuration.setComments(f.getPath(), f.getComments()));
+            writer.save(this.file);
         } catch (IOException ex) {
             Logger.error("Failed to save file {0}: {1}", this.file.getPath(), ex);
         }

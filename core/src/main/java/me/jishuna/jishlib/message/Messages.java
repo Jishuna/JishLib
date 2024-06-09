@@ -77,8 +77,10 @@ public class Messages {
         MapDataObject internal = readInternal(source);
 
         saved.merge(internal);
-        try (JsonWriter writer = JsonWriter.create(this.file)) {
+        try {
+            JsonWriter writer = JsonWriter.create();
             writer.writeMap("", saved);
+            writer.save(this.file);
         } catch (IOException e) {
             e.printStackTrace();
         }

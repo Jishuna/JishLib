@@ -1,10 +1,13 @@
 package me.jishuna.jishlib.data.source.nbt;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPOutputStream;
@@ -17,20 +20,38 @@ import me.jishuna.jishlib.data.object.NumericDataObject;
 import me.jishuna.jishlib.data.object.StringDataObject;
 import me.jishuna.jishlib.data.source.DataWriter;
 
-public class NBTWriter implements DataWriter {
+public class NBTWriter implements DataWriter, Closeable {
+    private final ByteArrayOutputStream byteStream;
     private final DataOutputStream writer;
     private boolean hasTag = false;
 
-    private NBTWriter(File file, CompressionType type) throws IOException {
-        this.writer = getOutputStream(file, type);
+    private NBTWriter() throws IOException {
+        this.byteStream = new ByteArrayOutputStream();
+        this.writer = new DataOutputStream(this.byteStream);
     }
 
-    public static NBTWriter create(File file) throws IOException {
-        return new NBTWriter(file, CompressionType.NONE);
+    public static NBTWriter create() throws IOException {
+        return new NBTWriter();
     }
 
-    public static NBTWriter create(File file, CompressionType type) throws IOException {
-        return new NBTWriter(file, type);
+    @Override
+    public void save(File file) throws IOException {
+        save(new BufferedOutputStream(new FileOutputStream(file)));
+    }
+
+    public void save(File file, CompressionType type) throws IOException {
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+        switch (type) {
+        case NONE -> save(new DataOutputStream(bos));
+        case GZIP -> save(new DataOutputStream(new GZIPOutputStream(bos)));
+        case ZLIB -> save(new DataOutputStream(new DeflaterOutputStream(bos)));
+        }
+    }
+
+    private void save(OutputStream output) throws IOException {
+        try (output) {
+            this.byteStream.writeTo(output);
+        }
     }
 
     @Override
@@ -162,17 +183,13 @@ public class NBTWriter implements DataWriter {
         return 0;
     }
 
-    private DataOutputStream getOutputStream(File file, CompressionType type) throws IOException {
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
-        return switch (type) {
-        case NONE -> new DataOutputStream(bos);
-        case GZIP -> new DataOutputStream(new GZIPOutputStream(bos));
-        case ZLIB -> new DataOutputStream(new DeflaterOutputStream(bos));
-        };
-    }
-
     @Override
     public void close() throws IOException {
         this.writer.close();
+        this.byteStream.close();
+    }
+
+    public byte[] getValue() {
+        return this.byteStream.toByteArray();
     }
 }

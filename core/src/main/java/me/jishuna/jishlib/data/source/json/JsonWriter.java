@@ -26,38 +26,52 @@ public class JsonWriter implements DataWriter {
             .disableHtmlEscaping()
             .create();
 
-    private final File file;
+    private final JsonObject root;
     private final Stack<JsonElement> stack = new Stack<>();
 
-    private JsonWriter(File file, JsonObject json) {
-        this.file = file;
-        this.stack.add(json);
+    private JsonWriter(JsonObject json) {
+        this.root = json;
+        this.stack.add(this.root);
     }
 
-    public static JsonWriter create(File file) {
-        return new JsonWriter(file, new JsonObject());
+    public static JsonWriter create() {
+        return new JsonWriter(new JsonObject());
     }
 
-    public static JsonWriter create(File file, JsonObject json) {
-        return new JsonWriter(file, json);
+    public static JsonWriter create(JsonObject json) {
+        return new JsonWriter(json);
+    }
+
+    @Override
+    public void save(File file) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            GSON.toJson(this.root, writer);
+        }
     }
 
     @Override
     public void writeMap(String name, MapDataObject value) throws IOException {
-        JsonObject json = new JsonObject();
-        this.stack.push(json);
+        boolean pop = false;
+        if (!name.isBlank()) {
+            JsonObject json = new JsonObject();
+            JsonElement element = this.stack.peek();
+
+            if (element.isJsonArray()) {
+                element.getAsJsonArray().add(json);
+            } else if (element.isJsonObject()) {
+                element.getAsJsonObject().add(name, json);
+            }
+
+            this.stack.push(json);
+            pop = true;
+        }
 
         for (DataObject<?> v : value.get().values()) {
             v.write(this);
         }
 
-        this.stack.pop();
-
-        JsonElement element = this.stack.peek();
-        if (element.isJsonArray()) {
-            element.getAsJsonArray().add(json);
-        } else if (element.isJsonObject()) {
-            element.getAsJsonObject().add(name, json);
+        if (pop) {
+            this.stack.pop();
         }
     }
 
@@ -115,10 +129,7 @@ public class JsonWriter implements DataWriter {
         }
     }
 
-    @Override
-    public void close() throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(this.file))) {
-            GSON.toJson(this.stack.peek(), writer);
-        }
+    public JsonObject getValue() {
+        return this.root;
     }
 }

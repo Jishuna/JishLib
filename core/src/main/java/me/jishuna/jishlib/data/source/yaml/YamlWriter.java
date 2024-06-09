@@ -15,40 +15,49 @@ import me.jishuna.jishlib.data.object.StringDataObject;
 import me.jishuna.jishlib.data.source.DataWriter;
 
 public class YamlWriter implements DataWriter {
-    private final File file;
     private final YamlConfiguration root;
     private final Stack<Object> stack = new Stack<>();
 
-    private YamlWriter(File file, YamlConfiguration config) {
-        this.file = file;
+    private YamlWriter(YamlConfiguration config) {
         this.root = config;
-        this.stack.add(config);
+        this.stack.add(this.root);
     }
 
-    public static YamlWriter create(File file) {
-        return new YamlWriter(file, new YamlConfiguration());
+    public static YamlWriter create() {
+        return new YamlWriter(new YamlConfiguration());
     }
 
-    public static YamlWriter create(File file, YamlConfiguration config) {
-        return new YamlWriter(file, config);
+    public static YamlWriter create(YamlConfiguration config) {
+        return new YamlWriter(config);
+    }
+
+    @Override
+    public void save(File file) throws IOException {
+        this.root.save(file);
     }
 
     @Override
     public void writeMap(String name, MapDataObject value) throws IOException {
-        YamlConfiguration config = new YamlConfiguration();
-        this.stack.push(config);
+        boolean pop = false;
+        if (!name.isBlank()) {
+            YamlConfiguration config = new YamlConfiguration();
+            Object object = this.stack.peek();
+            if (object instanceof ConfigurationList list) {
+                list.add(config);
+            } else if (object instanceof ConfigurationSection section) {
+                section.set(name, config);
+            }
+
+            this.stack.push(config);
+            pop = true;
+        }
 
         for (DataObject<?> v : value.get().values()) {
             v.write(this);
         }
 
-        this.stack.pop();
-
-        Object object = this.stack.peek();
-        if (object instanceof ConfigurationList list) {
-            list.add(config);
-        } else if (object instanceof ConfigurationSection section) {
-            section.set(name, config);
+        if (pop) {
+            this.stack.pop();
         }
     }
 
@@ -106,9 +115,7 @@ public class YamlWriter implements DataWriter {
         }
     }
 
-    @Override
-    public void close() throws IOException {
-        this.root.save(this.file);
-        this.stack.clear();
+    public YamlConfiguration getValue() {
+        return this.root;
     }
 }
