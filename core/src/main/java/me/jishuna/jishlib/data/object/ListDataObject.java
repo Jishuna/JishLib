@@ -1,11 +1,10 @@
 package me.jishuna.jishlib.data.object;
 
-import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import me.jishuna.jishlib.data.source.nbt.TagType;
+import me.jishuna.jishlib.data.source.DataWriter;
 
 public class ListDataObject extends DataObject<List<DataObject<?>>> implements Iterable<DataObject<?>> {
 
@@ -34,34 +33,12 @@ public class ListDataObject extends DataObject<List<DataObject<?>>> implements I
     }
 
     @Override
-    public Object serialize() {
-        List<Object> list = new ArrayList<>();
-        this.value.forEach(o -> list.add(o.serialize()));
-
-        return list;
-    }
-
-    @Override
     public Iterator<DataObject<?>> iterator() {
         return this.value.iterator();
     }
 
     @Override
-    public byte getTagType() {
-        return TagType.LIST.id();
-    }
-
-    @Override
-    public void write(DataOutput output) throws IOException {
-        if (this.value.isEmpty()) {
-            output.writeByte(0);
-        } else {
-            output.writeByte(this.value.get(0).getTagType());
-        }
-        output.writeInt(this.value.size());
-
-        for (DataObject<?> object : this) {
-            object.write(output);
-        }
+    public void write(DataWriter writer) throws IOException {
+        writer.writeList(this.name, this);
     }
 }

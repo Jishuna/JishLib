@@ -1,13 +1,11 @@
 package me.jishuna.jishlib.data.object;
 
-import java.io.DataOutput;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import me.jishuna.jishlib.data.source.nbt.TagType;
+import me.jishuna.jishlib.data.source.DataWriter;
 
 public class MapDataObject extends DataObject<Map<String, DataObject<?>>> {
     private final String pathSeperator;
@@ -148,14 +146,6 @@ public class MapDataObject extends DataObject<Map<String, DataObject<?>>> {
         });
     }
 
-    @Override
-    public Object serialize() {
-        Map<String, Object> map = new HashMap<>();
-        this.value.forEach((k, v) -> map.put(k, v.serialize()));
-
-        return map;
-    }
-
     private <R> R processKey(String key, boolean create, BiFunction<String, MapDataObject, R> function) {
         if (this.pathSeperator == null) {
             return function.apply(key, this);
@@ -185,19 +175,7 @@ public class MapDataObject extends DataObject<Map<String, DataObject<?>>> {
     }
 
     @Override
-    public byte getTagType() {
-        return TagType.COMPOUND.id();
-    }
-
-    @Override
-    public void write(DataOutput output) throws IOException {
-        for (DataObject<?> object : this.value.values()) {
-            output.writeByte(object.getTagType());
-            output.writeUTF(object.getName());
-
-            object.write(output);
-        }
-
-        output.writeByte(0);
+    public void write(DataWriter writer) throws IOException {
+        writer.writeMap(this.name, this);
     }
 }

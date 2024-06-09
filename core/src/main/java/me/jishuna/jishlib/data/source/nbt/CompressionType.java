@@ -11,17 +11,20 @@ public enum CompressionType {
         if (!in.markSupported()) {
             in = new BufferedInputStream(in);
         }
-        in.mark(0);
+        CompressionType type = NONE;
 
-        if (in.read() == 120) {
-            return ZLIB;
+        in.mark(1);
+        int firstByte = in.read();
+
+        if (firstByte == 120) {
+            type = ZLIB;
+        }
+
+        if (firstByte == 31) {
+            type = GZIP;
         }
 
         in.reset();
-        if (in.read() == 31) {
-            return GZIP;
-        }
-
-        return NONE;
+        return type;
     }
 }

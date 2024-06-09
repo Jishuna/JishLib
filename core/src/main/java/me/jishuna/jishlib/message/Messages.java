@@ -3,9 +3,6 @@ package me.jishuna.jishlib.message;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,7 +15,8 @@ import me.jishuna.jishlib.Plugin;
 import me.jishuna.jishlib.data.object.ListDataObject;
 import me.jishuna.jishlib.data.object.MapDataObject;
 import me.jishuna.jishlib.data.object.StringDataObject;
-import me.jishuna.jishlib.data.source.JsonDataSource;
+import me.jishuna.jishlib.data.source.json.JsonReader;
+import me.jishuna.jishlib.data.source.json.JsonWriter;
 
 public class Messages {
     private static Messages INSTANCE;
@@ -73,13 +71,17 @@ public class Messages {
     }
 
     private void load() {
-        JsonDataSource source = new JsonDataSource(null);
+        JsonReader source = JsonReader.create(null);
 
         MapDataObject saved = readSaved(source);
         MapDataObject internal = readInternal(source);
 
         saved.merge(internal);
-        source.write(saved, this.file);
+        try (JsonWriter writer = JsonWriter.create(this.file)) {
+            writer.writeMap("", saved);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         loadValues(saved);
     }
@@ -105,18 +107,21 @@ public class Messages {
         });
     }
 
-    private MapDataObject readSaved(JsonDataSource source) {
+    private MapDataObject readSaved(JsonReader source) {
         if (this.file.exists()) {
-            return source.read(this.file);
+            try {
+                return source.readFile(this.file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         return MapDataObject.empty("");
     }
 
-    private MapDataObject readInternal(JsonDataSource source) {
-        try (InputStream stream = Plugin.getInstance().getResource(this.path);
-                Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-            return source.read(reader);
+    private MapDataObject readInternal(JsonReader source) {
+        try (InputStream stream = Plugin.getInstance().getResource(this.path)) {
+            return source.readStream(stream);
         } catch (IOException e) {
             e.printStackTrace();
         }

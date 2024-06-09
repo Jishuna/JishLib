@@ -1,21 +1,17 @@
 package me.jishuna.jishlib.data.source.nbt;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.Reader;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 import java.util.zip.InflaterInputStream;
 import me.jishuna.jishlib.data.object.ArrayDataObject;
 import me.jishuna.jishlib.data.object.DataObject;
@@ -23,54 +19,44 @@ import me.jishuna.jishlib.data.object.ListDataObject;
 import me.jishuna.jishlib.data.object.MapDataObject;
 import me.jishuna.jishlib.data.object.NumericDataObject;
 import me.jishuna.jishlib.data.object.StringDataObject;
-import me.jishuna.jishlib.data.source.DataSource;
+import me.jishuna.jishlib.data.source.DataReader;
 
-public class NBTDataSource implements DataSource {
+public class NBTReader implements DataReader {
     private final String pathSeperator;
 
-    public NBTDataSource(String pathSeperator) {
+    private NBTReader(String pathSeperator) {
         this.pathSeperator = pathSeperator;
     }
 
+    public static NBTReader create(String pathSeperator) {
+        return new NBTReader(pathSeperator);
+    }
+
     @Override
-    public MapDataObject read(File file) {
-        try (FileInputStream fis = new FileInputStream(file);
-                BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
-            return switch (CompressionType.getCompression(fis)) {
+    public MapDataObject readFile(File file) throws IOException {
+        try (FileInputStream fis = new FileInputStream(file)) {
+            return readStream(fis);
+        }
+    }
+
+    @Override
+    public MapDataObject readStream(InputStream stream) throws IOException {
+        try (BufferedInputStream bis = new BufferedInputStream(stream)) {
+            return switch (CompressionType.getCompression(bis)) {
             case NONE -> read(new DataInputStream(bis));
             case GZIP -> read(new DataInputStream(new GZIPInputStream(bis)));
             case ZLIB -> read(new DataInputStream(new InflaterInputStream(bis)));
             };
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-
-        return MapDataObject.empty("");
     }
 
-    private MapDataObject read(DataInputStream input) {
+    private MapDataObject read(DataInputStream input) throws IOException {
         try (input) {
             input.readByte();
             String name = input.readUTF();
             MapDataObject data = readCompound(input);
             data.setName(name);
             return data;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return MapDataObject.empty("");
-    }
-
-    @Override
-    public void write(MapDataObject data, File file) {
-        try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
-                DataOutputStream writer = new DataOutputStream(new GZIPOutputStream(bos))) {
-            writer.writeByte(TagType.COMPOUND.id());
-            writer.writeUTF(data.getName());
-            data.write(writer);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -147,11 +133,5 @@ public class NBTDataSource implements DataSource {
         }
         default -> null;
         };
-    }
-
-    @Override
-    public MapDataObject read(Reader reader) {
-        // TODO Auto-generated method stub
-        return null;
     }
 }

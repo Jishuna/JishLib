@@ -1,8 +1,7 @@
 package me.jishuna.jishlib.data.object;
 
-import java.io.DataOutput;
 import java.io.IOException;
-import me.jishuna.jishlib.data.source.nbt.TagType;
+import me.jishuna.jishlib.data.source.DataWriter;
 
 public class StringDataObject extends DataObject<String> {
     protected StringDataObject(String name, String value) {
@@ -18,12 +17,7 @@ public class StringDataObject extends DataObject<String> {
     }
 
     @Override
-    public byte getTagType() {
-        return TagType.STRING.id();
-    }
-
-    @Override
-    public void write(DataOutput output) throws IOException {
-        output.writeUTF(this.value);
+    public void write(DataWriter writer) throws IOException {
+        writer.writeString(this.name, this);
     }
 }

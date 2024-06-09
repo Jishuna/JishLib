@@ -1,8 +1,7 @@
 package me.jishuna.jishlib.data.object;
 
-import java.io.DataOutput;
 import java.io.IOException;
-import me.jishuna.jishlib.data.source.nbt.TagType;
+import me.jishuna.jishlib.data.source.DataWriter;
 
 public class NumericDataObject<T extends Number> extends DataObject<T> {
     protected NumericDataObject(String name, T value) {
@@ -42,57 +41,7 @@ public class NumericDataObject<T extends Number> extends DataObject<T> {
     }
 
     @Override
-    public byte getTagType() {
-        if (this.value.getClass() == Byte.class) {
-            return TagType.BYTE.id();
-        }
-
-        if (this.value.getClass() == Short.class) {
-            return TagType.SHORT.id();
-        }
-
-        if (this.value.getClass() == Integer.class) {
-            return TagType.INT.id();
-        }
-
-        if (this.value.getClass() == Long.class) {
-            return TagType.LONG.id();
-        }
-
-        if (this.value.getClass() == Float.class) {
-            return TagType.FLOAT.id();
-        }
-
-        return TagType.DOUBLE.id();
-    }
-
-    @Override
-    public void write(DataOutput output) throws IOException {
-        if (this.value.getClass() == Byte.class) {
-            output.writeByte(this.value.byteValue());
-            return;
-        }
-
-        if (this.value.getClass() == Short.class) {
-            output.writeShort(this.value.shortValue());
-            return;
-        }
-
-        if (this.value.getClass() == Integer.class) {
-            output.writeInt(this.value.intValue());
-            return;
-        }
-
-        if (this.value.getClass() == Long.class) {
-            output.writeLong(this.value.longValue());
-            return;
-        }
-
-        if (this.value.getClass() == Float.class) {
-            output.writeFloat(this.value.floatValue());
-            return;
-        }
-
-        output.writeDouble(this.value.doubleValue());
+    public void write(DataWriter writer) throws IOException {
+        writer.writeNumber(this.name, this);
     }
 }

@@ -1,8 +1,9 @@
-package me.jishuna.jishlib.data.source;
+package me.jishuna.jishlib.data.source.yaml;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -16,47 +17,33 @@ import me.jishuna.jishlib.data.object.ListDataObject;
 import me.jishuna.jishlib.data.object.MapDataObject;
 import me.jishuna.jishlib.data.object.NumericDataObject;
 import me.jishuna.jishlib.data.object.StringDataObject;
+import me.jishuna.jishlib.data.source.DataReader;
 
-public class YamlDataSource implements DataSource {
+public class YamlReader implements DataReader {
     private final String pathSeperator;
 
-    public YamlDataSource(String pathSeperator) {
+    private YamlReader(String pathSeperator) {
         this.pathSeperator = pathSeperator;
     }
 
+    public static YamlReader create(String pathSeperator) {
+        return new YamlReader(pathSeperator);
+    }
+
     @Override
-    public MapDataObject read(File file) {
+    public MapDataObject readFile(File file) throws IOException {
         return read(YamlConfiguration.loadConfiguration(file));
     }
 
     @Override
-    public MapDataObject read(Reader reader) {
-        try (reader) {
+    public MapDataObject readStream(InputStream stream) throws IOException {
+        try (InputStreamReader reader = new InputStreamReader(stream)) {
             return read(YamlConfiguration.loadConfiguration(reader));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return MapDataObject.empty("");
-    }
-
-    @Override
-    public void write(MapDataObject data, File file) {
-        YamlConfiguration config = new YamlConfiguration();
-        write(data, config);
-        try {
-            config.save(file);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
-    public MapDataObject read(ConfigurationSection configuration) {
-        return readMap(configuration.getValues(false));
-    }
-
-    public void write(MapDataObject data, ConfigurationSection configuration) {
-        data.forEach((k, v) -> configuration.set(k, v.serialize()));
+    public MapDataObject read(YamlConfiguration config) {
+        return readMap(config.getValues(false));
     }
 
     private MapDataObject readMap(Map<?, ?> map) {

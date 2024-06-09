@@ -1,8 +1,7 @@
 package me.jishuna.jishlib.data.object;
 
-import java.io.DataOutput;
 import java.io.IOException;
-import me.jishuna.jishlib.data.source.nbt.TagType;
+import me.jishuna.jishlib.data.source.DataWriter;
 
 public class BooleanDataObject extends DataObject<Boolean> {
 
@@ -19,13 +18,8 @@ public class BooleanDataObject extends DataObject<Boolean> {
     }
 
     @Override
-    public byte getTagType() {
-        return TagType.BYTE.id();
-    }
-
-    @Override
-    public void write(DataOutput output) throws IOException {
-        output.writeByte(this.value ? 1 : 0);
+    public void write(DataWriter writer) throws IOException {
+        writer.writeBoolean(this.name, this);
     }
 
 }

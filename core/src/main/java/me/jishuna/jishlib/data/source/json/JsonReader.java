@@ -1,21 +1,15 @@
-package me.jishuna.jishlib.data.source;
+package me.jishuna.jishlib.data.source.json;
 
-import com.google.common.io.Files;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.reflect.TypeToken;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.lang.reflect.Type;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -27,56 +21,30 @@ import me.jishuna.jishlib.data.object.ListDataObject;
 import me.jishuna.jishlib.data.object.MapDataObject;
 import me.jishuna.jishlib.data.object.NumericDataObject;
 import me.jishuna.jishlib.data.object.StringDataObject;
+import me.jishuna.jishlib.data.source.DataReader;
 
-public class JsonDataSource implements DataSource {
-    private static final Gson GSON = new GsonBuilder()
-            .setLenient()
-            .setPrettyPrinting()
-            .disableHtmlEscaping()
-            .create();
-    private static final Type TYPE = new TypeToken<Map<String, Object>>() {
-    }.getType();
-
+public class JsonReader implements DataReader {
     private final String pathSeperator;
 
-    public JsonDataSource(String pathSeperator) {
+    private JsonReader(String pathSeperator) {
         this.pathSeperator = pathSeperator;
     }
 
+    public static JsonReader create(String pathSeperator) {
+        return new JsonReader(pathSeperator);
+    }
+
     @Override
-    public MapDataObject read(File file) {
+    public MapDataObject readFile(File file) throws IOException {
         try (FileReader reader = new FileReader(file, StandardCharsets.UTF_8)) {
-            return read(reader);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return MapDataObject.empty("");
-    }
-
-    @Override
-    public MapDataObject read(Reader reader) {
-        try (reader) {
             return readObject(JsonParser.parseReader(reader).getAsJsonObject());
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-
-        return MapDataObject.empty("");
     }
 
     @Override
-    public void write(MapDataObject data, File file) {
-        try {
-            Files.createParentDirs(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try (Writer writer = new FileWriter(file, StandardCharsets.UTF_8)) {
-            GSON.toJson(data.serialize(), TYPE, writer);
-        } catch (IOException e) {
-            e.printStackTrace();
+    public MapDataObject readStream(InputStream stream) throws IOException {
+        try (InputStreamReader reader = new InputStreamReader(stream)) {
+            return readObject(JsonParser.parseReader(reader).getAsJsonObject());
         }
     }
 

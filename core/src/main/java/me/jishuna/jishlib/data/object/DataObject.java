@@ -1,7 +1,7 @@
 package me.jishuna.jishlib.data.object;
 
-import java.io.DataOutput;
 import java.io.IOException;
+import me.jishuna.jishlib.data.source.DataWriter;
 
 public abstract class DataObject<T> {
     protected String name = "";
@@ -24,13 +24,7 @@ public abstract class DataObject<T> {
         return this.value;
     }
 
-    public Object serialize() {
-        return this.value;
-    }
-
-    public abstract byte getTagType();
-
-    public abstract void write(DataOutput output) throws IOException;
+    public abstract void write(DataWriter writer) throws IOException;
 
     @Override
     public String toString() {

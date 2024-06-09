@@ -13,7 +13,8 @@ import me.jishuna.jishlib.data.adapter.TypeAdapter;
 import me.jishuna.jishlib.data.adapter.TypeAdapterRegistry;
 import me.jishuna.jishlib.data.object.DataObject;
 import me.jishuna.jishlib.data.object.MapDataObject;
-import me.jishuna.jishlib.data.source.YamlDataSource;
+import me.jishuna.jishlib.data.source.yaml.YamlReader;
+import me.jishuna.jishlib.data.source.yaml.YamlWriter;
 
 public abstract class ReloadableDataHolder<T> {
     protected final File file;
@@ -47,8 +48,14 @@ public abstract class ReloadableDataHolder<T> {
             return this;
         }
 
-        YamlDataSource source = new YamlDataSource(".");
-        MapDataObject data = source.read(this.file);
+        YamlReader source = YamlReader.create(".");
+        MapDataObject data;
+        try {
+            data = source.readFile(this.file);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return this;
+        }
 
         for (ConfigField field : this.fields) {
             if (field.isStatic() && !includeStatic) {
@@ -95,7 +102,7 @@ public abstract class ReloadableDataHolder<T> {
         }
 
         YamlConfiguration configuration = YamlConfiguration.loadConfiguration(this.file);
-        YamlDataSource source = new YamlDataSource(".");
+        YamlReader source = YamlReader.create(".");
         MapDataObject data = source.read(configuration);
 
         for (ConfigField field : this.fields) {
@@ -122,10 +129,9 @@ public abstract class ReloadableDataHolder<T> {
             data.set(path, obj, replace);
         }
 
-        try {
-            source.write(data, configuration);
+        try (YamlWriter writer = YamlWriter.create(this.file, configuration)) {
+            writer.writeMap("", data);
             this.fields.forEach(f -> configuration.setComments(f.getPath(), f.getComments()));
-            configuration.save(this.file);
         } catch (IOException ex) {
             Logger.error("Failed to save file {0}: {1}", this.file.getPath(), ex);
         }
