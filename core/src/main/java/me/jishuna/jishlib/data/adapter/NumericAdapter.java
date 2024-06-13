@@ -1,31 +1,32 @@
 package me.jishuna.jishlib.data.adapter;
 
 import java.util.function.Function;
-import me.jishuna.jishlib.data.object.NumericDataObject;
+import me.jishuna.jishlib.data.holder.number.NumericDataHolder;
 
-public class NumericAdapter<R extends Number> implements TypeAdapter<NumericDataObject<R>, R> {
-    private final Function<NumericDataObject<R>, R> function;
+public class NumericAdapter<R extends Number> implements TypeAdapter<NumericDataHolder<R>, R> {
+    private final Function<NumericDataHolder<R>, R> function;
     private final Function<String, R> reader;
 
-    public NumericAdapter(Function<NumericDataObject<R>, R> function, Function<String, R> reader) {
+    public NumericAdapter(Function<NumericDataHolder<R>, R> function, Function<String, R> reader) {
         this.function = function;
         this.reader = reader;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public Class<NumericDataObject<R>> getObjectType() {
-        return (Class<NumericDataObject<R>>) (Object) NumericDataObject.class;
+    public Class<NumericDataHolder<R>> getObjectType() {
+        return (Class<NumericDataHolder<R>>) (Object) NumericDataHolder.class;
     }
 
     @Override
-    public R deserialize(NumericDataObject<R> data) {
+    public R deserialize(NumericDataHolder<R> data) {
         return this.function.apply(data);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public NumericDataObject<R> serialize(R value) {
-        return NumericDataObject.of(value);
+    public NumericDataHolder<R> serialize(R value) {
+        return (NumericDataHolder<R>) NumericDataHolder.of(value);
     }
 
     @Override

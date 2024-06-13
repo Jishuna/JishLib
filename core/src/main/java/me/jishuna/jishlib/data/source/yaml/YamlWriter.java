@@ -5,13 +5,18 @@ import java.io.IOException;
 import java.util.Stack;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import me.jishuna.jishlib.data.object.ArrayDataObject;
-import me.jishuna.jishlib.data.object.BooleanDataObject;
-import me.jishuna.jishlib.data.object.DataObject;
-import me.jishuna.jishlib.data.object.ListDataObject;
-import me.jishuna.jishlib.data.object.MapDataObject;
-import me.jishuna.jishlib.data.object.NumericDataObject;
-import me.jishuna.jishlib.data.object.StringDataObject;
+import me.jishuna.jishlib.data.holder.BooleanDataHolder;
+import me.jishuna.jishlib.data.holder.DataHolder;
+import me.jishuna.jishlib.data.holder.StringDataHolder;
+import me.jishuna.jishlib.data.holder.collection.ArrayDataHolder;
+import me.jishuna.jishlib.data.holder.collection.ListDataHolder;
+import me.jishuna.jishlib.data.holder.collection.MapDataHolder;
+import me.jishuna.jishlib.data.holder.number.ByteDataHolder;
+import me.jishuna.jishlib.data.holder.number.DoubleDataHolder;
+import me.jishuna.jishlib.data.holder.number.FloatDataHolder;
+import me.jishuna.jishlib.data.holder.number.IntDataHolder;
+import me.jishuna.jishlib.data.holder.number.LongDataHolder;
+import me.jishuna.jishlib.data.holder.number.ShortDataHolder;
 import me.jishuna.jishlib.data.source.DataWriter;
 
 public class YamlWriter implements DataWriter {
@@ -37,7 +42,7 @@ public class YamlWriter implements DataWriter {
     }
 
     @Override
-    public void writeMap(String name, MapDataObject value) throws IOException {
+    public void writeMap(String name, MapDataHolder value) throws IOException {
         boolean pop = false;
         if (!name.isBlank()) {
             YamlConfiguration config = new YamlConfiguration();
@@ -52,7 +57,7 @@ public class YamlWriter implements DataWriter {
             pop = true;
         }
 
-        for (DataObject<?> v : value.get().values()) {
+        for (DataHolder<?> v : value.get().values()) {
             v.write(this);
         }
 
@@ -62,11 +67,11 @@ public class YamlWriter implements DataWriter {
     }
 
     @Override
-    public void writeList(String name, ListDataObject value) throws IOException {
+    public void writeList(String name, ListDataHolder value) throws IOException {
         ConfigurationList config = new ConfigurationList();
         this.stack.push(config);
 
-        for (DataObject<?> v : value) {
+        for (DataHolder<?> v : value) {
             v.write(this);
         }
 
@@ -81,41 +86,60 @@ public class YamlWriter implements DataWriter {
     }
 
     @Override
-    public void writeArray(String name, ArrayDataObject value) throws IOException {
+    public void writeArray(String name, ArrayDataHolder value) throws IOException {
         writeList(name, value);
     }
 
     @Override
-    public void writeString(String name, StringDataObject value) {
-        Object object = this.stack.peek();
-        if (object instanceof ConfigurationList list) {
-            list.add(value.get());
-        } else if (object instanceof ConfigurationSection section) {
-            section.set(name, value.get());
-        }
+    public void writeString(String name, StringDataHolder value) {
+        write(name, value);
     }
 
     @Override
-    public void writeNumber(String name, NumericDataObject<?> value) {
-        Object object = this.stack.peek();
-        if (object instanceof ConfigurationList list) {
-            list.add(value.get());
-        } else if (object instanceof ConfigurationSection section) {
-            section.set(name, value.get());
-        }
+    public void writeByte(String name, ByteDataHolder value) throws IOException {
+        write(name, value);
     }
 
     @Override
-    public void writeBoolean(String name, BooleanDataObject value) {
-        Object object = this.stack.peek();
-        if (object instanceof ConfigurationList list) {
-            list.add(value.get());
-        } else if (object instanceof ConfigurationSection section) {
-            section.set(name, value.get());
-        }
+    public void writeShort(String name, ShortDataHolder value) throws IOException {
+        write(name, value);
+    }
+
+    @Override
+    public void writeInt(String name, IntDataHolder value) throws IOException {
+        write(name, value);
+    }
+
+    @Override
+    public void writeLong(String name, LongDataHolder value) throws IOException {
+        write(name, value);
+    }
+
+    @Override
+    public void writeFloat(String name, FloatDataHolder value) throws IOException {
+        write(name, value);
+    }
+
+    @Override
+    public void writeDouble(String name, DoubleDataHolder value) throws IOException {
+        write(name, value);
+    }
+
+    @Override
+    public void writeBoolean(String name, BooleanDataHolder value) {
+        write(name, value);
     }
 
     public YamlConfiguration getValue() {
         return this.root;
+    }
+
+    private void write(String name, DataHolder<?> value) {
+        Object object = this.stack.peek();
+        if (object instanceof ConfigurationList list) {
+            list.add(value.get());
+        } else if (object instanceof ConfigurationSection section) {
+            section.set(name, value.get());
+        }
     }
 }

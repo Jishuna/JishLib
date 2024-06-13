@@ -1,22 +1,22 @@
 package me.jishuna.jishlib.data.adapter;
 
-import me.jishuna.jishlib.data.object.StringDataObject;
+import me.jishuna.jishlib.data.holder.StringDataHolder;
 
-public class StringAdapter implements TypeAdapter<StringDataObject, String> {
+public class StringAdapter implements TypeAdapter<StringDataHolder, String> {
 
     @Override
-    public Class<StringDataObject> getObjectType() {
-        return StringDataObject.class;
+    public Class<StringDataHolder> getObjectType() {
+        return StringDataHolder.class;
     }
 
     @Override
-    public String deserialize(StringDataObject data) {
+    public String deserialize(StringDataHolder data) {
         return data.get();
     }
 
     @Override
-    public StringDataObject serialize(String value) {
-        return StringDataObject.of(value);
+    public StringDataHolder serialize(String value) {
+        return StringDataHolder.of(value);
     }
 
     @Override

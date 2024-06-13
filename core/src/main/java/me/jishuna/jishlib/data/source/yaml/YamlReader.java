@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Map;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import me.jishuna.jishlib.data.object.BooleanDataObject;
-import me.jishuna.jishlib.data.object.DataObject;
-import me.jishuna.jishlib.data.object.ListDataObject;
-import me.jishuna.jishlib.data.object.MapDataObject;
-import me.jishuna.jishlib.data.object.NumericDataObject;
-import me.jishuna.jishlib.data.object.StringDataObject;
+import me.jishuna.jishlib.data.holder.BooleanDataHolder;
+import me.jishuna.jishlib.data.holder.DataHolder;
+import me.jishuna.jishlib.data.holder.StringDataHolder;
+import me.jishuna.jishlib.data.holder.collection.ListDataHolder;
+import me.jishuna.jishlib.data.holder.collection.MapDataHolder;
+import me.jishuna.jishlib.data.holder.number.NumericDataHolder;
 import me.jishuna.jishlib.data.source.DataReader;
 
 public class YamlReader implements DataReader {
@@ -31,42 +31,42 @@ public class YamlReader implements DataReader {
     }
 
     @Override
-    public MapDataObject readFile(File file) throws IOException {
+    public MapDataHolder readFile(File file) throws IOException {
         return read(YamlConfiguration.loadConfiguration(file));
     }
 
     @Override
-    public MapDataObject readStream(InputStream stream) throws IOException {
+    public MapDataHolder readStream(InputStream stream) throws IOException {
         try (InputStreamReader reader = new InputStreamReader(stream)) {
             return read(YamlConfiguration.loadConfiguration(reader));
         }
     }
 
-    public MapDataObject read(YamlConfiguration config) {
+    public MapDataHolder read(YamlConfiguration config) {
         return readMap(config.getValues(false));
     }
 
-    private MapDataObject readMap(Map<?, ?> map) {
-        Map<String, DataObject<?>> dataMap = new LinkedHashMap<>();
+    private MapDataHolder readMap(Map<?, ?> map) {
+        Map<String, DataHolder<?>> dataMap = new LinkedHashMap<>();
         map.forEach((k, v) -> {
-            DataObject<?> value = readValue(v);
+            DataHolder<?> value = readValue(v);
             value.setName(String.valueOf(k));
             dataMap.put(value.getName(), value);
         });
 
-        return MapDataObject.of("", this.pathSeperator, dataMap);
+        return MapDataHolder.of("", this.pathSeperator, dataMap);
     }
 
-    private ListDataObject readList(Collection<?> list) {
-        List<DataObject<?>> dataList = new ArrayList<>();
+    private ListDataHolder readList(Collection<?> list) {
+        List<DataHolder<?>> dataList = new ArrayList<>();
         for (Object obj : list) {
             dataList.add(readValue(obj));
         }
 
-        return ListDataObject.of(dataList);
+        return ListDataHolder.of(dataList);
     }
 
-    private DataObject<?> readValue(Object value) {
+    private DataHolder<?> readValue(Object value) {
         if (Map.class.isInstance(value)) {
             return readMap((Map<?, ?>) value);
         }
@@ -80,13 +80,13 @@ public class YamlReader implements DataReader {
         }
 
         if (Boolean.class.isInstance(value)) {
-            return BooleanDataObject.of((boolean) value);
+            return BooleanDataHolder.of((boolean) value);
         }
 
         if (Number.class.isInstance(value)) {
-            return NumericDataObject.of((Number) value);
+            return NumericDataHolder.of((Number) value);
         }
 
-        return StringDataObject.of(String.valueOf(value));
+        return StringDataHolder.of(String.valueOf(value));
     }
 }

@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
-import me.jishuna.jishlib.data.object.ArrayDataObject;
-import me.jishuna.jishlib.data.object.DataObject;
-import me.jishuna.jishlib.data.object.ListDataObject;
-import me.jishuna.jishlib.data.object.MapDataObject;
-import me.jishuna.jishlib.data.object.NumericDataObject;
-import me.jishuna.jishlib.data.object.StringDataObject;
+import me.jishuna.jishlib.data.holder.DataHolder;
+import me.jishuna.jishlib.data.holder.StringDataHolder;
+import me.jishuna.jishlib.data.holder.collection.ArrayDataHolder;
+import me.jishuna.jishlib.data.holder.collection.ListDataHolder;
+import me.jishuna.jishlib.data.holder.collection.MapDataHolder;
+import me.jishuna.jishlib.data.holder.number.NumericDataHolder;
 import me.jishuna.jishlib.data.source.DataReader;
 
 public class NBTReader implements DataReader {
@@ -33,14 +33,14 @@ public class NBTReader implements DataReader {
     }
 
     @Override
-    public MapDataObject readFile(File file) throws IOException {
+    public MapDataHolder readFile(File file) throws IOException {
         try (FileInputStream fis = new FileInputStream(file)) {
             return readStream(fis);
         }
     }
 
     @Override
-    public MapDataObject readStream(InputStream stream) throws IOException {
+    public MapDataHolder readStream(InputStream stream) throws IOException {
         try (BufferedInputStream bis = new BufferedInputStream(stream)) {
             return switch (CompressionType.getCompression(bis)) {
             case NONE -> read(new DataInputStream(bis));
@@ -50,23 +50,23 @@ public class NBTReader implements DataReader {
         }
     }
 
-    private MapDataObject read(DataInputStream input) throws IOException {
+    private MapDataHolder read(DataInputStream input) throws IOException {
         try (input) {
             input.readByte();
             String name = input.readUTF();
-            MapDataObject data = readCompound(input);
+            MapDataHolder data = readCompound(input);
             data.setName(name);
             return data;
         }
     }
 
-    private MapDataObject readCompound(DataInput reader) throws IOException {
-        Map<String, DataObject<?>> dataMap = new LinkedHashMap<>();
+    private MapDataHolder readCompound(DataInput reader) throws IOException {
+        Map<String, DataHolder<?>> dataMap = new LinkedHashMap<>();
 
         byte nextTypeId;
         while ((nextTypeId = reader.readByte()) != 0) {
             String dataName = reader.readUTF();
-            DataObject<?> data = readValue(nextTypeId, reader);
+            DataHolder<?> data = readValue(nextTypeId, reader);
             if (data != null) {
                 data.setName(dataName);
 
@@ -74,62 +74,62 @@ public class NBTReader implements DataReader {
             }
         }
 
-        return MapDataObject.of("", this.pathSeperator, dataMap);
+        return MapDataHolder.of("", this.pathSeperator, dataMap);
     }
 
-    private ListDataObject readList(DataInput reader) throws IOException {
-        List<DataObject<?>> dataList = new ArrayList<>();
+    private ListDataHolder readList(DataInput reader) throws IOException {
+        List<DataHolder<?>> dataList = new ArrayList<>();
         byte tagType = reader.readByte();
         System.out.println(tagType);
         int length = reader.readInt();
 
         for (int i = 0; i < length; i++) {
-            DataObject<?> data = readValue(tagType, reader);
+            DataHolder<?> data = readValue(tagType, reader);
             if (data != null) {
                 dataList.add(data);
             }
         }
 
-        return ListDataObject.of(dataList);
+        return ListDataHolder.of(dataList);
     }
 
-    private DataObject<?> readValue(byte typeId, DataInput reader) throws IOException {
+    private DataHolder<?> readValue(byte typeId, DataInput reader) throws IOException {
         return switch (typeId) {
-        case 1 -> NumericDataObject.of(reader.readByte());
-        case 2 -> NumericDataObject.of(reader.readShort());
-        case 3 -> NumericDataObject.of(reader.readInt());
-        case 4 -> NumericDataObject.of(reader.readLong());
-        case 5 -> NumericDataObject.of(reader.readFloat());
-        case 6 -> NumericDataObject.of(reader.readDouble());
+        case 1 -> NumericDataHolder.of(reader.readByte());
+        case 2 -> NumericDataHolder.of(reader.readShort());
+        case 3 -> NumericDataHolder.of(reader.readInt());
+        case 4 -> NumericDataHolder.of(reader.readLong());
+        case 5 -> NumericDataHolder.of(reader.readFloat());
+        case 6 -> NumericDataHolder.of(reader.readDouble());
         case 7 -> {
-            List<DataObject<?>> list = new ArrayList<>();
+            List<DataHolder<?>> list = new ArrayList<>();
             int length = reader.readInt();
             for (int i = 0; i < length; i++) {
-                list.add(NumericDataObject.of(reader.readByte()));
+                list.add(NumericDataHolder.of(reader.readByte()));
             }
 
-            yield ArrayDataObject.of(list);
+            yield ArrayDataHolder.of(list);
         }
-        case 8 -> StringDataObject.of(reader.readUTF());
+        case 8 -> StringDataHolder.of(reader.readUTF());
         case 9 -> readList(reader);
         case 10 -> readCompound(reader);
         case 11 -> {
-            List<DataObject<?>> list = new ArrayList<>();
+            List<DataHolder<?>> list = new ArrayList<>();
             int length = reader.readInt();
             for (int i = 0; i < length; i++) {
-                list.add(NumericDataObject.of(reader.readInt()));
+                list.add(NumericDataHolder.of(reader.readInt()));
             }
 
-            yield ArrayDataObject.of(list);
+            yield ArrayDataHolder.of(list);
         }
         case 12 -> {
-            List<DataObject<?>> list = new ArrayList<>();
+            List<DataHolder<?>> list = new ArrayList<>();
             int length = reader.readInt();
             for (int i = 0; i < length; i++) {
-                list.add(NumericDataObject.of(reader.readLong()));
+                list.add(NumericDataHolder.of(reader.readLong()));
             }
 
-            yield ArrayDataObject.of(list);
+            yield ArrayDataHolder.of(list);
         }
         default -> null;
         };

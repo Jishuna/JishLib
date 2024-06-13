@@ -12,9 +12,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import me.jishuna.jishlib.Constants;
 import me.jishuna.jishlib.Plugin;
-import me.jishuna.jishlib.data.object.ListDataObject;
-import me.jishuna.jishlib.data.object.MapDataObject;
-import me.jishuna.jishlib.data.object.StringDataObject;
+import me.jishuna.jishlib.data.holder.StringDataHolder;
+import me.jishuna.jishlib.data.holder.collection.ListDataHolder;
+import me.jishuna.jishlib.data.holder.collection.MapDataHolder;
 import me.jishuna.jishlib.data.source.json.JsonReader;
 import me.jishuna.jishlib.data.source.json.JsonWriter;
 
@@ -73,8 +73,8 @@ public class Messages {
     private void load() {
         JsonReader source = JsonReader.create(null);
 
-        MapDataObject saved = readSaved(source);
-        MapDataObject internal = readInternal(source);
+        MapDataHolder saved = readSaved(source);
+        MapDataHolder internal = readInternal(source);
 
         saved.merge(internal);
         try {
@@ -88,28 +88,28 @@ public class Messages {
         loadValues(saved);
     }
 
-    private void loadValues(MapDataObject data) {
+    private void loadValues(MapDataHolder data) {
         this.strings.clear();
         this.stringLists.clear();
 
         data.forEach((k, v) -> {
-            if (v instanceof ListDataObject listObject) {
+            if (v instanceof ListDataHolder listObject) {
                 List<String> list = new ArrayList<>();
 
                 listObject.forEach(entry -> {
-                    if (entry instanceof StringDataObject primitive) {
+                    if (entry instanceof StringDataHolder primitive) {
                         list.add(primitive.get());
                     }
                 });
 
                 this.stringLists.put(k, list);
-            } else if (v instanceof StringDataObject primitive) {
+            } else if (v instanceof StringDataHolder primitive) {
                 this.strings.put(k, primitive.get());
             }
         });
     }
 
-    private MapDataObject readSaved(JsonReader source) {
+    private MapDataHolder readSaved(JsonReader source) {
         if (this.file.exists()) {
             try {
                 return source.readFile(this.file);
@@ -118,16 +118,16 @@ public class Messages {
             }
         }
 
-        return MapDataObject.empty("");
+        return MapDataHolder.empty("");
     }
 
-    private MapDataObject readInternal(JsonReader source) {
+    private MapDataHolder readInternal(JsonReader source) {
         try (InputStream stream = Plugin.getInstance().getResource(this.path)) {
             return source.readStream(stream);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return MapDataObject.empty("");
+        return MapDataHolder.empty("");
     }
 }

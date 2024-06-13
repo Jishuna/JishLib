@@ -1,8 +1,8 @@
 package me.jishuna.jishlib.data.adapter;
 
-import me.jishuna.jishlib.data.object.DataObject;
+import me.jishuna.jishlib.data.holder.DataHolder;
 
-public interface TypeAdapter<T extends DataObject<?>, R> {
+public interface TypeAdapter<T extends DataHolder<?>, R> {
 
     public Class<T> getObjectType();
 

@@ -2,23 +2,23 @@ package me.jishuna.jishlib.data.adapter;
 
 import net.kyori.adventure.text.Component;
 import me.jishuna.jishlib.Constants;
-import me.jishuna.jishlib.data.object.StringDataObject;
+import me.jishuna.jishlib.data.holder.StringDataHolder;
 
-public class ComponentAdapter implements TypeAdapter<StringDataObject, Component> {
+public class ComponentAdapter implements TypeAdapter<StringDataHolder, Component> {
 
     @Override
-    public Class<StringDataObject> getObjectType() {
-        return StringDataObject.class;
+    public Class<StringDataHolder> getObjectType() {
+        return StringDataHolder.class;
     }
 
     @Override
-    public Component deserialize(StringDataObject data) {
+    public Component deserialize(StringDataHolder data) {
         return fromString(data.get());
     }
 
     @Override
-    public StringDataObject serialize(Component value) {
-        return StringDataObject.of(toString(value));
+    public StringDataHolder serialize(Component value) {
+        return StringDataHolder.of(toString(value));
     }
 
     @Override

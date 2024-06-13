@@ -1,22 +1,22 @@
 package me.jishuna.jishlib.data.adapter;
 
 import org.bukkit.Material;
-import me.jishuna.jishlib.data.object.StringDataObject;
+import me.jishuna.jishlib.data.holder.StringDataHolder;
 
-public class MaterialAdapter implements TypeAdapter<StringDataObject, Material> {
+public class MaterialAdapter implements TypeAdapter<StringDataHolder, Material> {
     @Override
-    public Class<StringDataObject> getObjectType() {
-        return StringDataObject.class;
+    public Class<StringDataHolder> getObjectType() {
+        return StringDataHolder.class;
     }
 
     @Override
-    public Material deserialize(StringDataObject data) {
+    public Material deserialize(StringDataHolder data) {
         return fromString(data.get());
     }
 
     @Override
-    public StringDataObject serialize(Material value) {
-        return StringDataObject.of(toString(value));
+    public StringDataHolder serialize(Material value) {
+        return StringDataHolder.of(toString(value));
     }
 
     @Override

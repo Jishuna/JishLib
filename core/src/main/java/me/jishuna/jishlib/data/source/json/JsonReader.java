@@ -15,12 +15,12 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import me.jishuna.jishlib.data.object.BooleanDataObject;
-import me.jishuna.jishlib.data.object.DataObject;
-import me.jishuna.jishlib.data.object.ListDataObject;
-import me.jishuna.jishlib.data.object.MapDataObject;
-import me.jishuna.jishlib.data.object.NumericDataObject;
-import me.jishuna.jishlib.data.object.StringDataObject;
+import me.jishuna.jishlib.data.holder.BooleanDataHolder;
+import me.jishuna.jishlib.data.holder.DataHolder;
+import me.jishuna.jishlib.data.holder.StringDataHolder;
+import me.jishuna.jishlib.data.holder.collection.ListDataHolder;
+import me.jishuna.jishlib.data.holder.collection.MapDataHolder;
+import me.jishuna.jishlib.data.holder.number.NumericDataHolder;
 import me.jishuna.jishlib.data.source.DataReader;
 
 public class JsonReader implements DataReader {
@@ -35,36 +35,36 @@ public class JsonReader implements DataReader {
     }
 
     @Override
-    public MapDataObject readFile(File file) throws IOException {
+    public MapDataHolder readFile(File file) throws IOException {
         try (FileReader reader = new FileReader(file, StandardCharsets.UTF_8)) {
             return readObject(JsonParser.parseReader(reader).getAsJsonObject());
         }
     }
 
     @Override
-    public MapDataObject readStream(InputStream stream) throws IOException {
+    public MapDataHolder readStream(InputStream stream) throws IOException {
         try (InputStreamReader reader = new InputStreamReader(stream)) {
             return readObject(JsonParser.parseReader(reader).getAsJsonObject());
         }
     }
 
-    private MapDataObject readObject(JsonObject json) {
-        Map<String, DataObject<?>> dataMap = new LinkedHashMap<>();
+    private MapDataHolder readObject(JsonObject json) {
+        Map<String, DataHolder<?>> dataMap = new LinkedHashMap<>();
         json.asMap().forEach((k, v) -> {
             dataMap.put(k, readValue(v));
         });
 
-        return MapDataObject.of("", this.pathSeperator, dataMap);
+        return MapDataHolder.of("", this.pathSeperator, dataMap);
     }
 
-    private ListDataObject readArray(JsonArray array) {
-        List<DataObject<?>> dataList = new ArrayList<>();
+    private ListDataHolder readArray(JsonArray array) {
+        List<DataHolder<?>> dataList = new ArrayList<>();
         array.forEach(v -> dataList.add(readValue(v)));
 
-        return ListDataObject.of(dataList);
+        return ListDataHolder.of(dataList);
     }
 
-    private DataObject<?> readValue(JsonElement value) {
+    private DataHolder<?> readValue(JsonElement value) {
         if (value.isJsonObject()) {
             return readObject(value.getAsJsonObject());
         }
@@ -76,14 +76,14 @@ public class JsonReader implements DataReader {
         if (value.isJsonPrimitive()) {
             JsonPrimitive primitive = value.getAsJsonPrimitive();
             if (primitive.isBoolean()) {
-                return BooleanDataObject.of(primitive.getAsBoolean());
+                return BooleanDataHolder.of(primitive.getAsBoolean());
             }
 
             if (primitive.isNumber()) {
-                return NumericDataObject.of(primitive.getAsNumber());
+                return NumericDataHolder.of(primitive.getAsNumber());
             }
         }
 
-        return StringDataObject.of(value.getAsString());
+        return StringDataHolder.of(value.getAsString());
     }
 }

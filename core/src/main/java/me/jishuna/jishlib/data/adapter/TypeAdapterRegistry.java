@@ -16,21 +16,21 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import me.jishuna.jishlib.data.DataType;
-import me.jishuna.jishlib.data.object.DataObject;
+import me.jishuna.jishlib.data.holder.DataHolder;
 
 public class TypeAdapterRegistry {
     private static TypeAdapterRegistry INSTANCE;
 
-    public static <T extends DataObject<?>, R> TypeAdapter<T, R> getAdapter(Class<R> clazz) {
+    public static <T extends DataHolder<?>, R> TypeAdapter<T, R> getAdapter(Class<R> clazz) {
         return getAdapter(new DataType<>(clazz));
     }
 
-    public static <T extends DataObject<?>, R> void register(Class<R> clazz, TypeAdapter<T, R> adapter) {
+    public static <T extends DataHolder<?>, R> void register(Class<R> clazz, TypeAdapter<T, R> adapter) {
         getInstance().adapters.put(new DataType<>(clazz), adapter);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends DataObject<?>, R> TypeAdapter<T, R> getAdapter(DataType<R> type) {
+    public static <T extends DataHolder<?>, R> TypeAdapter<T, R> getAdapter(DataType<R> type) {
         TypeAdapter<?, ?> adapter = getInstance().adapters.get(type);
         if (adapter == null) {
             adapter = createAdapter(type);

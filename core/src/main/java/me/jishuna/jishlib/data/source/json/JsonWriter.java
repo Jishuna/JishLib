@@ -10,13 +10,19 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Stack;
-import me.jishuna.jishlib.data.object.ArrayDataObject;
-import me.jishuna.jishlib.data.object.BooleanDataObject;
-import me.jishuna.jishlib.data.object.DataObject;
-import me.jishuna.jishlib.data.object.ListDataObject;
-import me.jishuna.jishlib.data.object.MapDataObject;
-import me.jishuna.jishlib.data.object.NumericDataObject;
-import me.jishuna.jishlib.data.object.StringDataObject;
+import me.jishuna.jishlib.data.holder.BooleanDataHolder;
+import me.jishuna.jishlib.data.holder.DataHolder;
+import me.jishuna.jishlib.data.holder.StringDataHolder;
+import me.jishuna.jishlib.data.holder.collection.ArrayDataHolder;
+import me.jishuna.jishlib.data.holder.collection.ListDataHolder;
+import me.jishuna.jishlib.data.holder.collection.MapDataHolder;
+import me.jishuna.jishlib.data.holder.number.ByteDataHolder;
+import me.jishuna.jishlib.data.holder.number.DoubleDataHolder;
+import me.jishuna.jishlib.data.holder.number.FloatDataHolder;
+import me.jishuna.jishlib.data.holder.number.IntDataHolder;
+import me.jishuna.jishlib.data.holder.number.LongDataHolder;
+import me.jishuna.jishlib.data.holder.number.NumericDataHolder;
+import me.jishuna.jishlib.data.holder.number.ShortDataHolder;
 import me.jishuna.jishlib.data.source.DataWriter;
 
 public class JsonWriter implements DataWriter {
@@ -50,7 +56,7 @@ public class JsonWriter implements DataWriter {
     }
 
     @Override
-    public void writeMap(String name, MapDataObject value) throws IOException {
+    public void writeMap(String name, MapDataHolder value) throws IOException {
         boolean pop = false;
         if (!name.isBlank()) {
             JsonObject json = new JsonObject();
@@ -66,7 +72,7 @@ public class JsonWriter implements DataWriter {
             pop = true;
         }
 
-        for (DataObject<?> v : value.get().values()) {
+        for (DataHolder<?> v : value.get().values()) {
             v.write(this);
         }
 
@@ -76,11 +82,11 @@ public class JsonWriter implements DataWriter {
     }
 
     @Override
-    public void writeList(String name, ListDataObject value) throws IOException {
+    public void writeList(String name, ListDataHolder value) throws IOException {
         JsonArray json = new JsonArray();
         this.stack.push(json);
 
-        for (DataObject<?> v : value) {
+        for (DataHolder<?> v : value) {
             v.write(this);
         }
 
@@ -95,12 +101,12 @@ public class JsonWriter implements DataWriter {
     }
 
     @Override
-    public void writeArray(String name, ArrayDataObject value) throws IOException {
+    public void writeArray(String name, ArrayDataHolder value) throws IOException {
         writeList(name, value);
     }
 
     @Override
-    public void writeString(String name, StringDataObject value) {
+    public void writeString(String name, StringDataHolder value) {
         JsonElement element = this.stack.peek();
         if (element.isJsonArray()) {
             element.getAsJsonArray().add(value.get());
@@ -110,17 +116,37 @@ public class JsonWriter implements DataWriter {
     }
 
     @Override
-    public void writeNumber(String name, NumericDataObject<?> value) {
-        JsonElement element = this.stack.peek();
-        if (element.isJsonArray()) {
-            element.getAsJsonArray().add(value.get());
-        } else if (element.isJsonObject()) {
-            element.getAsJsonObject().addProperty(name, value.get());
-        }
+    public void writeByte(String name, ByteDataHolder value) throws IOException {
+        write(name, value);
     }
 
     @Override
-    public void writeBoolean(String name, BooleanDataObject value) {
+    public void writeShort(String name, ShortDataHolder value) throws IOException {
+        write(name, value);
+    }
+
+    @Override
+    public void writeInt(String name, IntDataHolder value) throws IOException {
+        write(name, value);
+    }
+
+    @Override
+    public void writeLong(String name, LongDataHolder value) throws IOException {
+        write(name, value);
+    }
+
+    @Override
+    public void writeFloat(String name, FloatDataHolder value) throws IOException {
+        write(name, value);
+    }
+
+    @Override
+    public void writeDouble(String name, DoubleDataHolder value) throws IOException {
+        write(name, value);
+    }
+
+    @Override
+    public void writeBoolean(String name, BooleanDataHolder value) {
         JsonElement element = this.stack.peek();
         if (element.isJsonArray()) {
             element.getAsJsonArray().add(value.get());
@@ -131,5 +157,14 @@ public class JsonWriter implements DataWriter {
 
     public JsonObject getValue() {
         return this.root;
+    }
+
+    private void write(String name, NumericDataHolder<?> value) {
+        JsonElement element = this.stack.peek();
+        if (element.isJsonArray()) {
+            element.getAsJsonArray().add(value.get());
+        } else if (element.isJsonObject()) {
+            element.getAsJsonObject().addProperty(name, value.get());
+        }
     }
 }

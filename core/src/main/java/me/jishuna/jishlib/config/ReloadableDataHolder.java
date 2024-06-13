@@ -11,8 +11,8 @@ import me.jishuna.jishlib.config.annotation.Path;
 import me.jishuna.jishlib.data.DataType;
 import me.jishuna.jishlib.data.adapter.TypeAdapter;
 import me.jishuna.jishlib.data.adapter.TypeAdapterRegistry;
-import me.jishuna.jishlib.data.object.DataObject;
-import me.jishuna.jishlib.data.object.MapDataObject;
+import me.jishuna.jishlib.data.holder.DataHolder;
+import me.jishuna.jishlib.data.holder.collection.MapDataHolder;
 import me.jishuna.jishlib.data.source.yaml.YamlReader;
 import me.jishuna.jishlib.data.source.yaml.YamlWriter;
 
@@ -49,7 +49,7 @@ public abstract class ReloadableDataHolder<T> {
         }
 
         YamlReader source = YamlReader.create(".");
-        MapDataObject data = source.read(YamlConfiguration.loadConfiguration(this.file));
+        MapDataHolder data = source.read(YamlConfiguration.loadConfiguration(this.file));
 
         for (ConfigField field : this.fields) {
             if (field.isStatic() && !includeStatic) {
@@ -59,13 +59,13 @@ public abstract class ReloadableDataHolder<T> {
             String path = field.getPath();
 
             DataType<?> type = DataType.get(field.getField());
-            TypeAdapter<DataObject<?>, ?> adapter = TypeAdapterRegistry.getAdapter(type);
+            TypeAdapter<DataHolder<?>, ?> adapter = TypeAdapterRegistry.getAdapter(type);
             if (adapter == null) {
                 Logger.warn("No data adapter found for {0}, using default value", type.getType());
                 continue;
             }
 
-            DataObject<?> saved = data.get(path);
+            DataHolder<?> saved = data.get(path);
             if ((saved == null) || !adapter.getObjectType().isInstance(saved)) {
                 Logger.warn("No saved value found for {0}, using default value", path);
                 continue;
@@ -97,13 +97,13 @@ public abstract class ReloadableDataHolder<T> {
 
         YamlConfiguration configuration = YamlConfiguration.loadConfiguration(this.file);
         YamlReader source = YamlReader.create(".");
-        MapDataObject data = source.read(configuration);
+        MapDataHolder data = source.read(configuration);
 
         for (ConfigField field : this.fields) {
             String path = field.getPath();
 
             DataType<?> type = DataType.get(field.getField());
-            TypeAdapter<DataObject<?>, Object> adapter = (TypeAdapter<DataObject<?>, Object>) TypeAdapterRegistry.getAdapter(type);
+            TypeAdapter<DataHolder<?>, Object> adapter = (TypeAdapter<DataHolder<?>, Object>) TypeAdapterRegistry.getAdapter(type);
             if (adapter == null) {
                 Logger.warn("No data adapter found for {0}, cannot save value", type.getType());
                 continue;
@@ -114,7 +114,7 @@ public abstract class ReloadableDataHolder<T> {
                 continue; // Don't save null
             }
 
-            DataObject<?> obj = adapter.serialize(writeValue);
+            DataHolder<?> obj = adapter.serialize(writeValue);
             if (obj == null) {
                 Logger.warn("Failed to read field {0}, cannot save value", field.getField().getName());
                 continue;

@@ -1,13 +1,14 @@
-package me.jishuna.jishlib.data.object;
+package me.jishuna.jishlib.data.holder;
 
 import java.io.IOException;
+import me.jishuna.jishlib.data.HolderType;
 import me.jishuna.jishlib.data.source.DataWriter;
 
-public abstract class DataObject<T> {
+public abstract class DataHolder<T> {
     protected String name = "";
     protected T value;
 
-    protected DataObject(String name, T value) {
+    protected DataHolder(String name, T value) {
         this.name = name;
         this.value = value;
     }
@@ -25,6 +26,8 @@ public abstract class DataObject<T> {
     }
 
     public abstract void write(DataWriter writer) throws IOException;
+
+    public abstract HolderType getType();
 
     @Override
     public String toString() {

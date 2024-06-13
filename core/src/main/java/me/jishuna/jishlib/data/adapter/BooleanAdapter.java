@@ -1,22 +1,22 @@
 package me.jishuna.jishlib.data.adapter;
 
-import me.jishuna.jishlib.data.object.BooleanDataObject;
+import me.jishuna.jishlib.data.holder.BooleanDataHolder;
 
-public class BooleanAdapter implements TypeAdapter<BooleanDataObject, Boolean> {
+public class BooleanAdapter implements TypeAdapter<BooleanDataHolder, Boolean> {
 
     @Override
-    public Class<BooleanDataObject> getObjectType() {
-        return BooleanDataObject.class;
+    public Class<BooleanDataHolder> getObjectType() {
+        return BooleanDataHolder.class;
     }
 
     @Override
-    public Boolean deserialize(BooleanDataObject data) {
+    public Boolean deserialize(BooleanDataHolder data) {
         return data.get();
     }
 
     @Override
-    public BooleanDataObject serialize(Boolean value) {
-        return BooleanDataObject.of(value);
+    public BooleanDataHolder serialize(Boolean value) {
+        return BooleanDataHolder.of(value);
     }
 
     @Override

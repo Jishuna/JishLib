@@ -1,23 +1,23 @@
 package me.jishuna.jishlib.data.adapter;
 
 import org.bukkit.NamespacedKey;
-import me.jishuna.jishlib.data.object.StringDataObject;
+import me.jishuna.jishlib.data.holder.StringDataHolder;
 
-public class NamespaceKeyAdapter implements TypeAdapter<StringDataObject, NamespacedKey> {
+public class NamespaceKeyAdapter implements TypeAdapter<StringDataHolder, NamespacedKey> {
 
     @Override
-    public Class<StringDataObject> getObjectType() {
-        return StringDataObject.class;
+    public Class<StringDataHolder> getObjectType() {
+        return StringDataHolder.class;
     }
 
     @Override
-    public NamespacedKey deserialize(StringDataObject data) {
+    public NamespacedKey deserialize(StringDataHolder data) {
         return fromString(data.get());
     }
 
     @Override
-    public StringDataObject serialize(NamespacedKey value) {
-        return StringDataObject.of(toString(value));
+    public StringDataHolder serialize(NamespacedKey value) {
+        return StringDataHolder.of(toString(value));
     }
 
     @Override

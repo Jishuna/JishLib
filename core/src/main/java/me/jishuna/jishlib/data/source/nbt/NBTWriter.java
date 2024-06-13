@@ -11,13 +11,19 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPOutputStream;
-import me.jishuna.jishlib.data.object.ArrayDataObject;
-import me.jishuna.jishlib.data.object.BooleanDataObject;
-import me.jishuna.jishlib.data.object.DataObject;
-import me.jishuna.jishlib.data.object.ListDataObject;
-import me.jishuna.jishlib.data.object.MapDataObject;
-import me.jishuna.jishlib.data.object.NumericDataObject;
-import me.jishuna.jishlib.data.object.StringDataObject;
+import me.jishuna.jishlib.data.HolderType;
+import me.jishuna.jishlib.data.holder.BooleanDataHolder;
+import me.jishuna.jishlib.data.holder.DataHolder;
+import me.jishuna.jishlib.data.holder.StringDataHolder;
+import me.jishuna.jishlib.data.holder.collection.ArrayDataHolder;
+import me.jishuna.jishlib.data.holder.collection.ListDataHolder;
+import me.jishuna.jishlib.data.holder.collection.MapDataHolder;
+import me.jishuna.jishlib.data.holder.number.ByteDataHolder;
+import me.jishuna.jishlib.data.holder.number.DoubleDataHolder;
+import me.jishuna.jishlib.data.holder.number.FloatDataHolder;
+import me.jishuna.jishlib.data.holder.number.IntDataHolder;
+import me.jishuna.jishlib.data.holder.number.LongDataHolder;
+import me.jishuna.jishlib.data.holder.number.ShortDataHolder;
 import me.jishuna.jishlib.data.source.DataWriter;
 
 public class NBTWriter implements DataWriter, Closeable {
@@ -25,12 +31,12 @@ public class NBTWriter implements DataWriter, Closeable {
     private final DataOutputStream writer;
     private boolean hasTag = false;
 
-    private NBTWriter() throws IOException {
+    private NBTWriter() {
         this.byteStream = new ByteArrayOutputStream();
         this.writer = new DataOutputStream(this.byteStream);
     }
 
-    public static NBTWriter create() throws IOException {
+    public static NBTWriter create() {
         return new NBTWriter();
     }
 
@@ -40,11 +46,12 @@ public class NBTWriter implements DataWriter, Closeable {
     }
 
     public void save(File file, CompressionType type) throws IOException {
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
-        switch (type) {
-        case NONE -> save(new DataOutputStream(bos));
-        case GZIP -> save(new DataOutputStream(new GZIPOutputStream(bos)));
-        case ZLIB -> save(new DataOutputStream(new DeflaterOutputStream(bos)));
+        try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file))) {
+            switch (type) {
+            case NONE -> save(new DataOutputStream(bos));
+            case GZIP -> save(new DataOutputStream(new GZIPOutputStream(bos)));
+            case ZLIB -> save(new DataOutputStream(new DeflaterOutputStream(bos)));
+            }
         }
     }
 
@@ -55,15 +62,15 @@ public class NBTWriter implements DataWriter, Closeable {
     }
 
     @Override
-    public void writeMap(String name, MapDataObject value) throws IOException {
+    public void writeMap(String name, MapDataHolder value) throws IOException {
         if (!this.hasTag) {
-            this.writer.writeByte(TagType.COMPOUND.id());
+            this.writer.writeByte(HolderType.MAP.id());
             this.writer.writeUTF(value.getName());
             this.hasTag = true;
         }
 
-        for (DataObject<?> v : value.get().values()) {
-            this.writer.writeByte(getTagType(v));
+        for (DataHolder<?> v : value.get().values()) {
+            this.writer.writeByte(v.getType().id());
             this.writer.writeUTF(v.getName());
 
             v.write(this);
@@ -73,114 +80,66 @@ public class NBTWriter implements DataWriter, Closeable {
     }
 
     @Override
-    public void writeList(String name, ListDataObject value) throws IOException {
-        List<DataObject<?>> list = value.get();
+    public void writeList(String name, ListDataHolder value) throws IOException {
+        List<DataHolder<?>> list = value.get();
         if (list.isEmpty()) {
             this.writer.writeByte(0);
         } else {
-            this.writer.writeByte(getTagType(list.get(0)));
+            this.writer.writeByte(list.get(0).getType().id());
         }
 
         this.writer.writeInt(list.size());
-        for (DataObject<?> object : value) {
+        for (DataHolder<?> object : value) {
             object.write(this);
         }
     }
 
     @Override
-    public void writeArray(String name, ArrayDataObject value) throws IOException {
+    public void writeArray(String name, ArrayDataHolder value) throws IOException {
         this.writer.writeInt(value.get().size());
-        for (DataObject<?> object : value) {
+        for (DataHolder<?> object : value) {
             object.write(this);
         }
     }
 
     @Override
-    public void writeString(String name, StringDataObject value) throws IOException {
+    public void writeString(String name, StringDataHolder value) throws IOException {
         this.writer.writeUTF(value.get());
     }
 
     @Override
-    public void writeNumber(String name, NumericDataObject<?> value) throws IOException {
-        Number num = value.get();
-        if (num.getClass() == Byte.class) {
-            this.writer.writeByte(num.byteValue());
-        } else if (num.getClass() == Short.class) {
-            this.writer.writeShort(num.shortValue());
-        } else if (num.getClass() == Integer.class) {
-            this.writer.writeInt(num.intValue());
-        } else if (num.getClass() == Long.class) {
-            this.writer.writeLong(num.longValue());
-        } else if (num.getClass() == Float.class) {
-            this.writer.writeFloat(num.floatValue());
-        } else if (num.getClass() == Double.class) {
-            this.writer.writeDouble(num.doubleValue());
-        }
+    public void writeByte(String name, ByteDataHolder value) throws IOException {
+        this.writer.writeByte(value.get());
     }
 
     @Override
-    public void writeBoolean(String name, BooleanDataObject value) throws IOException {
-        this.writer.writeByte(value.get() ? 1 : 0);
+    public void writeShort(String name, ShortDataHolder value) throws IOException {
+        this.writer.writeShort(value.get());
     }
 
-    private byte getTagType(DataObject<?> object) {
-        if (object instanceof ArrayDataObject array) {
-            List<DataObject<?>> list = array.get();
-            if (list.isEmpty()) {
-                return TagType.BYTE_ARRAY.id();
-            }
+    @Override
+    public void writeInt(String name, IntDataHolder value) throws IOException {
+        this.writer.writeInt(value.get());
+    }
 
-            return switch (getTagType(list.get(0))) {
-            case 3 -> TagType.INT_ARRAY.id();
-            case 4 -> TagType.LONG_ARRAY.id();
-            default -> TagType.BYTE_ARRAY.id();
-            };
-        }
+    @Override
+    public void writeLong(String name, LongDataHolder value) throws IOException {
+        this.writer.writeLong(value.get());
+    }
 
-        if (object instanceof MapDataObject) {
-            return TagType.COMPOUND.id();
-        }
+    @Override
+    public void writeFloat(String name, FloatDataHolder value) throws IOException {
+        this.writer.writeFloat(value.get());
+    }
 
-        if (object instanceof ListDataObject) {
-            return TagType.LIST.id();
-        }
+    @Override
+    public void writeDouble(String name, DoubleDataHolder value) throws IOException {
+        this.writer.writeDouble(value.get());
+    }
 
-        if (object instanceof StringDataObject) {
-            return TagType.STRING.id();
-        }
-
-        if (object instanceof BooleanDataObject) {
-            return TagType.BYTE.id();
-        }
-
-        if (object instanceof NumericDataObject<?> numeric) {
-            Number num = numeric.get();
-            if (num.getClass() == Byte.class) {
-                return TagType.BYTE.id();
-            }
-
-            if (num.getClass() == Short.class) {
-                return TagType.SHORT.id();
-            }
-
-            if (num.getClass() == Integer.class) {
-                return TagType.INT.id();
-            }
-
-            if (num.getClass() == Long.class) {
-                return TagType.LONG.id();
-            }
-
-            if (num.getClass() == Float.class) {
-                return TagType.FLOAT.id();
-            }
-
-            if (num.getClass() == Double.class) {
-                return TagType.DOUBLE.id();
-            }
-        }
-
-        return 0;
+    @Override
+    public void writeBoolean(String name, BooleanDataHolder value) throws IOException {
+        this.writer.writeByte(value.get() ? 1 : 0);
     }
 
     @Override
