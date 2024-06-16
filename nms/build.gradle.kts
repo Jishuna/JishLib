@@ -1,7 +1,7 @@
 plugins {
     id("java")
 	id("io.github.goooler.shadow") version "8.1.7"
-    id("io.papermc.paperweight.userdev") version "1.6.3" apply false
+    id("io.papermc.paperweight.userdev") version "1.7.1" apply false
 }
 
 val adapters = configurations.create("adapters") {

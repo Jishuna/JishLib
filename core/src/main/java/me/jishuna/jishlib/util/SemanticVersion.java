@@ -20,12 +20,12 @@ public class SemanticVersion implements Comparable<SemanticVersion> {
         version = version.replaceAll("[^\\d.]", "");
         String[] parts = version.split("\\.");
 
-        if (parts.length != 3) {
-            throw new IllegalArgumentException("String must be in the format major.minor.patch");
-        }
-
         try {
-            return new SemanticVersion(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+            int major = parts.length >= 1 ? Integer.parseInt(parts[0]) : 0;
+            int minor = parts.length >= 2 ? Integer.parseInt(parts[1]) : 0;
+            int patch = parts.length >= 3 ? Integer.parseInt(parts[2]) : 0;
+
+            return new SemanticVersion(major, minor, patch);
         } catch (NumberFormatException ex) {
             throw new IllegalArgumentException("String must be in the format major.minor.patch");
         }

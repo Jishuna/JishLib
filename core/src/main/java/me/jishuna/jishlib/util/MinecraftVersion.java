@@ -17,6 +17,7 @@ public final class MinecraftVersion {
     public static final SemanticVersion MC1_20_4 = new SemanticVersion(1, 20, 4);
     public static final SemanticVersion MC1_20_5 = new SemanticVersion(1, 20, 5);
     public static final SemanticVersion MC1_20_6 = new SemanticVersion(1, 20, 6);
+    public static final SemanticVersion MC1_21_0 = new SemanticVersion(1, 21, 0);
 
     private static String getServerVersion() {
         String version = Bukkit.getServer().getBukkitVersion();

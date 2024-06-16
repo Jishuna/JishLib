@@ -19,4 +19,6 @@ include("core")
 include("paper")
 include("nms")
 include("nms:v1_20_R4")
+include("nms:v1_21_R1")
 findProject(":nms:v1_20_R4")?.name = "v1_20_R4"
+findProject(":nms:v1_21_R1")?.name = "v1_21_R1"

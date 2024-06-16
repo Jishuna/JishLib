@@ -14,6 +14,7 @@ public class NMS {
     static {
         ADAPTER_MAP.put(MinecraftVersion.MC1_20_6, "v1_20_R4");
         ADAPTER_MAP.put(MinecraftVersion.MC1_20_5, "v1_20_R4");
+        ADAPTER_MAP.put(MinecraftVersion.MC1_21_0, "v1_21_R1");
     }
 
     public static boolean isInitialized() {
