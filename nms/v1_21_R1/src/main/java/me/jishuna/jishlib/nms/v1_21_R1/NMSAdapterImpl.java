@@ -9,15 +9,21 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.level.Level;
+import org.bukkit.Location;
+import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.craftbukkit.inventory.CraftContainer;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import me.jishuna.jishlib.Constants;
 import me.jishuna.jishlib.Logger;
 import me.jishuna.jishlib.nms.NMSAdapter;
+import me.jishuna.jishlib.nms.entity.PacketEntity;
+import me.jishuna.jishlib.nms.v1_21_R1.entity.PacketEntityImpl;
 import me.jishuna.jishlib.util.ReflectionHelper;
 
 public class NMSAdapterImpl implements NMSAdapter {
@@ -84,5 +90,11 @@ public class NMSAdapterImpl implements NMSAdapter {
     @Override
     public int getCurrentTick() {
         return MinecraftServer.currentTick;
+    }
+
+    @Override
+    public PacketEntity createPacketEntity(EntityType type, Location location) {
+        Level level = ((CraftWorld) location.getWorld()).getHandle();
+        return new PacketEntityImpl(type, location, level);
     }
 }
