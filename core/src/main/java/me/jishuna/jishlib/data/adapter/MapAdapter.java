@@ -40,7 +40,12 @@ public class MapAdapter<K, V> implements TypeAdapter<MapDataHolder, Map<K, V>> {
         Map<String, DataHolder<?>> dataMap = new LinkedHashMap<>();
 
         value.forEach((k, v) -> {
-            dataMap.put(this.keyAdapter.toString(k), this.valueAdapter.serialize(v));
+            String key = this.keyAdapter.toString(k);
+            DataHolder<?> holder = this.valueAdapter.serialize(v);
+            if (key != null && holder != null) {
+                holder.setName(key);
+                dataMap.put(key, holder);
+            }
         });
 
         return MapDataHolder.of(dataMap);

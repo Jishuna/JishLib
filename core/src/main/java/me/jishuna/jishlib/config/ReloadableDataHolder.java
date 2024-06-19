@@ -120,6 +120,7 @@ public abstract class ReloadableDataHolder<T> {
                 continue;
             }
 
+            obj.setName(path);
             data.set(path, obj, replace);
         }
 
