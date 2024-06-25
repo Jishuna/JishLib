@@ -58,6 +58,10 @@ public class MapDataHolder extends DataHolder<Map<String, DataHolder<?>>> implem
     }
 
     public void set(String key, DataHolder<?> value, boolean replace) {
+        if (!value.getName().equals(key)) {
+            value.setName(key);
+        }
+
         if (replace) {
             processKey(key, true, (k, v) -> v.value.put(k, value));
         } else {
@@ -65,75 +69,26 @@ public class MapDataHolder extends DataHolder<Map<String, DataHolder<?>>> implem
         }
     }
 
-    public <T extends DataHolder<?>> T get(String key, Class<T> type) {
+    public DataHolder<?> get(String key) {
+        return get(key, (DataHolder<?>) null);
+    }
+
+    public DataHolder<?> get(String key, DataHolder<?> def) {
+        DataHolder<?> result = processKey(key, false, (k, v) -> v.value.get(k));
+        return result == null ? def : result;
+    }
+
+    public <T> T get(String key, Class<T> type) {
         return get(key, type, null);
     }
 
-    public <T extends DataHolder<?>> T get(String key, Class<T> type, T def) {
-        DataHolder<?> obj = get(key);
-        if (type.isInstance(obj)) {
-            return type.cast(obj);
+    public <T> T get(String key, Class<T> type, T def) {
+        DataHolder<?> result = get(key, (DataHolder<?>) null);
+        if (type.isInstance(result.get())) {
+            return type.cast(result);
         }
 
         return def;
-    }
-
-    public DataHolder<?> get(String key) {
-        return processKey(key, false, (k, v) -> v.value.get(k));
-    }
-
-    public byte getByte(String key) {
-        DataHolder<?> obj = get(key);
-        if (obj instanceof NumericDataHolder<?> numeric) {
-            return numeric.byteValue();
-        }
-
-        return 0;
-    }
-
-    public short getShort(String key) {
-        DataHolder<?> obj = get(key);
-        if (obj instanceof NumericDataHolder<?> numeric) {
-            return numeric.shortValue();
-        }
-
-        return 0;
-    }
-
-    public int getInt(String key) {
-        DataHolder<?> obj = get(key);
-        if (obj instanceof NumericDataHolder<?> numeric) {
-            return numeric.intValue();
-        }
-
-        return 0;
-    }
-
-    public long getLong(String key) {
-        DataHolder<?> obj = get(key);
-        if (obj instanceof NumericDataHolder<?> numeric) {
-            return numeric.longValue();
-        }
-
-        return 0;
-    }
-
-    public float getFloat(String key) {
-        DataHolder<?> obj = get(key);
-        if (obj instanceof NumericDataHolder<?> numeric) {
-            return numeric.floatValue();
-        }
-
-        return 0;
-    }
-
-    public double getDouble(String key) {
-        DataHolder<?> obj = get(key);
-        if (obj instanceof NumericDataHolder<?> numeric) {
-            return numeric.doubleValue();
-        }
-
-        return 0;
     }
 
     public void forEach(BiConsumer<String, DataHolder<?>> consumer) {
@@ -158,7 +113,7 @@ public class MapDataHolder extends DataHolder<Map<String, DataHolder<?>>> implem
     }
 
     @Override
-    public void write(DataWriter writer) throws IOException {
+    public void write(DataWriter<?> writer) throws IOException {
         writer.writeMap(this.name, this);
     }
 

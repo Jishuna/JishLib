@@ -19,7 +19,7 @@ public class FloatDataHolder extends NumericDataHolder<Float> {
     }
 
     @Override
-    public void write(DataWriter writer) throws IOException {
+    public void write(DataWriter<?> writer) throws IOException {
         writer.writeFloat(this.name, this);
     }
 

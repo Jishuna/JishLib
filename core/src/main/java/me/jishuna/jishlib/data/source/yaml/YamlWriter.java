@@ -19,7 +19,7 @@ import me.jishuna.jishlib.data.holder.number.LongDataHolder;
 import me.jishuna.jishlib.data.holder.number.ShortDataHolder;
 import me.jishuna.jishlib.data.source.DataWriter;
 
-public class YamlWriter implements DataWriter {
+public class YamlWriter implements DataWriter<YamlConfiguration> {
     private final YamlConfiguration root;
     private final Stack<Object> stack = new Stack<>();
 
@@ -130,6 +130,12 @@ public class YamlWriter implements DataWriter {
         write(name, value);
     }
 
+    @Override
+    public void close() throws IOException {
+        // Nothing to close
+    }
+
+    @Override
     public YamlConfiguration getValue() {
         return this.root;
     }

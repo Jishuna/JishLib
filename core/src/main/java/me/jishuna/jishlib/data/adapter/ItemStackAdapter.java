@@ -21,7 +21,7 @@ public class ItemStackAdapter implements TypeAdapter<MapDataHolder, ItemStack> {
     @Override
     public ItemStack deserialize(MapDataHolder data) {
         ItemBuilder builder = ItemBuilder.of(MATERIAL.deserialize(data.get("material", StringDataHolder.class)));
-        builder.amount(data.get("amount", NumericDataHolder.class).intValue());
+        builder.amount(data.get("amount", Integer.class, 1));
         builder.name(COMPONENT.deserialize(data.get("name", StringDataHolder.class)));
 
         return builder.build();

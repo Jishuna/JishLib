@@ -40,7 +40,7 @@ public class ListDataHolder extends DataHolder<List<DataHolder<?>>> implements I
     }
 
     @Override
-    public void write(DataWriter writer) throws IOException {
+    public void write(DataWriter<?> writer) throws IOException {
         writer.writeList(this.name, this);
     }
 

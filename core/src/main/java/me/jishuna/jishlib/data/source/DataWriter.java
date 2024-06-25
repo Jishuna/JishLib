@@ -1,5 +1,6 @@
 package me.jishuna.jishlib.data.source;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import me.jishuna.jishlib.data.holder.BooleanDataHolder;
@@ -14,7 +15,7 @@ import me.jishuna.jishlib.data.holder.number.IntDataHolder;
 import me.jishuna.jishlib.data.holder.number.LongDataHolder;
 import me.jishuna.jishlib.data.holder.number.ShortDataHolder;
 
-public interface DataWriter {
+public interface DataWriter<T> extends Closeable {
     public void writeMap(String name, MapDataHolder value) throws IOException;
 
     public void writeList(String name, ListDataHolder value) throws IOException;
@@ -38,4 +39,6 @@ public interface DataWriter {
     public void writeBoolean(String name, BooleanDataHolder value) throws IOException;
 
     public void save(File file) throws IOException;
+
+    public T getValue();
 }

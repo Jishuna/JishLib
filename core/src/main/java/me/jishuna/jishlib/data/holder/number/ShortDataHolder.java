@@ -19,7 +19,7 @@ public class ShortDataHolder extends NumericDataHolder<Short> {
     }
 
     @Override
-    public void write(DataWriter writer) throws IOException {
+    public void write(DataWriter<?> writer) throws IOException {
         writer.writeShort(this.name, this);
     }
 

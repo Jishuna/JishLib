@@ -26,7 +26,7 @@ public class ArrayDataHolder extends ListDataHolder {
     }
 
     @Override
-    public void write(DataWriter writer) throws IOException {
+    public void write(DataWriter<?> writer) throws IOException {
         writer.writeArray(this.name, this);
     }
 

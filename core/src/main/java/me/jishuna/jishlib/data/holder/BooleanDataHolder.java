@@ -19,7 +19,7 @@ public class BooleanDataHolder extends DataHolder<Boolean> {
     }
 
     @Override
-    public void write(DataWriter writer) throws IOException {
+    public void write(DataWriter<?> writer) throws IOException {
         writer.writeBoolean(this.name, this);
     }
 

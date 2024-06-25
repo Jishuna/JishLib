@@ -19,7 +19,7 @@ public class LongDataHolder extends NumericDataHolder<Long> {
     }
 
     @Override
-    public void write(DataWriter writer) throws IOException {
+    public void write(DataWriter<?> writer) throws IOException {
         writer.writeLong(this.name, this);
     }
 

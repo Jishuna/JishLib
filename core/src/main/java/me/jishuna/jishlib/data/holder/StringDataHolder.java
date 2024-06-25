@@ -18,7 +18,7 @@ public class StringDataHolder extends DataHolder<String> {
     }
 
     @Override
-    public void write(DataWriter writer) throws IOException {
+    public void write(DataWriter<?> writer) throws IOException {
         writer.writeString(this.name, this);
     }
 

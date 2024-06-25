@@ -2,7 +2,6 @@ package me.jishuna.jishlib.data.source.nbt;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,7 +25,7 @@ import me.jishuna.jishlib.data.holder.number.LongDataHolder;
 import me.jishuna.jishlib.data.holder.number.ShortDataHolder;
 import me.jishuna.jishlib.data.source.DataWriter;
 
-public class NBTWriter implements DataWriter, Closeable {
+public class NBTWriter implements DataWriter<byte[]> {
     private final ByteArrayOutputStream byteStream;
     private final DataOutputStream writer;
     private boolean hasTag = false;
@@ -148,6 +147,7 @@ public class NBTWriter implements DataWriter, Closeable {
         this.byteStream.close();
     }
 
+    @Override
     public byte[] getValue() {
         return this.byteStream.toByteArray();
     }

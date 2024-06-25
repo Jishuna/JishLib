@@ -19,7 +19,7 @@ public class ByteDataHolder extends NumericDataHolder<Byte> {
     }
 
     @Override
-    public void write(DataWriter writer) throws IOException {
+    public void write(DataWriter<?> writer) throws IOException {
         writer.writeByte(this.name, this);
     }
 

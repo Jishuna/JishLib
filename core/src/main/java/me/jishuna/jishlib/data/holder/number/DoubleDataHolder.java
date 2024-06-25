@@ -19,7 +19,7 @@ public class DoubleDataHolder extends NumericDataHolder<Double> {
     }
 
     @Override
-    public void write(DataWriter writer) throws IOException {
+    public void write(DataWriter<?> writer) throws IOException {
         writer.writeDouble(this.name, this);
     }
 

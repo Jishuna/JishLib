@@ -19,7 +19,7 @@ public class IntDataHolder extends NumericDataHolder<Integer> {
     }
 
     @Override
-    public void write(DataWriter writer) throws IOException {
+    public void write(DataWriter<?> writer) throws IOException {
         writer.writeInt(this.name, this);
     }
 

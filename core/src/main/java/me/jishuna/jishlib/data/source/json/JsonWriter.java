@@ -25,7 +25,7 @@ import me.jishuna.jishlib.data.holder.number.NumericDataHolder;
 import me.jishuna.jishlib.data.holder.number.ShortDataHolder;
 import me.jishuna.jishlib.data.source.DataWriter;
 
-public class JsonWriter implements DataWriter {
+public class JsonWriter implements DataWriter<JsonObject> {
     private static final Gson GSON = new GsonBuilder()
             .setLenient()
             .setPrettyPrinting()
@@ -155,6 +155,12 @@ public class JsonWriter implements DataWriter {
         }
     }
 
+    @Override
+    public void close() throws IOException {
+        // Nothing to close
+    }
+
+    @Override
     public JsonObject getValue() {
         return this.root;
     }

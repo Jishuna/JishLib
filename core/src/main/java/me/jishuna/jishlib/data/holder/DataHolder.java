@@ -25,7 +25,7 @@ public abstract class DataHolder<T> {
         return this.value;
     }
 
-    public abstract void write(DataWriter writer) throws IOException;
+    public abstract void write(DataWriter<?> writer) throws IOException;
 
     public abstract HolderType getType();
 
