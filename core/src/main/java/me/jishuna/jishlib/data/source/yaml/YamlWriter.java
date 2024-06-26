@@ -2,7 +2,8 @@ package me.jishuna.jishlib.data.source.yaml;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import me.jishuna.jishlib.data.holder.BooleanDataHolder;
@@ -21,11 +22,11 @@ import me.jishuna.jishlib.data.source.DataWriter;
 
 public class YamlWriter implements DataWriter<YamlConfiguration> {
     private final YamlConfiguration root;
-    private final Stack<Object> stack = new Stack<>();
+    private final Deque<Object> stack = new ArrayDeque<>();
 
     private YamlWriter(YamlConfiguration config) {
         this.root = config;
-        this.stack.add(this.root);
+        this.stack.addFirst(config);
     }
 
     public static YamlWriter create() {
@@ -43,41 +44,40 @@ public class YamlWriter implements DataWriter<YamlConfiguration> {
 
     @Override
     public void writeMap(String name, MapDataHolder value) throws IOException {
-        boolean pop = false;
-        if (!name.isBlank()) {
-            YamlConfiguration config = new YamlConfiguration();
-            Object object = this.stack.peek();
-            if (object instanceof ConfigurationList list) {
-                list.add(config);
-            } else if (object instanceof ConfigurationSection section) {
-                section.set(name, config);
+        if (this.stack.size() == 1 && name.isBlank()) {
+            for (DataHolder<?> v : value) {
+                v.write(this);
             }
-
-            this.stack.push(config);
-            pop = true;
+            return;
         }
 
-        for (DataHolder<?> v : value.get().values()) {
+        YamlConfiguration subSection = new YamlConfiguration();
+        this.stack.addFirst(subSection);
+
+        for (DataHolder<?> v : value) {
             v.write(this);
         }
 
-        if (pop) {
-            this.stack.pop();
+        this.stack.removeFirst();
+        Object object = this.stack.peekFirst();
+        if (object instanceof ConfigurationList list) {
+            list.add(subSection);
+        } else if (object instanceof ConfigurationSection section) {
+            section.set(name, subSection);
         }
     }
 
     @Override
     public void writeList(String name, ListDataHolder value) throws IOException {
         ConfigurationList config = new ConfigurationList();
-        this.stack.push(config);
+        this.stack.addFirst(config);
 
         for (DataHolder<?> v : value) {
             v.write(this);
         }
 
-        this.stack.pop();
-
-        Object object = this.stack.peek();
+        this.stack.removeFirst();
+        Object object = this.stack.peekFirst();
         if (object instanceof ConfigurationList list) {
             list.add(config);
         } else if (object instanceof ConfigurationSection section) {
@@ -141,7 +141,7 @@ public class YamlWriter implements DataWriter<YamlConfiguration> {
     }
 
     private void write(String name, DataHolder<?> value) {
-        Object object = this.stack.peek();
+        Object object = this.stack.peekFirst();
         if (object instanceof ConfigurationList list) {
             list.add(value.get());
         } else if (object instanceof ConfigurationSection section) {

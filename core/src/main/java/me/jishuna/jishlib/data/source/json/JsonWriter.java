@@ -9,7 +9,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import me.jishuna.jishlib.data.holder.BooleanDataHolder;
 import me.jishuna.jishlib.data.holder.DataHolder;
 import me.jishuna.jishlib.data.holder.StringDataHolder;
@@ -33,11 +34,11 @@ public class JsonWriter implements DataWriter<JsonObject> {
             .create();
 
     private final JsonObject root;
-    private final Stack<JsonElement> stack = new Stack<>();
+    private final Deque<JsonElement> stack = new ArrayDeque<>();
 
     private JsonWriter(JsonObject json) {
         this.root = json;
-        this.stack.add(this.root);
+        this.stack.add(json);
     }
 
     public static JsonWriter create() {
@@ -57,42 +58,40 @@ public class JsonWriter implements DataWriter<JsonObject> {
 
     @Override
     public void writeMap(String name, MapDataHolder value) throws IOException {
-        boolean pop = false;
-        if (!name.isBlank()) {
-            JsonObject json = new JsonObject();
-            JsonElement element = this.stack.peek();
-
-            if (element.isJsonArray()) {
-                element.getAsJsonArray().add(json);
-            } else if (element.isJsonObject()) {
-                element.getAsJsonObject().add(name, json);
+        if (this.stack.size() == 1 && name.isBlank()) {
+            for (DataHolder<?> v : value) {
+                v.write(this);
             }
-
-            this.stack.push(json);
-            pop = true;
+            return;
         }
 
-        for (DataHolder<?> v : value.get().values()) {
+        JsonObject json = new JsonObject();
+        this.stack.addFirst(json);
+
+        for (DataHolder<?> v : value) {
             v.write(this);
         }
 
-        if (pop) {
-            this.stack.pop();
+        this.stack.removeFirst();
+        JsonElement element = this.stack.peekFirst();
+        if (element.isJsonArray()) {
+            element.getAsJsonArray().add(json);
+        } else if (element.isJsonObject()) {
+            element.getAsJsonObject().add(name, json);
         }
     }
 
     @Override
     public void writeList(String name, ListDataHolder value) throws IOException {
         JsonArray json = new JsonArray();
-        this.stack.push(json);
+        this.stack.addFirst(json);
 
         for (DataHolder<?> v : value) {
             v.write(this);
         }
 
-        this.stack.pop();
-
-        JsonElement element = this.stack.peek();
+        this.stack.removeFirst();
+        JsonElement element = this.stack.peekFirst();
         if (element.isJsonArray()) {
             element.getAsJsonArray().add(json);
         } else if (element.isJsonObject()) {
@@ -107,7 +106,7 @@ public class JsonWriter implements DataWriter<JsonObject> {
 
     @Override
     public void writeString(String name, StringDataHolder value) {
-        JsonElement element = this.stack.peek();
+        JsonElement element = this.stack.peekFirst();
         if (element.isJsonArray()) {
             element.getAsJsonArray().add(value.get());
         } else if (element.isJsonObject()) {
@@ -147,7 +146,7 @@ public class JsonWriter implements DataWriter<JsonObject> {
 
     @Override
     public void writeBoolean(String name, BooleanDataHolder value) {
-        JsonElement element = this.stack.peek();
+        JsonElement element = this.stack.peekFirst();
         if (element.isJsonArray()) {
             element.getAsJsonArray().add(value.get());
         } else if (element.isJsonObject()) {
@@ -166,7 +165,7 @@ public class JsonWriter implements DataWriter<JsonObject> {
     }
 
     private void write(String name, NumericDataHolder<?> value) {
-        JsonElement element = this.stack.peek();
+        JsonElement element = this.stack.peekFirst();
         if (element.isJsonArray()) {
             element.getAsJsonArray().add(value.get());
         } else if (element.isJsonObject()) {

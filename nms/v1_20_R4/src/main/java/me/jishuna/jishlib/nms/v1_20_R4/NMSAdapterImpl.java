@@ -2,6 +2,7 @@ package me.jishuna.jishlib.nms.v1_20_R4;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.minecraft.nbt.CompoundTag;
@@ -63,6 +64,17 @@ public class NMSAdapterImpl implements NMSAdapter {
     }
 
     @Override
+    public Component getItemNameComponent(ItemMeta meta) {
+        try {
+            Object nmsComponent = DISPLAY_NAME_FIELD.get(meta);
+            return Constants.MOJANG_SERIALIZER.deserializeOr(nmsComponent, Component.empty());
+        } catch (Exception e) {
+            Logger.error("An unexpected error occured while reading item name: {0}", e);
+        }
+        return Component.empty();
+    }
+
+    @Override
     public void setItemNameComponent(ItemMeta meta, Component component) {
         Object nmsComponent = Constants.MOJANG_SERIALIZER.serialize(component);
         try {
@@ -70,6 +82,27 @@ public class NMSAdapterImpl implements NMSAdapter {
         } catch (Exception e) {
             Logger.error("An unexpected error occured while modifying item name: {0}", e);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Component> getItemLoreComponents(ItemMeta meta) {
+        try {
+            List<net.minecraft.network.chat.Component> nmsLore = (List<net.minecraft.network.chat.Component>) LORE_FIELD.get(meta);
+            if (nmsLore == null) {
+                return Collections.emptyList();
+            }
+
+            List<Component> lore = new ArrayList<>();
+            for (net.minecraft.network.chat.Component component : nmsLore) {
+                lore.add(Constants.MOJANG_SERIALIZER.deserializeOr(component, Component.empty()));
+            }
+
+            return lore;
+        } catch (Exception e) {
+            Logger.error("An unexpected error occured while reading item lore: {0}", e);
+        }
+        return Collections.emptyList();
     }
 
     @SuppressWarnings("unchecked")

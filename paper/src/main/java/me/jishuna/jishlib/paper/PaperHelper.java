@@ -6,9 +6,10 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import me.jishuna.jishlib.Capabilities;
 
 public class PaperHelper {
-    private static final boolean HAS_PAPER = isPaper();
+    private static final boolean HAS_PAPER = Capabilities.PAPER;
 
     public static CompletableFuture<Boolean> teleportAsync(Player player, Location location) {
         if (HAS_PAPER) {
@@ -32,15 +33,5 @@ public class PaperHelper {
         }
 
         return Bukkit.spigot().getPaperConfig().getBoolean("proxies.velocity.enabled", false);
-    }
-
-    private static boolean isPaper() {
-        try {
-            Class.forName("com.destroystokyo.paper.PaperConfig");
-            Class.forName("io.papermc.paper.configuration.Configuration");
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
     }
 }

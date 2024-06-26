@@ -1,5 +1,6 @@
 package me.jishuna.jishlib.nms;
 
+import java.util.List;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -15,7 +16,11 @@ import me.jishuna.jishlib.nms.entity.PacketEntity;
 public interface NMSAdapter {
     public void openInventory(HumanEntity player, Inventory inventory, Component component);
 
+    public Component getItemNameComponent(ItemMeta meta);
+
     public void setItemNameComponent(ItemMeta meta, Component component);
+
+    public List<Component> getItemLoreComponents(ItemMeta meta);
 
     public void addItemLoreComponents(ItemMeta meta, Component... lore);
 

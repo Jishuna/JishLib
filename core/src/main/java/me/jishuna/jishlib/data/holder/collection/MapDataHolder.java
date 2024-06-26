@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import me.jishuna.jishlib.data.HolderType;
@@ -38,6 +39,8 @@ public class MapDataHolder extends DataHolder<Map<String, DataHolder<?>>> implem
     }
 
     public static MapDataHolder of(String name, String seperator, Map<String, DataHolder<?>> value) {
+        value.forEach((k, v) -> v.setName(k));
+
         return new MapDataHolder(name, seperator, value);
     }
 
@@ -80,6 +83,10 @@ public class MapDataHolder extends DataHolder<Map<String, DataHolder<?>>> implem
 
     public <T> T get(String key, Class<T> type) {
         return get(key, type, null);
+    }
+
+    public <T> Optional<T> find(String key, Class<T> type) {
+        return Optional.ofNullable(get(key, type, null));
     }
 
     public <T> T get(String key, Class<T> type, T def) {

@@ -32,7 +32,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.profile.PlayerProfile;
 import me.jishuna.jishlib.Constants;
 import me.jishuna.jishlib.nms.NMS;
-import me.jishuna.jishlib.util.Components;
 import me.jishuna.jishlib.util.EffectBuilder;
 import me.jishuna.jishlib.util.MinecraftVersion;
 import me.jishuna.jishlib.util.Utils;
@@ -88,8 +87,19 @@ public class ItemBuilder implements ItemSupplier {
         return this;
     }
 
-    public String name() {
+    public boolean hasName() {
+        return this.meta.hasDisplayName();
+    }
+
+    public String nameRaw() {
         return this.meta.getDisplayName();
+    }
+
+    public Component name() {
+        if (NMS.isInitialized()) {
+            return NMS.get().getItemNameComponent(this.meta);
+        }
+        return Constants.LEGACY_SERIALIZER.deserialize(this.meta.getDisplayName());
     }
 
     public ItemBuilder name(String name) {
@@ -98,16 +108,32 @@ public class ItemBuilder implements ItemSupplier {
     }
 
     public ItemBuilder name(Component component) {
-        Components.setItemName(this.meta, component);
+        if (NMS.isInitialized()) {
+            NMS.get().setItemNameComponent(this.meta, component);
+        } else {
+            this.meta.setDisplayName(Constants.LEGACY_SERIALIZER.serialize(component));
+        }
         return this;
     }
 
-    public List<String> lore() {
+    public List<String> loreRaw() {
         return this.meta.hasLore() ? this.meta.getLore() : new ArrayList<>();
     }
 
+    public List<Component> lore() {
+        if (NMS.isInitialized()) {
+            return NMS.get().getItemLoreComponents(this.meta);
+        }
+
+        List<Component> itemLore = new ArrayList<>();
+        for (String line : loreRaw()) {
+            itemLore.add(Constants.LEGACY_SERIALIZER.deserialize(line));
+        }
+        return itemLore;
+    }
+
     public ItemBuilder lore(Collection<String> lore) {
-        List<String> itemLore = lore();
+        List<String> itemLore = loreRaw();
         itemLore.addAll(lore);
 
         this.meta.setLore(itemLore);
@@ -115,7 +141,7 @@ public class ItemBuilder implements ItemSupplier {
     }
 
     public ItemBuilder lore(String... lore) {
-        List<String> itemLore = lore();
+        List<String> itemLore = loreRaw();
         Collections.addAll(itemLore, lore);
 
         this.meta.setLore(itemLore);
@@ -126,7 +152,7 @@ public class ItemBuilder implements ItemSupplier {
         if (NMS.isInitialized()) {
             NMS.get().addItemLoreComponents(this.meta, lore);
         } else {
-            List<String> itemLore = lore();
+            List<String> itemLore = loreRaw();
             for (Component component : lore) {
                 itemLore.add(Constants.LEGACY_SERIALIZER.serialize(component));
             }

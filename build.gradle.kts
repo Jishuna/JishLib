@@ -10,6 +10,7 @@ tasks.withType<JavaCompile> {
 
 dependencies {
 	implementation(project(":core"))
+	implementation(project(":paper"))
 	implementation(project(path = ":nms", configuration = "shadow"))	
 }
 

@@ -66,6 +66,7 @@ public class NBTReader implements DataReader {
         byte nextTypeId;
         while ((nextTypeId = reader.readByte()) != 0) {
             String dataName = reader.readUTF();
+
             DataHolder<?> data = readValue(nextTypeId, reader);
             if (data != null) {
                 data.setName(dataName);
@@ -80,7 +81,6 @@ public class NBTReader implements DataReader {
     private ListDataHolder readList(DataInput reader) throws IOException {
         List<DataHolder<?>> dataList = new ArrayList<>();
         byte tagType = reader.readByte();
-        System.out.println(tagType);
         int length = reader.readInt();
 
         for (int i = 0; i < length; i++) {

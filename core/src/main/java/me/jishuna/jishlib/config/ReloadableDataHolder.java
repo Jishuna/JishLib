@@ -124,8 +124,7 @@ public abstract class ReloadableDataHolder<T> {
             data.set(path, obj, replace);
         }
 
-        try {
-            YamlWriter writer = YamlWriter.create(configuration);
+        try (YamlWriter writer = YamlWriter.create(configuration)) {
             writer.writeMap("", data);
             this.fields.forEach(f -> configuration.setComments(f.getPath(), f.getComments()));
             writer.save(this.file);

@@ -16,6 +16,7 @@ import me.jishuna.jishlib.data.holder.number.LongDataHolder;
 import me.jishuna.jishlib.data.holder.number.ShortDataHolder;
 
 public interface DataWriter<T> extends Closeable {
+
     public void writeMap(String name, MapDataHolder value) throws IOException;
 
     public void writeList(String name, ListDataHolder value) throws IOException;
