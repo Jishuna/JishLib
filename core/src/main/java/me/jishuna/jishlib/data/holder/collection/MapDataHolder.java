@@ -92,7 +92,7 @@ public class MapDataHolder extends DataHolder<Map<String, DataHolder<?>>> implem
     public <T> T get(String key, Class<T> type, T def) {
         DataHolder<?> result = get(key, (DataHolder<?>) null);
         if (type.isInstance(result.get())) {
-            return type.cast(result);
+            return type.cast(result.get());
         }
 
         return def;
