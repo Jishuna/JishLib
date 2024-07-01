@@ -14,6 +14,8 @@ import me.jishuna.jishlib.data.holder.collection.MapDataHolder;
 import me.jishuna.jishlib.nms.entity.PacketEntity;
 
 public interface NMSAdapter {
+    public int getReloadCount();
+
     public void openInventory(HumanEntity player, Inventory inventory, Component component);
 
     public Component getItemNameComponent(ItemMeta meta);

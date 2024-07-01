@@ -7,10 +7,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.Future;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.event.EventPriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import me.jishuna.jishlib.event.EventBus;
+import me.jishuna.jishlib.nms.NMS;
 
 public class Plugin extends JavaPlugin {
     private static Plugin INSTANCE;
@@ -23,7 +25,11 @@ public class Plugin extends JavaPlugin {
         return INSTANCE;
     }
 
-    Set<Cleanable> cleanables = new HashSet<>();
+    public static NamespacedKey key(String value) {
+        return new NamespacedKey(getInstance(), value);
+    }
+
+    private final Set<Cleanable> cleanables = new HashSet<>();
     private EventBus eventBus;
 
     @Override
@@ -32,7 +38,7 @@ public class Plugin extends JavaPlugin {
         Capabilities.init();
         Constants.init();
 
-        onEnable(false);
+        onEnable(isReload());
     }
 
     protected void onEnable(boolean reload) {
@@ -44,7 +50,7 @@ public class Plugin extends JavaPlugin {
         this.cleanables.clear();
 
         INSTANCE = null;
-        onDisable(false);
+        onDisable(isReload());
     }
 
     protected void onDisable(boolean reload) {
@@ -107,5 +113,13 @@ public class Plugin extends JavaPlugin {
 
     public void registerCleanup(Cleanable feature) {
         this.cleanables.add(feature);
+    }
+
+    private boolean isReload() {
+        if (!Capabilities.NMS) {
+            return !Bukkit.getOnlinePlayers().isEmpty();
+        }
+
+        return NMS.get().getReloadCount() > 0;
     }
 }

@@ -45,6 +45,12 @@ public class NMSAdapterImpl implements NMSAdapter {
         LORE_FIELD = ReflectionHelper.getField(craftMetaItemClass, "lore");
     }
 
+    @SuppressWarnings("resource")
+    @Override
+    public int getReloadCount() {
+        return MinecraftServer.getServer().server.reloadCount;
+    }
+
     @Override
     public void openInventory(HumanEntity player, Inventory inventory, Component component) {
         ServerPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
