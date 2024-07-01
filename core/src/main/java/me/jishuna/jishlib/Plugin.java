@@ -29,7 +29,7 @@ public class Plugin extends JavaPlugin {
         return new NamespacedKey(getInstance(), value);
     }
 
-    private final Set<Cleanable> cleanables = new HashSet<>();
+    final Set<Cleanable> cleanables = new HashSet<>();
     private EventBus eventBus;
 
     @Override
