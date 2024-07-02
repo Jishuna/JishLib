@@ -1,9 +1,5 @@
 package me.jishuna.jishlib.item;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import net.kyori.adventure.text.Component;
@@ -41,10 +37,12 @@ public class ItemBuilder implements ItemSupplier {
 
     private ItemStack item;
     private ItemMeta meta;
+    private ItemLore lore;
 
     private ItemBuilder(ItemStack item) {
         this.item = item;
         this.meta = item.getItemMeta();
+        this.lore = ItemLore.fromMeta(this.meta);
     }
 
     public static ItemBuilder of(Material material) {
@@ -116,48 +114,17 @@ public class ItemBuilder implements ItemSupplier {
         return this;
     }
 
-    public List<String> loreRaw() {
-        return this.meta.hasLore() ? this.meta.getLore() : new ArrayList<>();
-    }
-
-    public List<Component> lore() {
-        if (NMS.isInitialized()) {
-            return NMS.get().getItemLoreComponents(this.meta);
-        }
-
-        List<Component> itemLore = new ArrayList<>();
-        for (String line : loreRaw()) {
-            itemLore.add(Constants.LEGACY_SERIALIZER.deserialize(line));
-        }
-        return itemLore;
-    }
-
-    public ItemBuilder lore(Collection<String> lore) {
-        List<String> itemLore = loreRaw();
-        itemLore.addAll(lore);
-
-        this.meta.setLore(itemLore);
-        return this;
+    public ItemLore lore() {
+        return this.lore;
     }
 
     public ItemBuilder lore(String... lore) {
-        List<String> itemLore = loreRaw();
-        Collections.addAll(itemLore, lore);
-
-        this.meta.setLore(itemLore);
+        this.lore.add(lore);
         return this;
     }
 
     public ItemBuilder lore(Component... lore) {
-        if (NMS.isInitialized()) {
-            NMS.get().addItemLoreComponents(this.meta, lore);
-        } else {
-            List<String> itemLore = loreRaw();
-            for (Component component : lore) {
-                itemLore.add(Constants.LEGACY_SERIALIZER.serialize(component));
-            }
-            this.meta.setLore(itemLore);
-        }
+        this.lore.add(lore);
         return this;
     }
 
@@ -176,6 +143,10 @@ public class ItemBuilder implements ItemSupplier {
     public ItemBuilder attribute(Attribute attribute, AttributeModifier modifier) {
         this.meta.addAttributeModifier(attribute, modifier);
         return this;
+    }
+
+    public <Z> Z persistentData(NamespacedKey key, PersistentDataType<?, Z> type) {
+        return this.meta.getPersistentDataContainer().get(key, type);
     }
 
     public <T, Z> ItemBuilder persistentData(NamespacedKey key, PersistentDataType<T, Z> type, Z value) {
@@ -290,6 +261,7 @@ public class ItemBuilder implements ItemSupplier {
     }
 
     public ItemStack build() {
+        this.lore.apply(this.meta);
         this.item.setItemMeta(this.meta);
         return this.item;
     }

@@ -24,7 +24,7 @@ public interface NMSAdapter {
 
     public List<Component> getItemLoreComponents(ItemMeta meta);
 
-    public void addItemLoreComponents(ItemMeta meta, Component... lore);
+    public void setItemLoreComponents(ItemMeta meta, List<Component> lore);
 
     public PacketEntity createPacketEntity(EntityType type, Location location);
 

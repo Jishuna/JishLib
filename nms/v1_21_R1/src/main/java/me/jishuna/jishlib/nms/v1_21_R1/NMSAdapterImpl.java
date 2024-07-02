@@ -111,19 +111,14 @@ public class NMSAdapterImpl implements NMSAdapter {
         return Collections.emptyList();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void addItemLoreComponents(ItemMeta meta, Component... lore) {
+    public void setItemLoreComponents(ItemMeta meta, List<Component> lore) {
         try {
-            List<net.minecraft.network.chat.Component> nmsLore = (List<net.minecraft.network.chat.Component>) LORE_FIELD.get(meta);
-            if (nmsLore == null) {
-                nmsLore = new ArrayList<>();
-            }
-
+            List<net.minecraft.network.chat.Component> nmsLore = new ArrayList<>();
             for (Component component : lore) {
-                net.minecraft.network.chat.Component nmsComponent = (net.minecraft.network.chat.Component) Constants.MOJANG_SERIALIZER.serialize(component);
-                if (nmsComponent != null) {
-                    nmsLore.add(nmsComponent);
+                Object nmsComponent = Constants.MOJANG_SERIALIZER.serialize(component);
+                if (nmsComponent instanceof net.minecraft.network.chat.Component nms) {
+                    nmsLore.add(nms);
                 }
             }
 

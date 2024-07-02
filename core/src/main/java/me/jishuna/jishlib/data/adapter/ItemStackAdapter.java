@@ -45,7 +45,7 @@ public class ItemStackAdapter implements TypeAdapter<MapDataHolder, ItemStack> {
         if (builder.hasName()) {
             dataMap.put("name", COMPONENT.serialize(builder.name()));
         }
-        dataMap.put("lore", COMPONENT_LIST.serialize(builder.lore()));
+        dataMap.put("lore", COMPONENT_LIST.serialize(builder.lore().getComponents()));
 
         return MapDataHolder.of(dataMap);
     }
