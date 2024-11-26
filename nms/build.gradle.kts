@@ -1,31 +1,38 @@
 plugins {
-    id("java")
-	id("io.github.goooler.shadow") version "8.1.7"
-    id("io.papermc.paperweight.userdev") version "1.7.1" apply false
-}
-
-val adapters = configurations.create("adapters") {
-    isCanBeConsumed = false
-    isCanBeResolved = true
-    shouldResolveConsistentlyWith(configurations["runtimeClasspath"])
+    id("java-library")
+    id("com.gradleup.shadow") version "8.3.5"
+    id("maven-publish")
+    id("io.papermc.paperweight.userdev") version "1.7.5" apply false
 }
 
 dependencies {
-      project.project(":nms").subprojects.forEach {
-		"adapters"(project(path = it.path, configuration = "reobf"))
+    shadow(project(":core"))
+    project.project(":nms").subprojects.forEach {
+        implementation(project(path = it.path, configuration = "reobf"))
+    }
+}
+
+subprojects {
+    apply(plugin = "java-library")
+
+    dependencies {
+        compileOnly(project(":core"))
     }
 }
 
 tasks.shadowJar {
-	configurations.add(adapters)
-	
-	project.project(":nms").subprojects.forEach {
-        dependencies {
-            include(dependency("${it.group}:${it.name}"))
-        }
-    }
+    archiveClassifier = ""
+    archiveVersion = ""
 }
 
-tasks.assemble {
-	dependsOn(tasks.shadowJar)
+publishing {
+    publications {
+        create<MavenPublication>("NMS") {
+            groupId = gradle.rootProject.group.toString()
+            artifactId = gradle.rootProject.name + "-nms"
+            version = gradle.rootProject.version.toString()
+
+            from(components["shadow"])
+        }
+    }
 }

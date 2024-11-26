@@ -1,24 +1,21 @@
-rootProject.name = "Jishlib"
+rootProject.name = "jishlib"
 
 gradle.rootProject {
-    this.version = "3.0.0-SNAPSHOT"
+    this.version = "4.0.0-SNAPSHOT"
     this.group = "me.jishuna"
 }
 
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
-		maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
         maven("https://oss.sonatype.org/content/repositories/central")
-        maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+        mavenLocal()
     }
 }
 
 include("core")
-include("paper")
+include("inventory")
 include("nms")
-include("nms:v1_20_R4")
-include("nms:v1_21_R1")
-findProject(":nms:v1_20_R4")?.name = "v1_20_R4"
-findProject(":nms:v1_21_R1")?.name = "v1_21_R1"
+include("nms:v1_21_R3")
+findProject(":nms:v1_21_R3")?.name = "v1_21_R3"

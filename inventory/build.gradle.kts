@@ -4,16 +4,14 @@ plugins {
 }
 
 dependencies {
-    compileOnlyApi("org.spigotmc:spigot-api:1.21.3-R0.1-SNAPSHOT")
-    api("net.kyori:adventure-text-minimessage:4.17.0")
-    api("net.kyori:adventure-platform-bukkit:4.3.4")
+   api(project(":core"))
 }
 
 publishing {
     publications {
-        create<MavenPublication>("Core") {
+        create<MavenPublication>("Inventory") {
             groupId = gradle.rootProject.group.toString()
-            artifactId = gradle.rootProject.name + "-core"
+            artifactId = gradle.rootProject.name + "-inventory"
             version = gradle.rootProject.version.toString()
 
             from(components["java"])

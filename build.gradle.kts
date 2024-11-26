@@ -1,41 +1,28 @@
 plugins {
-    id("java")
+    id("java-library")
+    id("com.gradleup.shadow") version "8.3.5"
     id("maven-publish")
-	id("io.github.goooler.shadow") version "8.1.7"
-}
-
-tasks.withType<JavaCompile> {
-    options.encoding = "UTF-8"
 }
 
 dependencies {
-	implementation(project(":core"))
-	implementation(project(":paper"))
-	implementation(project(path = ":nms", configuration = "shadow"))	
+  api(project(":core"))
+  api(project(":inventory"))
+  api(project(path = ":nms", configuration = "shadow"))
 }
 
 tasks.shadowJar {
-	archiveClassifier.set("")
-    archiveVersion.set("")
-}
-
-tasks.assemble {
-	dependsOn(tasks.shadowJar)
+    archiveClassifier = ""
+    archiveVersion = ""
 }
 
 publishing {
     publications {
-        create<MavenPublication>("Maven") {
-            project.shadow.component(this)
-        }
-    }
+        create<MavenPublication>("All") {
+            groupId = gradle.rootProject.group.toString()
+            artifactId = gradle.rootProject.name + "-all"
+            version = gradle.rootProject.version.toString()
 
-    repositories {
-        maven("https://repo.epicebic.xyz/public/") {
-            credentials {
-                this.username = "josh"
-                this.password = System.getenv("Secret")
-            }
+            from(components["shadow"])
         }
     }
 }
