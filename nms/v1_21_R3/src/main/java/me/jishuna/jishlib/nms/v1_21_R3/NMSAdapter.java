@@ -1,20 +1,30 @@
 package me.jishuna.jishlib.nms.v1_21_R3;
 
+import com.mojang.serialization.Dynamic;
 import me.jishuna.jishlib.adapter.Adapter;
 import me.jishuna.jishlib.reflection.FieldAccess;
 import me.jishuna.jishlib.reflection.ReflectionException;
 import me.jishuna.jishlib.reflection.ReflectionHelper;
 import net.kyori.adventure.platform.bukkit.MinecraftComponentSerializer;
 import net.kyori.adventure.text.Component;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.datafix.DataFixers;
+import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.craftbukkit.inventory.CraftContainer;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
@@ -22,6 +32,9 @@ import java.util.Collection;
 import java.util.List;
 
 public class NMSAdapter implements Adapter {
+    private static final NbtOps NBT_OPS = NbtOps.INSTANCE;
+    private static final RegistryAccess.Frozen REGISTRY_ACCESS = MinecraftServer.getServer().registryAccess();
+
     private static FieldAccess<net.minecraft.network.chat.Component> NAME_FIELD;
     private static FieldAccess<List> LORE_FIELD;
 
@@ -104,5 +117,20 @@ public class NMSAdapter implements Adapter {
             NAME_FIELD.writeSafe(meta, nmsName);
         } catch (Exception ignored) {
         }
+    }
+
+    @Override
+    public byte[] serializeItem(ItemStack item) {
+        CompoundTag tag = (CompoundTag) CraftItemStack.asNMSCopy(item).save(REGISTRY_ACCESS);
+        return NBTHelper.toBytes(tag);
+    }
+
+    @Override
+    public ItemStack deserializeItem(byte[] bytes) {
+        CompoundTag compound = NBTHelper.fromBytes(bytes);
+        int dataVersion = compound.getInt("DataVersion");
+        Tag tag = DataFixers.getDataFixer().update(References.ITEM_STACK, new Dynamic<>(NBT_OPS, compound), dataVersion, NBTHelper.getDataVersion()).getValue();
+
+        return CraftItemStack.asCraftMirror(net.minecraft.world.item.ItemStack.parse(REGISTRY_ACCESS, tag).orElseThrow());
     }
 }

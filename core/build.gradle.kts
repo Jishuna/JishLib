@@ -5,6 +5,7 @@ plugins {
 
 dependencies {
     compileOnlyApi("org.spigotmc:spigot-api:1.21.3-R0.1-SNAPSHOT")
+    api("me.jishuna:genericdataapi-nbt:1.0.0-SNAPSHOT")
     api("net.kyori:adventure-text-minimessage:4.17.0")
     api("net.kyori:adventure-platform-bukkit:4.3.4")
 }

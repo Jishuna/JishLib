@@ -6,10 +6,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class JishlibPlugin extends JavaPlugin {
-    private static JishlibPlugin instance;
+    private static JishlibPlugin INSTANCE;
 
     public static JishlibPlugin instance() {
-        return instance;
+        return INSTANCE;
     }
 
     public void loaded() {
@@ -30,7 +30,7 @@ public class JishlibPlugin extends JavaPlugin {
 
     @Override
     public final void onLoad() {
-        instance = this;
+        INSTANCE = this;
         loaded();
     }
 
@@ -50,7 +50,7 @@ public class JishlibPlugin extends JavaPlugin {
     @Override
     public final void onDisable() {
         disabled();
-        instance = null;
+        INSTANCE = null;
 
         JishlibDisableEvent event = new JishlibDisableEvent();
         Bukkit.getPluginManager().callEvent(event);

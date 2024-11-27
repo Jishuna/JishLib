@@ -15,6 +15,10 @@ dependencies {
 subprojects {
     apply(plugin = "java-library")
 
+    repositories {
+        mavenLocal()
+    }
+
     dependencies {
         compileOnly(project(":core"))
     }

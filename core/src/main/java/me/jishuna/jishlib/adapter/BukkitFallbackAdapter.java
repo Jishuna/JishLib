@@ -4,6 +4,7 @@ import me.jishuna.jishlib.ComponentSerializers;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
@@ -61,5 +62,15 @@ public class BukkitFallbackAdapter implements Adapter {
         }
 
         meta.setDisplayName(ComponentSerializers.LEGACY_SERIALIZER.serialize(name));
+    }
+
+    @Override
+    public byte[] serializeItem(ItemStack item) {
+       throw new UnsupportedOperationException("Operation not supported by " + getClass().getName());
+    }
+
+    @Override
+    public ItemStack deserializeItem(byte[] bytes) {
+        throw new UnsupportedOperationException("Operation not supported by " + getClass().getName());
     }
 }

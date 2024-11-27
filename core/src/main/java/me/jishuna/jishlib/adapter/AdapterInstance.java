@@ -1,10 +1,12 @@
 package me.jishuna.jishlib.adapter;
 
+import me.jishuna.jishlib.JishlibPlugin;
 import me.jishuna.jishlib.util.MinecraftVersion;
 import me.jishuna.jishlib.util.SemanticVersion;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 final class AdapterInstance {
     private static final String path = "me.jishuna.jishlib.nms.%s.NMSAdapter";
@@ -19,7 +21,7 @@ final class AdapterInstance {
     static Adapter getAdapter() {
         if (adapter == null) {
             adapter = initAdapter();
-            System.out.println(adapter.getClass().getName());
+            JishlibPlugin.instance().getLogger().log(Level.INFO, "Active adapter: {0}", adapter.getClass().getName());
         }
         return adapter;
     }
