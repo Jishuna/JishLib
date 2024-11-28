@@ -4,6 +4,7 @@ import me.jishuna.jishlib.JishlibPlugin;
 import me.jishuna.jishlib.util.MinecraftVersion;
 import me.jishuna.jishlib.util.SemanticVersion;
 
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -32,7 +33,9 @@ final class AdapterInstance {
             return new BukkitFallbackAdapter();
         } else {
             try {
-                return (Adapter) Class.forName(path.formatted(adapterVersion)).getDeclaredConstructor().newInstance();
+                Constructor<?> constructor = Class.forName(path.formatted(adapterVersion)).getDeclaredConstructor();
+                constructor.setAccessible(true);
+                return (Adapter) constructor.newInstance();
             } catch (ReflectiveOperationException e) {
                 return new BukkitFallbackAdapter();
             }

@@ -10,9 +10,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class NBTHelper {
+    public static final int DATA_VERSION = SharedConstants.getCurrentVersion().getDataVersion().getVersion();
 
     public static byte[] toBytes(CompoundTag tag) {
-        tag.putInt("DataVersion", getDataVersion());
+        tag.putInt("DataVersion", DATA_VERSION);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
             net.minecraft.nbt.NbtIo.writeCompressed(tag, outputStream);
@@ -30,9 +31,5 @@ public class NBTHelper {
             throw new RuntimeException(ex);
         }
         return compound;
-    }
-
-    public static int getDataVersion() {
-        return SharedConstants.getCurrentVersion().getDataVersion().getVersion();
     }
 }

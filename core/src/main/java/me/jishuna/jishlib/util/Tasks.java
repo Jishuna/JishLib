@@ -8,6 +8,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
 public final class Tasks {
     public static BukkitTask run(Runnable task) {
@@ -34,6 +35,14 @@ public final class Tasks {
         return Bukkit.getScheduler().runTaskTimer(JishlibPlugin.instance(), task, delay, ticks);
     }
 
+    public static void runTimer(Consumer<BukkitTask> task, long ticks) {
+        runTimer(task, 0, ticks);
+    }
+
+    public static void runTimer(Consumer<BukkitTask> task, long delay, long ticks) {
+        Bukkit.getScheduler().runTaskTimer(JishlibPlugin.instance(), task, delay, ticks);
+    }
+
     public static BukkitTask runTimerAsync(Runnable task, long ticks) {
         return runTimerAsync(task, 0, ticks);
     }
@@ -42,11 +51,11 @@ public final class Tasks {
         return Bukkit.getScheduler().runTaskTimerAsynchronously(JishlibPlugin.instance(), task, delay, ticks);
     }
 
-    public <T> Future<T> callSync(Callable<T> callable) {
+    public static <T> Future<T> callSync(Callable<T> callable) {
         return Bukkit.getScheduler().callSyncMethod(JishlibPlugin.instance(), callable);
     }
 
-    public <T> CompletableFuture<T> completeSync(Callable<T> callable) {
+    public static <T> CompletableFuture<T> completeSync(Callable<T> callable) {
         return CompletableFuture.supplyAsync(() -> {
             Future<T> future = Bukkit.getScheduler().callSyncMethod(JishlibPlugin.instance(), callable);
             try {

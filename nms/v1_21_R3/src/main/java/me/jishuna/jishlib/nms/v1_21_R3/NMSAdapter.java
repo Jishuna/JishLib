@@ -31,9 +31,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class NMSAdapter implements Adapter {
+class NMSAdapter implements Adapter {
     private static final NbtOps NBT_OPS = NbtOps.INSTANCE;
     private static final RegistryAccess.Frozen REGISTRY_ACCESS = MinecraftServer.getServer().registryAccess();
+    private static final MinecraftComponentSerializer MINECRAFT_COMPONENT_SERIALIZER = MinecraftComponentSerializer.get();
 
     private static FieldAccess<net.minecraft.network.chat.Component> NAME_FIELD;
     private static FieldAccess<List> LORE_FIELD;
@@ -60,7 +61,7 @@ public class NMSAdapter implements Adapter {
             return;
         }
 
-        net.minecraft.network.chat.Component nmsComponent = (net.minecraft.network.chat.Component) MinecraftComponentSerializer.get().serialize(component);
+        net.minecraft.network.chat.Component nmsComponent = (net.minecraft.network.chat.Component) MINECRAFT_COMPONENT_SERIALIZER.serialize(component);
         nmsPlayer.connection.send(new ClientboundOpenScreenPacket(menu.containerId, type, nmsComponent));
         nmsPlayer.containerMenu = menu;
         nmsPlayer.initMenu(menu);
@@ -73,7 +74,7 @@ public class NMSAdapter implements Adapter {
             List<net.minecraft.network.chat.Component> nmsLore = (List<net.minecraft.network.chat.Component>) LORE_FIELD.readSafe(meta, null);
             if (nmsLore != null) {
                 for (net.minecraft.network.chat.Component component : nmsLore) {
-                    lore.add(MinecraftComponentSerializer.get().deserializeOr(component, Component.empty()));
+                    lore.add(MINECRAFT_COMPONENT_SERIALIZER.deserializeOr(component, Component.empty()));
                 }
 
             }
@@ -87,7 +88,7 @@ public class NMSAdapter implements Adapter {
         try {
             List<net.minecraft.network.chat.Component> nmsLore = new ArrayList<>();
             for (Component component : lore) {
-                Object nmsComponent = MinecraftComponentSerializer.get().serialize(component);
+                Object nmsComponent = MINECRAFT_COMPONENT_SERIALIZER.serialize(component);
                 if (nmsComponent instanceof net.minecraft.network.chat.Component nms) {
                     nmsLore.add(nms);
                 }
@@ -103,7 +104,7 @@ public class NMSAdapter implements Adapter {
     public Component getName(ItemMeta meta) {
         try {
             net.minecraft.network.chat.Component nmsName = NAME_FIELD.readSafe(meta, null);
-            return MinecraftComponentSerializer.get().deserializeOr(nmsName, null);
+            return MINECRAFT_COMPONENT_SERIALIZER.deserializeOr(nmsName, null);
         } catch (Exception ignored) {
         }
 
@@ -113,7 +114,7 @@ public class NMSAdapter implements Adapter {
     @Override
     public void setName(ItemMeta meta, Component name) {
         try {
-            net.minecraft.network.chat.Component nmsName = (net.minecraft.network.chat.Component) MinecraftComponentSerializer.get().serialize(name);
+            net.minecraft.network.chat.Component nmsName = (net.minecraft.network.chat.Component) MINECRAFT_COMPONENT_SERIALIZER.serialize(name);
             NAME_FIELD.writeSafe(meta, nmsName);
         } catch (Exception ignored) {
         }
@@ -129,7 +130,7 @@ public class NMSAdapter implements Adapter {
     public ItemStack deserializeItem(byte[] bytes) {
         CompoundTag compound = NBTHelper.fromBytes(bytes);
         int dataVersion = compound.getInt("DataVersion");
-        Tag tag = DataFixers.getDataFixer().update(References.ITEM_STACK, new Dynamic<>(NBT_OPS, compound), dataVersion, NBTHelper.getDataVersion()).getValue();
+        Tag tag = DataFixers.getDataFixer().update(References.ITEM_STACK, new Dynamic<>(NBT_OPS, compound), dataVersion, NBTHelper.DATA_VERSION).getValue();
 
         return CraftItemStack.asCraftMirror(net.minecraft.world.item.ItemStack.parse(REGISTRY_ACCESS, tag).orElseThrow());
     }
