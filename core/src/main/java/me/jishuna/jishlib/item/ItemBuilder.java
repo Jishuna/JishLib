@@ -2,13 +2,18 @@ package me.jishuna.jishlib.item;
 
 import me.jishuna.jishlib.ComponentSerializers;
 import me.jishuna.jishlib.adapter.Adapter;
+import me.jishuna.jishlib.util.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemRarity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.components.UseCooldownComponent;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Collection;
 import java.util.Set;
@@ -66,6 +71,16 @@ public class ItemBuilder {
         return this;
     }
 
+    public ItemBuilder enchant(Enchantment enchantment, int level) {
+        meta.addEnchant(enchantment, level, true);
+        return this;
+    }
+
+    public <P, C> ItemBuilder persistentData(Key key, PersistentDataType<P, C> type, C value) {
+        meta.getPersistentDataContainer().set(key.toBukkit(), type, value);
+        return this;
+    }
+
     public Set<ItemFlag> flags() {
         return meta.getItemFlags();
     }
@@ -104,6 +119,37 @@ public class ItemBuilder {
 
     public ItemBuilder model(NamespacedKey key) {
         meta.setItemModel(key);
+        return this;
+    }
+
+    public ItemBuilder cooldown(Key key, float seconds) {
+        UseCooldownComponent component = meta.getUseCooldown();
+        component.setCooldownGroup(key.toBukkit());
+        component.setCooldownSeconds(seconds);
+        meta.setUseCooldown(component);
+
+        return this;
+    }
+
+    public ItemRarity rarity() {
+        if (meta.hasRarity()) {
+            return meta.getRarity();
+        }
+
+        return null;
+    }
+
+    public ItemBuilder rarity(ItemRarity rarity) {
+        meta.setRarity(rarity);
+        return this;
+    }
+
+    public boolean glider() {
+        return meta.isGlider();
+    }
+
+    public ItemBuilder glider(boolean glider) {
+        meta.setGlider(glider);
         return this;
     }
 

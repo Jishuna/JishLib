@@ -5,9 +5,19 @@ import org.bukkit.NamespacedKey;
 import java.util.Objects;
 
 public class Key {
+    public static final String MINECRAFT = "minecraft";
+
     private final String namespace;
     private final String value;
     private NamespacedKey bukkit;
+
+    public static Key of(String namespace, String value) {
+        return new Key(namespace, value);
+    }
+
+    public static Key minecraft(String value) {
+        return new Key(MINECRAFT, value);
+    }
 
     public static Key of(String string) {
         String[] components = string.split(":", 3);
@@ -16,10 +26,6 @@ public class Key {
         }
 
         return new Key(components[0], components[1]);
-    }
-
-    public static Key of(String namespace, String value) {
-        return new Key(namespace, value);
     }
 
     private Key(String namespace, String value) {
