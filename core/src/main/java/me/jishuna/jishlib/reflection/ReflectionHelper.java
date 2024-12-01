@@ -4,6 +4,8 @@ import org.bukkit.Bukkit;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 
 public class ReflectionHelper {
     public static final String CRAFTBUKKIT_PACKAGE = Bukkit.getServer().getClass().getPackageName();
@@ -39,6 +41,37 @@ public class ReflectionHelper {
             throw new ReflectionException("Cannot find field with type " + type, e);
         }
         throw new ReflectionException("Cannot find field with type " + type);
+    }
+
+    public static <T> MethodAccess<T> getMethod(Class<?> target, Class<T> returnType, String name) throws ReflectionException {
+        for (Method method : target.getDeclaredMethods()) {
+            if (method.getName().equals(name) && method.getReturnType().equals(returnType)) {
+                method.setAccessible(true);
+                return new MethodAccess<>(returnType, method);
+            }
+        }
+
+        if (target.getSuperclass() != null) {
+            return getMethod(target.getSuperclass(), returnType, name);
+        }
+
+        throw new ReflectionException("Cannot find method with type " + returnType);
+    }
+
+    public static <T> MethodAccess<T> getMethod(Class<?> target, Class<T> returnType, int index, Class<?>... paramTypes) throws ReflectionException {
+        int i = index;
+        for (Method method : target.getDeclaredMethods()) {
+            if (method.getReturnType().equals(returnType) && Arrays.equals(method.getParameterTypes(), paramTypes)  && i-- <= 0) {
+                method.setAccessible(true);
+                return new MethodAccess<>(returnType, method);
+            }
+        }
+
+        if (target.getSuperclass() != null) {
+            return getMethod(target.getSuperclass(), returnType, index, paramTypes);
+        }
+
+        throw new ReflectionException("Cannot find method with type " + returnType);
     }
 
     public static Class<?> getClass(String... names) throws ReflectionException {

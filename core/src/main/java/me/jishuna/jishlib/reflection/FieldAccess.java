@@ -12,6 +12,14 @@ public class FieldAccess<T> {
         this.field = field;
     }
 
+    public Object readRaw(Object instance) throws ReflectionException {
+        try {
+            return field.get(instance);
+        } catch (Exception e) {
+            throw new ReflectionException("Failed to read field value", e);
+        }
+    }
+
     public T read(Object instance) throws ReflectionException {
         try {
             return this.clazz.cast(field.get(instance));

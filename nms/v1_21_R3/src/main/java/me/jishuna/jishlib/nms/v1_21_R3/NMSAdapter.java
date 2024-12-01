@@ -3,7 +3,6 @@ package me.jishuna.jishlib.nms.v1_21_R3;
 import com.mojang.serialization.Dynamic;
 import me.jishuna.jishlib.adapter.Adapter;
 import me.jishuna.jishlib.reflection.FieldAccess;
-import me.jishuna.jishlib.reflection.ReflectionException;
 import me.jishuna.jishlib.reflection.ReflectionHelper;
 import net.kyori.adventure.platform.bukkit.MinecraftComponentSerializer;
 import net.kyori.adventure.text.Component;
@@ -40,13 +39,9 @@ class NMSAdapter implements Adapter {
     private static FieldAccess<List> LORE_FIELD;
 
     static {
-        try {
-            Class<?> craftMetaItemClass = ReflectionHelper.getCraftClass(".inventory.CraftMetaItem");
-            NAME_FIELD = ReflectionHelper.getField(craftMetaItemClass, net.minecraft.network.chat.Component.class, "displayName");
-            LORE_FIELD = ReflectionHelper.getField(craftMetaItemClass, List.class, "lore");
-        } catch (ReflectionException e) {
-            e.printStackTrace();
-        }
+        Class<?> craftMetaItemClass = ReflectionHelper.getCraftClass(".inventory.CraftMetaItem");
+        NAME_FIELD = ReflectionHelper.getField(craftMetaItemClass, net.minecraft.network.chat.Component.class, "displayName");
+        LORE_FIELD = ReflectionHelper.getField(craftMetaItemClass, List.class, "lore");
     }
 
     @Override
