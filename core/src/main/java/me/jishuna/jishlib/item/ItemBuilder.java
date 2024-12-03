@@ -22,12 +22,14 @@ public class ItemBuilder {
     private final ItemStack item;
     private final ItemMeta meta;
     private Component name;
+    private Component displayName;
     private final Collection<Component> lore;
 
     private ItemBuilder(ItemStack item) {
         this.item = item;
         this.meta = item.getItemMeta();
         this.name = Adapter.get().getName(this.meta);
+        this.displayName = Adapter.get().getDisplayName(this.meta);
         this.lore = Adapter.get().getLore(this.meta);
     }
 
@@ -54,6 +56,20 @@ public class ItemBuilder {
 
     public ItemBuilder name(String name, TagResolver... resolvers) {
         this.name = ComponentSerializers.MINI_MESSAGE.deserialize(name, resolvers);
+        return this;
+    }
+
+    public Component displayName() {
+        return displayName;
+    }
+
+    public ItemBuilder displayName(Component name) {
+        this.displayName = name;
+        return this;
+    }
+
+    public ItemBuilder displayName(String name, TagResolver... resolvers) {
+        this.displayName = ComponentSerializers.MINI_MESSAGE.deserialize(name, resolvers);
         return this;
     }
 
@@ -155,6 +171,7 @@ public class ItemBuilder {
 
     public ItemStack build() {
         Adapter.get().setName(meta, name);
+        Adapter.get().setDisplayName(meta, name);
         Adapter.get().setLore(meta, lore);
 
         item.setItemMeta(meta);

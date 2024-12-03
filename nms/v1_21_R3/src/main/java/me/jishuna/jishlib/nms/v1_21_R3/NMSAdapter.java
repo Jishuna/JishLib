@@ -36,11 +36,13 @@ class NMSAdapter implements Adapter {
     private static final MinecraftComponentSerializer MINECRAFT_COMPONENT_SERIALIZER = MinecraftComponentSerializer.get();
 
     private static FieldAccess<net.minecraft.network.chat.Component> NAME_FIELD;
+    private static FieldAccess<net.minecraft.network.chat.Component> DISPLAY_NAME_FIELD;
     private static FieldAccess<List> LORE_FIELD;
 
     static {
         Class<?> craftMetaItemClass = ReflectionHelper.getCraftClass(".inventory.CraftMetaItem");
-        NAME_FIELD = ReflectionHelper.getField(craftMetaItemClass, net.minecraft.network.chat.Component.class, "displayName");
+        NAME_FIELD = ReflectionHelper.getField(craftMetaItemClass, net.minecraft.network.chat.Component.class, "itemName");
+        DISPLAY_NAME_FIELD = ReflectionHelper.getField(craftMetaItemClass, net.minecraft.network.chat.Component.class, "displayName");
         LORE_FIELD = ReflectionHelper.getField(craftMetaItemClass, List.class, "lore");
     }
 
@@ -111,6 +113,26 @@ class NMSAdapter implements Adapter {
         try {
             net.minecraft.network.chat.Component nmsName = (net.minecraft.network.chat.Component) MINECRAFT_COMPONENT_SERIALIZER.serialize(name);
             NAME_FIELD.writeSafe(meta, nmsName);
+        } catch (Exception ignored) {
+        }
+    }
+
+    @Override
+    public Component getDisplayName(ItemMeta meta) {
+        try {
+            net.minecraft.network.chat.Component nmsName = DISPLAY_NAME_FIELD.readSafe(meta, null);
+            return MINECRAFT_COMPONENT_SERIALIZER.deserializeOr(nmsName, null);
+        } catch (Exception ignored) {
+        }
+
+        return null;
+    }
+
+    @Override
+    public void setDisplayName(ItemMeta meta, Component name) {
+        try {
+            net.minecraft.network.chat.Component nmsName = (net.minecraft.network.chat.Component) MINECRAFT_COMPONENT_SERIALIZER.serialize(name);
+            DISPLAY_NAME_FIELD.writeSafe(meta, nmsName);
         } catch (Exception ignored) {
         }
     }

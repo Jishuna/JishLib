@@ -23,6 +23,10 @@ public interface Adapter {
 
     void setName(ItemMeta meta, Component name);
 
+    Component getDisplayName(ItemMeta meta);
+
+    void setDisplayName(ItemMeta meta, Component name);
+
     byte[] serializeItem(ItemStack item);
 
     ItemStack deserializeItem(byte[] bytes);

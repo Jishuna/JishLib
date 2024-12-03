@@ -48,6 +48,24 @@ public class BukkitFallbackAdapter implements Adapter {
 
     @Override
     public Component getName(ItemMeta meta) {
+        if (meta == null || !meta.hasItemName()) {
+            return null;
+        }
+
+        return ComponentSerializers.LEGACY_SERIALIZER.deserialize(meta.getItemName());
+    }
+
+    @Override
+    public void setName(ItemMeta meta, Component name) {
+        if (meta == null || name == null) {
+            return;
+        }
+
+        meta.setItemName(ComponentSerializers.LEGACY_SERIALIZER.serialize(name));
+    }
+
+    @Override
+    public Component getDisplayName(ItemMeta meta) {
         if (meta == null || !meta.hasDisplayName()) {
             return null;
         }
@@ -56,7 +74,7 @@ public class BukkitFallbackAdapter implements Adapter {
     }
 
     @Override
-    public void setName(ItemMeta meta, Component name) {
+    public void setDisplayName(ItemMeta meta, Component name) {
         if (meta == null || name == null) {
             return;
         }
