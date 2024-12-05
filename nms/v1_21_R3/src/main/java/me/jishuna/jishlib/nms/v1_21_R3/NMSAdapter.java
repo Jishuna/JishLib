@@ -35,9 +35,9 @@ class NMSAdapter implements Adapter {
     private static final RegistryAccess.Frozen REGISTRY_ACCESS = MinecraftServer.getServer().registryAccess();
     private static final MinecraftComponentSerializer MINECRAFT_COMPONENT_SERIALIZER = MinecraftComponentSerializer.get();
 
-    private static FieldAccess<net.minecraft.network.chat.Component> NAME_FIELD;
-    private static FieldAccess<net.minecraft.network.chat.Component> DISPLAY_NAME_FIELD;
-    private static FieldAccess<List> LORE_FIELD;
+    private static final FieldAccess<net.minecraft.network.chat.Component> NAME_FIELD;
+    private static final FieldAccess<net.minecraft.network.chat.Component> DISPLAY_NAME_FIELD;
+    private static final FieldAccess<List> LORE_FIELD;
 
     static {
         Class<?> craftMetaItemClass = ReflectionHelper.getCraftClass(".inventory.CraftMetaItem");

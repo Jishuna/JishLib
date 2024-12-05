@@ -11,6 +11,10 @@ public sealed class Position {
     public static final Position ZERO = new Position(0, 0, 0);
     public static final Position ONE = new Position(1, 1, 1);
 
+    public static Position of(Location location) {
+        return new Position(location.getX(), location.getY(), location.getZ());
+    }
+
     protected double x;
     protected double y;
     protected double z;
