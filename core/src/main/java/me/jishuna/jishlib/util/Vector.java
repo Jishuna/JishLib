@@ -7,74 +7,74 @@ import org.bukkit.util.NumberConversions;
 
 import java.util.Objects;
 
-public sealed class Position {
-    public static final Position ZERO = new Position(0, 0, 0);
-    public static final Position ONE = new Position(1, 1, 1);
+public sealed class Vector {
+    public static final Vector ZERO = new Vector(0, 0, 0);
+    public static final Vector ONE = new Vector(1, 1, 1);
 
-    public static Position of(Location location) {
-        return new Position(location.getX(), location.getY(), location.getZ());
+    public static Vector of(Location location) {
+        return new Vector(location.getX(), location.getY(), location.getZ());
     }
 
     protected double x;
     protected double y;
     protected double z;
 
-    public Position(double x, double y, double z) {
+    public Vector(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
     }
 
-    public Position(int x, int y, int z) {
+    public Vector(int x, int y, int z) {
         this.x = x;
         this.y = y;
         this.z = z;
     }
 
-    public Position(double value) {
+    public Vector(double value) {
         this.x = value;
         this.y = value;
         this.z = value;
     }
 
-    public Position set(double x, double y, double z) {
-        return new Position(x, y, z);
+    public Vector set(double x, double y, double z) {
+        return new Vector(x, y, z);
     }
 
-    public Position set(int x, int y, int z) {
-        return new Position(x, y, z);
+    public Vector set(int x, int y, int z) {
+        return new Vector(x, y, z);
     }
 
-    public Position add(double x, double y, double z) {
+    public Vector add(double x, double y, double z) {
         return set(this.x + x, this.y + y, this.z + z);
     }
 
-    public Position add(int x, int y, int z) {
+    public Vector add(int x, int y, int z) {
         return set(this.x + x, this.y + y, this.z + z);
     }
 
-    public Position add(Position other) {
+    public Vector add(Vector other) {
         return set(this.x + other.x, this.y + other.y, this.z + other.z);
     }
 
-    public Position sub(double x, double y, double z) {
+    public Vector sub(double x, double y, double z) {
         return set(this.x - x, this.y - y, this.z - z);
     }
 
-    public Position sub(int x, int y, int z) {
+    public Vector sub(int x, int y, int z) {
         return set(this.x - x, this.y - y, this.z - z);
     }
 
-    public Position sub(Position other) {
+    public Vector sub(Vector other) {
         return set(this.x - other.x, this.y - other.y, this.z - other.z);
     }
 
-    public Position relative(Direction direction) {
+    public Vector relative(Direction direction) {
         BlockFace face = direction.blockFace();
         return set(x + face.getModX(), y + face.getModY(), z + face.getModZ());
     }
 
-    public Position transform(Rotation rotation) {
+    public Vector transform(Rotation rotation) {
         return switch (rotation) {
             case COUNTERCLOCKWISE_90 -> set(z, y, -x);
             case CLOCKWISE_90 -> set(-z, y, x);
@@ -83,7 +83,7 @@ public sealed class Position {
         };
     }
 
-    public Position transform(Rotation rotation, Position pivot) {
+    public Vector transform(Rotation rotation, Vector pivot) {
         double pivotX = pivot.x();
         double pivotZ = pivot.z();
 
@@ -134,8 +134,8 @@ public sealed class Position {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Position position)) return false;
-        return Double.compare(x, position.x) == 0 && Double.compare(y, position.y) == 0 && Double.compare(z, position.z) == 0;
+        if (!(o instanceof Vector vector)) return false;
+        return Double.compare(x, vector.x) == 0 && Double.compare(y, vector.y) == 0 && Double.compare(z, vector.z) == 0;
     }
 
     @Override
@@ -148,7 +148,7 @@ public sealed class Position {
         return "Position[" + x + ", " + y + ", " + z + "]";
     }
 
-    public static final class Mutable extends Position {
+    public static final class Mutable extends Vector {
 
         public Mutable(double x, double y, double z) {
             super(x, y, z);
@@ -162,14 +162,14 @@ public sealed class Position {
             super(value);
         }
 
-        public Position set(double x, double y, double z) {
+        public Vector set(double x, double y, double z) {
             this.x = x;
             this.y = y;
             this.z = z;
             return this;
         }
 
-        public Position set(int x, int y, int z) {
+        public Vector set(int x, int y, int z) {
             this.x = x;
             this.y = y;
             this.z = z;
@@ -181,8 +181,8 @@ public sealed class Position {
             return this;
         }
 
-        public Position immutable() {
-            return new Position(x, y, z);
+        public Vector immutable() {
+            return new Vector(x, y, z);
         }
     }
 }

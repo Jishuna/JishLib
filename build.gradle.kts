@@ -5,9 +5,9 @@ plugins {
 }
 
 dependencies {
-  api(project(":core"))
-  api(project(":inventory"))
-  api(project(path = ":nms", configuration = "shadow"))
+    api(project(":core"))
+    api(project(":inventory"))
+    api(project(path = ":nms", configuration = "shadow"))
 }
 
 tasks.shadowJar {

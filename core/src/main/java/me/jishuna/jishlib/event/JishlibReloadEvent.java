@@ -4,7 +4,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
-public class JishlibReloadEvent extends Event  {
+public class JishlibReloadEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
 
     @NotNull

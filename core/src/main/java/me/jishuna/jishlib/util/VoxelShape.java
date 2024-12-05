@@ -7,8 +7,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class VoxelShape {
-    private final Position.Mutable minimumCorner = new Position.Mutable(Double.MAX_VALUE);
-    private final Position.Mutable maximumCorner = new Position.Mutable(Double.MIN_VALUE);
+    private final Vector.Mutable minimumCorner = new Vector.Mutable(Double.MAX_VALUE);
+    private final Vector.Mutable maximumCorner = new Vector.Mutable(Double.MIN_VALUE);
     private final Set<Cuboid> components = new HashSet<>();
 
     public boolean intersects(Cuboid cuboid) {
@@ -34,11 +34,11 @@ public class VoxelShape {
         }
     }
 
-    public Position getMinimumCorner() {
+    public Vector getMinimumCorner() {
         return minimumCorner.immutable();
     }
 
-    public Position getMaximumCorner() {
+    public Vector getMaximumCorner() {
         return maximumCorner.immutable();
     }
 

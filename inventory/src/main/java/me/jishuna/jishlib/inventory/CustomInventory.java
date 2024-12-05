@@ -1,15 +1,5 @@
 package me.jishuna.jishlib.inventory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.function.Consumer;
-
 import me.jishuna.jishlib.ComponentSerializers;
 import me.jishuna.jishlib.adapter.Adapter;
 import net.kyori.adventure.text.Component;
@@ -17,6 +7,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.*;
+import java.util.function.Consumer;
 
 public class CustomInventory {
     private final Map<Integer, Consumer<ClickContext>> buttons = new HashMap<>();

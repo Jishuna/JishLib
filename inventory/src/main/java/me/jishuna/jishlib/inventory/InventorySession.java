@@ -1,9 +1,10 @@
 package me.jishuna.jishlib.inventory;
 
+import me.jishuna.jishlib.util.Tasks;
+import org.bukkit.entity.Player;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
-import org.bukkit.entity.Player;
-import me.jishuna.jishlib.util.Tasks;
 
 public final class InventorySession {
     public enum State {

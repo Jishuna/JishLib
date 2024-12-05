@@ -4,12 +4,11 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 
 import java.util.Iterator;
 import java.util.Objects;
 
-public class Cuboid implements Iterable<Position> {
+public class Cuboid implements Iterable<Vector> {
     private double minX;
     private double minY;
     private double minZ;
@@ -33,7 +32,7 @@ public class Cuboid implements Iterable<Position> {
         this.maxZ = maxZ;
     }
 
-    public Cuboid(Position pos1, Position pos2) {
+    public Cuboid(Vector pos1, Vector pos2) {
         this(pos1.x(), pos1.y(), pos1.z(), pos2.x(), pos2.y(), pos2.z());
     }
 
@@ -47,8 +46,8 @@ public class Cuboid implements Iterable<Position> {
                 && z >= this.minZ && z < this.maxZ;
     }
 
-    public boolean contains(Position position) {
-        return contains(position.x(), position.y(), position.z());
+    public boolean contains(Vector vector) {
+        return contains(vector.x(), vector.y(), vector.z());
     }
 
     public boolean contains(Location location) {
@@ -56,14 +55,14 @@ public class Cuboid implements Iterable<Position> {
     }
 
     public void outline(Player player, Color color) {
-        Vector pointA = new Vector(this.minX, this.minY, this.minZ);
-        Vector pointB = new Vector(this.maxX, this.minY, this.maxZ);
-        Vector pointC = new Vector(this.maxX, this.maxY, this.minZ);
-        Vector pointD = new Vector(this.minX, this.maxY, this.maxZ);
+        org.bukkit.util.Vector pointA = new org.bukkit.util.Vector(this.minX, this.minY, this.minZ);
+        org.bukkit.util.Vector pointB = new org.bukkit.util.Vector(this.maxX, this.minY, this.maxZ);
+        org.bukkit.util.Vector pointC = new org.bukkit.util.Vector(this.maxX, this.maxY, this.minZ);
+        org.bukkit.util.Vector pointD = new org.bukkit.util.Vector(this.minX, this.maxY, this.maxZ);
 
-        Vector sizeX = new Vector(getWidthX(), 0, 0);
-        Vector sizeY = new Vector(0, getHeight(), 0);
-        Vector sizeZ = new Vector(0, 0, getWidthZ());
+        org.bukkit.util.Vector sizeX = new org.bukkit.util.Vector(getWidthX(), 0, 0);
+        org.bukkit.util.Vector sizeY = new org.bukkit.util.Vector(0, getHeight(), 0);
+        org.bukkit.util.Vector sizeZ = new org.bukkit.util.Vector(0, 0, getWidthZ());
 
         drawParticleLines(player, sizeX, 0.5, color, pointA, pointD);
         drawParticleLines(player, sizeY, 0.5, color, pointA, pointB);
@@ -74,12 +73,12 @@ public class Cuboid implements Iterable<Position> {
         drawParticleLines(player, sizeZ.clone().multiply(-1), 0.5, color, pointB, pointD);
     }
 
-    public Position getMinimumCorner() {
-        return new Position(minX, minY, minZ);
+    public Vector getMinimumCorner() {
+        return new Vector(minX, minY, minZ);
     }
 
-    public Position getMaximumCorner() {
-        return new Position(maxX, maxY, maxZ);
+    public Vector getMaximumCorner() {
+        return new Vector(maxX, maxY, maxZ);
     }
 
     public double getWidthX() {
@@ -123,7 +122,7 @@ public class Cuboid implements Iterable<Position> {
     }
 
     @Override
-    public Iterator<Position> iterator() {
+    public Iterator<Vector> iterator() {
         return new CuboidIterator(this);
     }
 
@@ -159,17 +158,17 @@ public class Cuboid implements Iterable<Position> {
         return "Cuboid [minX=" + this.minX + ", minY=" + this.minY + ", minZ=" + this.minZ + ", maxX=" + this.maxX + ", maxY=" + this.maxY + ", maxZ=" + this.maxZ + "]";
     }
 
-    private void drawParticleLines(Player player, Vector path, double spacing, Color color, Vector... origins) {
-        for (Vector origin : origins) {
+    private void drawParticleLines(Player player, org.bukkit.util.Vector path, double spacing, Color color, org.bukkit.util.Vector... origins) {
+        for (org.bukkit.util.Vector origin : origins) {
             for (double distance = 0; distance <= path.length(); distance += spacing) {
-                Vector position = origin.clone().add(path.clone().normalize().multiply(distance));
+                org.bukkit.util.Vector vector = origin.clone().add(path.clone().normalize().multiply(distance));
 
-                player.spawnParticle(Particle.DUST, position.toLocation(player.getWorld()), 1, new Particle.DustOptions(color, 1));
+                player.spawnParticle(Particle.DUST, vector.toLocation(player.getWorld()), 1, new Particle.DustOptions(color, 1));
             }
         }
     }
 
-    private static class CuboidIterator implements Iterator<Position> {
+    private static class CuboidIterator implements Iterator<Vector> {
 
         private final Cuboid cuboid;
         private int index;
@@ -184,14 +183,14 @@ public class Cuboid implements Iterable<Position> {
         }
 
         @Override
-        public Position next() {
+        public Vector next() {
             int x = (int) (this.index % this.cuboid.getWidthX() + this.cuboid.minX);
             int y = (int) (this.index / this.cuboid.getWidthX() % this.cuboid.getHeight() + this.cuboid.minY);
             int z = (int) (this.index / this.cuboid.getWidthX() / this.cuboid.getHeight() + this.cuboid.minZ);
 
             this.index++;
 
-            return new Position(x, y, z);
+            return new Vector(x, y, z);
         }
     }
 }

@@ -61,7 +61,7 @@ public class ReflectionHelper {
     public static <T> MethodAccess<T> getMethod(Class<?> target, Class<T> returnType, int index, Class<?>... paramTypes) throws ReflectionException {
         int i = index;
         for (Method method : target.getDeclaredMethods()) {
-            if (method.getReturnType().equals(returnType) && Arrays.equals(method.getParameterTypes(), paramTypes)  && i-- <= 0) {
+            if (method.getReturnType().equals(returnType) && Arrays.equals(method.getParameterTypes(), paramTypes) && i-- <= 0) {
                 method.setAccessible(true);
                 return new MethodAccess<>(returnType, method);
             }

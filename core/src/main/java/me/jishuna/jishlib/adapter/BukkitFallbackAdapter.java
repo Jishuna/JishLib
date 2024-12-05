@@ -84,7 +84,7 @@ public class BukkitFallbackAdapter implements Adapter {
 
     @Override
     public byte[] serializeItem(ItemStack item) {
-       throw new UnsupportedOperationException("Operation not supported by " + getClass().getName());
+        throw new UnsupportedOperationException("Operation not supported by " + getClass().getName());
     }
 
     @Override
