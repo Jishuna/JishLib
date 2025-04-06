@@ -1,15 +1,28 @@
 package me.jishuna.jishlib;
 
-import me.jishuna.jishlib.event.JishlibDisableEvent;
-import me.jishuna.jishlib.event.JishlibReloadEvent;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class JishlibPlugin extends JavaPlugin {
-    private static JishlibPlugin INSTANCE;
 
-    public static JishlibPlugin instance() {
-        return INSTANCE;
+    @Override
+    public final void onLoad() {
+        JishLib.setInstance(this);
+        loaded();
+    }
+
+    @Override
+    public final void onEnable() {
+        enabled();
+    }
+
+    @Override
+    public final void reloadConfig() {
+        reloaded();
+    }
+
+    @Override
+    public final void onDisable() {
+        disabled();
     }
 
     public void loaded() {
@@ -26,33 +39,5 @@ public class JishlibPlugin extends JavaPlugin {
 
     public void disabled() {
 
-    }
-
-    @Override
-    public final void onLoad() {
-        INSTANCE = this;
-        loaded();
-    }
-
-    @Override
-    public final void onEnable() {
-        enabled();
-    }
-
-    @Override
-    public final void reloadConfig() {
-        reloaded();
-
-        JishlibReloadEvent event = new JishlibReloadEvent();
-        Bukkit.getPluginManager().callEvent(event);
-    }
-
-    @Override
-    public final void onDisable() {
-        disabled();
-        INSTANCE = null;
-
-        JishlibDisableEvent event = new JishlibDisableEvent();
-        Bukkit.getPluginManager().callEvent(event);
     }
 }

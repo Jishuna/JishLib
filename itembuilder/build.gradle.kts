@@ -1,6 +1,5 @@
 plugins {
     id("java-library")
-    id("com.gradleup.shadow") version "8.3.5"
     id("maven-publish")
 }
 
@@ -8,19 +7,14 @@ dependencies {
     api(project(":core"))
 }
 
-tasks.shadowJar {
-    archiveClassifier = ""
-    archiveVersion = ""
-}
-
 publishing {
     publications {
-        create<MavenPublication>("All") {
+        create<MavenPublication>("ItemBuilder") {
             groupId = gradle.rootProject.group.toString()
-            artifactId = gradle.rootProject.name
+            artifactId = gradle.rootProject.name + "-itembuilder"
             version = gradle.rootProject.version.toString()
 
-            from(components["shadow"])
+            from(components["java"])
         }
     }
 }

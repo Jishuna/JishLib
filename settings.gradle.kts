@@ -15,8 +15,5 @@ dependencyResolutionManagement {
 }
 
 include("core")
-include("inventory")
-include("pdc")
-include("nms")
-include("nms:v1_21_R3")
-findProject(":nms:v1_21_R3")?.name = "v1_21_R3"
+include("itembuilder")
+include("itembuilder")
