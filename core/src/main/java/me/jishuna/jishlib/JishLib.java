@@ -21,7 +21,7 @@ public class JishLib {
     public static Adapter adapter() {
         if (adapter == null) {
             adapter = initAdapter();
-            logger().log(Level.INFO, "Active adapter: {0}", adapter.getClass().getName());
+            logger().log(Level.INFO, "Active adapter: {0}", adapter.getAdapterName());
         }
 
         return adapter;

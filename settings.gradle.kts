@@ -15,5 +15,3 @@ dependencyResolutionManagement {
 }
 
 include("core")
-include("itembuilder")
-include("itembuilder")

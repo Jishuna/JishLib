@@ -1,6 +1,6 @@
 package me.jishuna.jishlib.inventory;
 
-import me.jishuna.jishlib.JishlibPlugin;
+import me.jishuna.jishlib.JishLib;
 import me.jishuna.jishlib.event.JishlibDisableEvent;
 import me.jishuna.jishlib.event.JishlibReloadEvent;
 import org.bukkit.Bukkit;
@@ -27,8 +27,8 @@ public class InventoryManager implements Listener {
     private final Map<UUID, InventorySession> inventoryMap = new HashMap<>();
 
     private InventoryManager() {
-        Bukkit.getPluginManager().registerEvents(this, JishlibPlugin.instance());
-        Bukkit.getPluginManager().registerEvents(new CustomInventoryListener(this), JishlibPlugin.instance());
+        Bukkit.getPluginManager().registerEvents(this, JishLib.instance());
+        Bukkit.getPluginManager().registerEvents(new CustomInventoryListener(this), JishLib.instance());
     }
 
     public InventorySession getSession(HumanEntity entity) {

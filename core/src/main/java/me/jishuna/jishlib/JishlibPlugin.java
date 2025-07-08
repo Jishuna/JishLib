@@ -7,37 +7,37 @@ public class JishlibPlugin extends JavaPlugin {
     @Override
     public final void onLoad() {
         JishLib.setInstance(this);
-        loaded();
+        pluginLoaded();
     }
 
     @Override
     public final void onEnable() {
-        enabled();
+        pluginEnabled();
     }
 
     @Override
     public final void reloadConfig() {
-        reloaded();
+        pluginReloaded();
     }
 
     @Override
     public final void onDisable() {
-        disabled();
+        pluginDisabled();
     }
 
-    public void loaded() {
-
-    }
-
-    public void enabled() {
+    public void pluginLoaded() {
 
     }
 
-    public void reloaded() {
+    public void pluginEnabled() {
 
     }
 
-    public void disabled() {
+    public void pluginReloaded() {
+
+    }
+
+    public void pluginDisabled() {
 
     }
 }

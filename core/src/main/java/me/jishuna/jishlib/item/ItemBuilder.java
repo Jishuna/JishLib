@@ -1,4 +1,4 @@
-package me.jishuna.jishlib.itembuilder;
+package me.jishuna.jishlib.item;
 
 import me.jishuna.jishlib.ComponentSerializers;
 import me.jishuna.jishlib.JishLib;

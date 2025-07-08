@@ -1,7 +1,7 @@
 package me.jishuna.jishlib.inventory;
 
 import me.jishuna.jishlib.ComponentSerializers;
-import me.jishuna.jishlib.adapter.Adapter;
+import me.jishuna.jishlib.JishLib;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
@@ -110,7 +110,7 @@ public class CustomInventory {
     }
 
     protected final void open(HumanEntity target) {
-        Adapter.get().openInventory(target, inventory, title);
+        JishLib.adapter().openInventory(target, inventory, title);
     }
 
     final void consumeClickEvent(ClickContext context) {

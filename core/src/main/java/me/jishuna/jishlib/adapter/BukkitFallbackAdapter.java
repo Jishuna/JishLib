@@ -2,6 +2,8 @@ package me.jishuna.jishlib.adapter;
 
 import me.jishuna.jishlib.ComponentSerializers;
 import net.kyori.adventure.text.Component;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
@@ -9,6 +11,11 @@ import java.util.Collection;
 import java.util.List;
 
 public class BukkitFallbackAdapter implements Adapter {
+
+    @Override
+    public String getAdapterName() {
+        return "Bukkit Fallback Adapter";
+    }
 
     @Override
     public Collection<Component> getLore(ItemMeta meta) {
@@ -73,5 +80,10 @@ public class BukkitFallbackAdapter implements Adapter {
         }
 
         meta.setDisplayName(ComponentSerializers.LEGACY_SERIALIZER.serialize(name));
+    }
+
+    @Override
+    public void openInventory(HumanEntity target, Inventory inventory, Component title) {
+        target.openInventory(inventory);
     }
 }
