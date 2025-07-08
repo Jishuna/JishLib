@@ -125,6 +125,7 @@ public abstract class ReloadableDataHolder<T> {
             }
 
             data.set(path, obj, replace);
+            data.setComments(path, field.getComments());
         }
 
         try {

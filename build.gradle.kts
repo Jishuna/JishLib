@@ -4,6 +4,14 @@ plugins {
     id("maven-publish")
 }
 
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor(0, "seconds")
+}
+
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
+}
+
 dependencies {
     api(project(":core"))
 }
